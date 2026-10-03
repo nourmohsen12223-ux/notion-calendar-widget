@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,14 +9,21 @@
 
 <style>
 
+/* =====================================================
+   BASE
+===================================================== */
+
 * {
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
-    background: #ffffff;
+
+    background: transparent;
+
     color: #37352f;
 
     font-family:
@@ -28,100 +36,167 @@ html, body {
 }
 
 body {
-    padding: 20px 22px 26px;
+    padding: 12px;
 }
 
 
-/* =========================
+/* =====================================================
+   MAIN ROUNDED CONTAINER
+===================================================== */
+
+.widget-container {
+
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #e9e9e7;
+
+    border-radius: 14px;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
    HEADER
-========================= */
+===================================================== */
 
 .header {
-    margin-bottom: 18px;
+
+    padding: 20px 22px 17px;
 }
 
 .title {
+
     font-size: 26px;
+
     font-weight: 600;
+
     letter-spacing: -0.4px;
+
     line-height: 1.2;
+
     color: #37352f;
 }
 
 .date {
+
     margin-top: 5px;
 
     font-size: 13px;
+
     color: #9b9a97;
 }
 
 
-/* =========================
-   EVENT LIST
-========================= */
+/* =====================================================
+   EVENTS
+===================================================== */
 
 .events {
+
     width: 100%;
+
     border-top: 1px solid #e9e9e7;
 }
 
+
+/* =====================================================
+   INDIVIDUAL EVENT
+===================================================== */
+
 .event {
+
     position: relative;
 
     display: grid;
-    grid-template-columns: 92px 14px minmax(0, 1fr);
+
+    grid-template-columns:
+        92px
+        18px
+        minmax(0, 1fr);
+
     align-items: center;
 
-    min-height: 62px;
+    min-height: 66px;
 
-    padding: 10px 6px 10px 0;
+    padding: 10px 22px;
 
     border-bottom: 1px solid #e9e9e7;
 
-    transition: background 0.15s ease;
+    background: #ffffff;
+
+    transition:
+        background 0.15s ease;
 }
 
+
+/*
+Remove divider from final event
+*/
+
+.event:last-child {
+
+    border-bottom: none;
+}
+
+
+/*
+Subtle hover
+*/
+
 .event:hover {
+
     background: #fafaf9;
 }
 
 
-/* =========================
+/* =====================================================
    TIME
-========================= */
+===================================================== */
 
 .time-column {
-    padding-left: 3px;
 
     font-size: 12px;
-    color: #787774;
 
     line-height: 1.35;
+
+    color: #787774;
 }
 
 .start-time {
-    font-weight: 500;
+
     color: #37352f;
+
+    font-weight: 500;
 }
 
 .end-time {
+
     margin-top: 2px;
+
     color: #9b9a97;
 }
 
 
-/* =========================
-   CALENDAR COLOR
-========================= */
+/* =====================================================
+   CALENDAR COLOR DOT
+===================================================== */
 
 .dot-column {
+
     display: flex;
+
     align-items: center;
+
     justify-content: flex-start;
 }
 
 .calendar-dot {
+
     width: 8px;
+
     height: 8px;
 
     border-radius: 50%;
@@ -130,79 +205,110 @@ body {
 }
 
 
-/* =========================
+/* =====================================================
    EVENT INFORMATION
-========================= */
+===================================================== */
 
 .event-content {
+
     min-width: 0;
 }
 
 .event-title {
+
+    display: flex;
+
+    align-items: center;
+
+    min-width: 0;
+
     font-size: 14px;
+
     font-weight: 500;
 
     color: #37352f;
+}
+
+.event-title-text {
 
     white-space: nowrap;
+
     overflow: hidden;
+
     text-overflow: ellipsis;
 }
 
 .event-meta {
+
     margin-top: 4px;
 
     display: flex;
+
     align-items: center;
+
     gap: 6px;
 
-    font-size: 11px;
-    color: #9b9a97;
-
     min-width: 0;
+
+    font-size: 11px;
+
+    color: #9b9a97;
 }
 
 .calendar-name {
+
     white-space: nowrap;
+
     overflow: hidden;
+
     text-overflow: ellipsis;
 }
 
 
-/* =========================
-   ALL DAY
-========================= */
+/* =====================================================
+   ALL-DAY EVENT
+===================================================== */
 
 .all-day {
+
     color: #787774;
+
     font-weight: 500;
 }
 
 
-/* =========================
+/* =====================================================
    CURRENT EVENT
-========================= */
+===================================================== */
 
 .event.current {
+
     background: #fafaf9;
 }
 
 .now {
+
     display: inline-flex;
+
     align-items: center;
 
-    margin-left: 7px;
+    flex-shrink: 0;
 
-    font-size: 10px;
-    font-weight: 600;
+    margin-left: 8px;
 
     color: #eb5757;
+
+    font-size: 10px;
+
+    font-weight: 600;
 
     letter-spacing: 0.3px;
 }
 
 .now-dot {
+
     width: 6px;
+
     height: 6px;
 
     margin-right: 4px;
@@ -213,96 +319,147 @@ body {
 }
 
 
-/* =========================
-   STATUS
-========================= */
+/* =====================================================
+   LOADING / EMPTY / ERROR
+===================================================== */
 
 .status {
-    padding: 38px 10px;
+
+    padding: 38px 20px;
+
+    border-top: 1px solid #e9e9e7;
 
     text-align: center;
 
     color: #9b9a97;
-    font-size: 13px;
 
-    border-top: 1px solid #e9e9e7;
+    font-size: 13px;
 }
 
 .error {
+
     color: #eb5757;
 }
 
 
-/* =========================
+/* =====================================================
    RESPONSIVE
-========================= */
+===================================================== */
 
 @media (max-width: 500px) {
 
     body {
-        padding: 15px;
+
+        padding: 8px;
     }
 
+
+    .header {
+
+        padding:
+            17px
+            17px
+            14px;
+    }
+
+
     .title {
+
         font-size: 22px;
     }
 
+
     .event {
-        grid-template-columns: 78px 13px minmax(0, 1fr);
+
+        grid-template-columns:
+            76px
+            16px
+            minmax(0, 1fr);
+
+        padding:
+            9px
+            17px;
     }
 
 }
 
 </style>
+
 </head>
 
 
 <body>
 
-<div class="header">
 
-    <div class="title">
-        Today's Events
+<div class="widget-container">
+
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <div class="header">
+
+        <div class="title">
+            Today's Events
+        </div>
+
+
+        <div
+            id="todayDate"
+            class="date"
+        ></div>
+
     </div>
 
+
+
+    <!-- =================================================
+         LOADING / EMPTY STATUS
+    ================================================== -->
+
     <div
-        id="todayDate"
-        class="date"
+        id="status"
+        class="status"
+    >
+        Loading today's events…
+    </div>
+
+
+
+    <!-- =================================================
+         EVENTS
+    ================================================== -->
+
+    <div
+        id="events"
+        class="events"
+        style="display:none;"
     ></div>
 
+
 </div>
 
-
-<div
-    id="status"
-    class="status"
->
-    Loading today's events…
-</div>
-
-
-<div
-    id="events"
-    class="events"
-    style="display:none;"
-></div>
 
 
 <script>
 
-/* ==========================================
-   BACKEND
-========================================== */
+/* =====================================================
+   CLOUDFLARE BACKEND
+===================================================== */
 
 const API_URL =
     "https://notion-calendar-api.nourmohsen12223.workers.dev/events";
 
 
-/* ==========================================
-   DATE HEADER
-========================================== */
 
-const today = new Date();
+/* =====================================================
+   TODAY'S DATE
+===================================================== */
+
+const today =
+    new Date();
+
 
 document.getElementById(
     "todayDate"
@@ -319,29 +476,47 @@ document.getElementById(
     );
 
 
-/* ==========================================
-   LOAD TODAY
-========================================== */
+
+/* =====================================================
+   LOAD TODAY'S EVENTS
+===================================================== */
 
 async function loadToday() {
 
+
     const status =
-        document.getElementById("status");
+        document.getElementById(
+            "status"
+        );
+
 
     const container =
-        document.getElementById("events");
+        document.getElementById(
+            "events"
+        );
 
+
+    /* Start of today */
 
     const start =
         new Date();
 
+
     start.setHours(
-        0, 0, 0, 0
+        0,
+        0,
+        0,
+        0
     );
 
 
+    /* Start of tomorrow */
+
     const end =
-        new Date(start);
+        new Date(
+            start
+        );
+
 
     end.setDate(
         end.getDate() + 1
@@ -350,13 +525,18 @@ async function loadToday() {
 
     try {
 
+
         const url =
-            new URL(API_URL);
+            new URL(
+                API_URL
+            );
+
 
         url.searchParams.set(
             "timeMin",
             start.toISOString()
         );
+
 
         url.searchParams.set(
             "timeMax",
@@ -368,6 +548,7 @@ async function loadToday() {
             await fetch(
                 url.toString()
             );
+
 
         const data =
             await response.json();
@@ -387,381 +568,534 @@ async function loadToday() {
             data.events || [];
 
 
-        if (events.length === 0) {
+        /* ---------------------------------------------
+           NO EVENTS
+        --------------------------------------------- */
+
+        if (
+            events.length === 0
+        ) {
+
+
+            container.style.display =
+                "none";
+
 
             status.style.display =
                 "block";
 
+
+            status.className =
+                "status";
+
+
             status.textContent =
                 "No events today.";
 
-            container.style.display =
-                "none";
 
             return;
 
         }
 
 
+        /* ---------------------------------------------
+           EVENTS FOUND
+        --------------------------------------------- */
+
         status.style.display =
             "none";
+
 
         container.style.display =
             "block";
 
 
-        renderEvents(events);
+        renderEvents(
+            events
+        );
+
 
     }
 
     catch (error) {
 
-        console.error(error);
+
+        console.error(
+            error
+        );
+
+
+        container.style.display =
+            "none";
+
+
+        status.style.display =
+            "block";
+
 
         status.className =
             "status error";
 
+
         status.textContent =
             "Unable to load today's events.";
+
 
     }
 
 }
 
 
-/* ==========================================
-   RENDER EVENTS
-========================================== */
 
-function renderEvents(events) {
+/* =====================================================
+   RENDER EVENTS
+===================================================== */
+
+function renderEvents(
+    events
+) {
+
 
     const container =
         document.getElementById(
             "events"
         );
 
-    container.innerHTML = "";
+
+    container.innerHTML =
+        "";
 
 
-    events.forEach(event => {
-
-        const card =
-            document.createElement(
-                "div"
-            );
-
-        card.className =
-            "event";
+    events.forEach(
+        event => {
 
 
-        let isCurrent = false;
+            /* =========================================
+               EVENT ROW
+            ========================================= */
 
-
-        if (
-            event.start?.dateTime &&
-            event.end?.dateTime
-        ) {
-
-            const now =
-                new Date();
-
-            const eventStart =
-                new Date(
-                    event.start.dateTime
-                );
-
-            const eventEnd =
-                new Date(
-                    event.end.dateTime
-                );
-
-
-            if (
-                now >= eventStart &&
-                now < eventEnd
-            ) {
-
-                isCurrent = true;
-
-                card.classList.add(
-                    "current"
-                );
-
-            }
-
-        }
-
-
-        /* ==========================
-           TIME COLUMN
-        ========================== */
-
-        const timeColumn =
-            document.createElement(
-                "div"
-            );
-
-        timeColumn.className =
-            "time-column";
-
-
-        if (event.start?.dateTime) {
-
-            const startTime =
-                new Date(
-                    event.start.dateTime
-                );
-
-            const endTime =
-                event.end?.dateTime
-                    ? new Date(
-                        event.end.dateTime
-                    )
-                    : null;
-
-
-            const startDiv =
+            const card =
                 document.createElement(
                     "div"
                 );
 
-            startDiv.className =
-                "start-time";
 
-            startDiv.textContent =
-                formatTime(
-                    startTime
+            card.className =
+                "event";
+
+
+            let isCurrent =
+                false;
+
+
+
+            /* =========================================
+               CHECK IF EVENT IS HAPPENING NOW
+            ========================================= */
+
+            if (
+                event.start?.dateTime &&
+                event.end?.dateTime
+            ) {
+
+
+                const now =
+                    new Date();
+
+
+                const eventStart =
+                    new Date(
+                        event.start.dateTime
+                    );
+
+
+                const eventEnd =
+                    new Date(
+                        event.end.dateTime
+                    );
+
+
+                if (
+                    now >= eventStart &&
+                    now < eventEnd
+                ) {
+
+
+                    isCurrent =
+                        true;
+
+
+                    card.classList.add(
+                        "current"
+                    );
+
+
+                }
+
+            }
+
+
+
+            /* =========================================
+               TIME COLUMN
+            ========================================= */
+
+            const timeColumn =
+                document.createElement(
+                    "div"
                 );
 
 
-            timeColumn.appendChild(
-                startDiv
-            );
+            timeColumn.className =
+                "time-column";
 
 
-            if (endTime) {
+            if (
+                event.start?.dateTime
+            ) {
 
-                const endDiv =
+
+                const startTime =
+                    new Date(
+                        event.start.dateTime
+                    );
+
+
+                const endTime =
+                    event.end?.dateTime
+                        ?
+                        new Date(
+                            event.end.dateTime
+                        )
+                        :
+                        null;
+
+
+
+                /* START TIME */
+
+                const startDiv =
                     document.createElement(
                         "div"
                     );
 
-                endDiv.className =
-                    "end-time";
 
-                endDiv.textContent =
+                startDiv.className =
+                    "start-time";
+
+
+                startDiv.textContent =
                     formatTime(
-                        endTime
+                        startTime
                     );
 
+
                 timeColumn.appendChild(
-                    endDiv
+                    startDiv
                 );
+
+
+
+                /* END TIME */
+
+                if (
+                    endTime
+                ) {
+
+
+                    const endDiv =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    endDiv.className =
+                        "end-time";
+
+
+                    endDiv.textContent =
+                        formatTime(
+                            endTime
+                        );
+
+
+                    timeColumn.appendChild(
+                        endDiv
+                    );
+
+
+                }
+
 
             }
 
-        }
+            else {
 
-        else {
 
-            const allDay =
+                /* ALL-DAY EVENT */
+
+                const allDay =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                allDay.className =
+                    "all-day";
+
+
+                allDay.textContent =
+                    "All day";
+
+
+                timeColumn.appendChild(
+                    allDay
+                );
+
+
+            }
+
+
+
+            /* =========================================
+               CALENDAR COLOR DOT
+            ========================================= */
+
+            const dotColumn =
                 document.createElement(
                     "div"
                 );
 
-            allDay.className =
-                "all-day";
 
-            allDay.textContent =
-                "All day";
+            dotColumn.className =
+                "dot-column";
 
-            timeColumn.appendChild(
-                allDay
+
+            const dot =
+                document.createElement(
+                    "div"
+                );
+
+
+            dot.className =
+                "calendar-dot";
+
+
+            dot.style.backgroundColor =
+                event.calendarColor ||
+                "#9b9a97";
+
+
+            dotColumn.appendChild(
+                dot
             );
 
-        }
 
 
-        /* ==========================
-           COLOR DOT
-        ========================== */
+            /* =========================================
+               EVENT CONTENT
+            ========================================= */
 
-        const dotColumn =
-            document.createElement(
-                "div"
-            );
-
-        dotColumn.className =
-            "dot-column";
+            const content =
+                document.createElement(
+                    "div"
+                );
 
 
-        const dot =
-            document.createElement(
-                "div"
-            );
-
-        dot.className =
-            "calendar-dot";
-
-        dot.style.backgroundColor =
-            event.calendarColor ||
-            "#9b9a97";
+            content.className =
+                "event-content";
 
 
-        dotColumn.appendChild(
-            dot
-        );
+
+            /* =========================================
+               EVENT TITLE
+            ========================================= */
+
+            const title =
+                document.createElement(
+                    "div"
+                );
 
 
-        /* ==========================
-           CONTENT
-        ========================== */
-
-        const content =
-            document.createElement(
-                "div"
-            );
-
-        content.className =
-            "event-content";
+            title.className =
+                "event-title";
 
 
-        const title =
-            document.createElement(
-                "div"
-            );
-
-        title.className =
-            "event-title";
-
-
-        const titleText =
-            document.createElement(
-                "span"
-            );
-
-        titleText.textContent =
-            event.summary ||
-            "Event";
-
-
-        title.appendChild(
-            titleText
-        );
-
-
-        /* NOW */
-
-        if (isCurrent) {
-
-            const now =
+            const titleText =
                 document.createElement(
                     "span"
                 );
 
-            now.className =
-                "now";
+
+            titleText.className =
+                "event-title-text";
 
 
-            const nowDot =
-                document.createElement(
-                    "span"
-                );
-
-            nowDot.className =
-                "now-dot";
-
-
-            now.appendChild(
-                nowDot
-            );
-
-            now.appendChild(
-                document.createTextNode(
-                    "NOW"
-                )
-            );
+            titleText.textContent =
+                event.summary ||
+                "Event";
 
 
             title.appendChild(
-                now
+                titleText
             );
 
-        }
 
 
-        /* META */
+            /* =========================================
+               NOW INDICATOR
+            ========================================= */
 
-        const meta =
-            document.createElement(
-                "div"
-            );
-
-        meta.className =
-            "event-meta";
+            if (
+                isCurrent
+            ) {
 
 
-        if (event.calendarName) {
+                const now =
+                    document.createElement(
+                        "span"
+                    );
 
-            const calendarName =
-                document.createElement(
-                    "span"
+
+                now.className =
+                    "now";
+
+
+                const nowDot =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                nowDot.className =
+                    "now-dot";
+
+
+                now.appendChild(
+                    nowDot
                 );
 
-            calendarName.className =
-                "calendar-name";
 
-            calendarName.textContent =
-                event.calendarName;
+                now.appendChild(
+                    document.createTextNode(
+                        "NOW"
+                    )
+                );
 
 
-            meta.appendChild(
-                calendarName
+                title.appendChild(
+                    now
+                );
+
+
+            }
+
+
+
+            /* =========================================
+               CALENDAR NAME
+            ========================================= */
+
+            const meta =
+                document.createElement(
+                    "div"
+                );
+
+
+            meta.className =
+                "event-meta";
+
+
+            if (
+                event.calendarName
+            ) {
+
+
+                const calendarName =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                calendarName.className =
+                    "calendar-name";
+
+
+                calendarName.textContent =
+                    event.calendarName;
+
+
+                meta.appendChild(
+                    calendarName
+                );
+
+
+            }
+
+
+
+            /* =========================================
+               BUILD CONTENT
+            ========================================= */
+
+            content.appendChild(
+                title
             );
 
+
+            if (
+                event.calendarName
+            ) {
+
+
+                content.appendChild(
+                    meta
+                );
+
+
+            }
+
+
+
+            /* =========================================
+               BUILD EVENT ROW
+            ========================================= */
+
+            card.appendChild(
+                timeColumn
+            );
+
+
+            card.appendChild(
+                dotColumn
+            );
+
+
+            card.appendChild(
+                content
+            );
+
+
+            container.appendChild(
+                card
+            );
+
+
         }
-
-
-        content.appendChild(
-            title
-        );
-
-        content.appendChild(
-            meta
-        );
-
-
-        /* ==========================
-           BUILD
-        ========================== */
-
-        card.appendChild(
-            timeColumn
-        );
-
-        card.appendChild(
-            dotColumn
-        );
-
-        card.appendChild(
-            content
-        );
-
-
-        container.appendChild(
-            card
-        );
-
-    });
+    );
 
 }
 
 
-/* ==========================================
-   FORMAT TIME
-========================================== */
 
-function formatTime(date) {
+/* =====================================================
+   FORMAT TIME
+===================================================== */
+
+function formatTime(
+    date
+) {
+
 
     return date.toLocaleTimeString(
         [],
@@ -771,16 +1105,20 @@ function formatTime(date) {
         }
     );
 
+
 }
 
 
-/* ==========================================
-   START
-========================================== */
+
+/* =====================================================
+   START AUTOMATICALLY
+===================================================== */
 
 loadToday();
 
 </script>
 
+
 </body>
+
 </html>
