@@ -7,8 +7,6 @@
 
 <title>Calendar</title>
 
-<script src="https://accounts.google.com/gsi/client"></script>
-
 <style>
 
 /* =====================================================
@@ -54,30 +52,21 @@ body {
     margin-bottom: 14px;
 }
 
-
-/* MONTH + YEAR */
-
 .month-title {
     font-size: 35px;
-    font-weight: 600;
+    font-weight: 800;
 
     color: #37352f;
 
     letter-spacing: -0.4px;
-
     line-height: 1.2;
 }
-
-
-/* NAVIGATION */
 
 .controls {
     display: flex;
     align-items: center;
-
     gap: 5px;
 }
-
 
 .control-button {
     height: 34px;
@@ -101,11 +90,9 @@ body {
     cursor: pointer;
 }
 
-
 .control-button:hover {
     background: #f1f1ef;
 }
-
 
 .today-button {
     color: #37352f;
@@ -127,7 +114,6 @@ body {
     grid-template-columns:
         repeat(7, minmax(0, 1fr));
 }
-
 
 .weekday {
     height: 34px;
@@ -166,7 +152,6 @@ body {
     position: relative;
 
     min-width: 0;
-
     height: 135px;
 
     padding: 8px 9px 7px;
@@ -179,21 +164,17 @@ body {
     overflow: hidden;
 }
 
-
-/* WEEKENDS */
-
 .day.weekend {
     background: #fafaf9;
 }
 
 
 /* =====================================================
-   DATE NUMBER
+   DATE
 ===================================================== */
 
 .date-row {
     display: flex;
-
     justify-content: flex-end;
     align-items: center;
 
@@ -201,7 +182,6 @@ body {
 
     margin-bottom: 4px;
 }
-
 
 .day-number {
     height: 28px;
@@ -221,9 +201,6 @@ body {
     font-weight: 400;
 }
 
-
-/* PREVIOUS / NEXT MONTH */
-
 .other-month .day-number {
     color: #b4b4b1;
 }
@@ -240,7 +217,6 @@ body {
     padding: 0;
 
     background: #eb5757;
-
     color: #ffffff;
 
     font-weight: 600;
@@ -255,17 +231,14 @@ body {
     width: 100%;
 }
 
-
 .event {
     width: 100%;
-
     min-height: 21px;
 
     display: flex;
     align-items: center;
 
     padding: 3px 6px;
-
     margin-bottom: 3px;
 
     border-radius: 3px;
@@ -274,12 +247,9 @@ body {
     line-height: 15px;
 
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
 }
-
 
 .event-time {
     margin-right: 5px;
@@ -290,17 +260,13 @@ body {
     flex-shrink: 0;
 }
 
-
 .event-title {
     min-width: 0;
 
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
 }
-
 
 .more {
     padding: 3px 5px;
@@ -312,57 +278,21 @@ body {
 
 
 /* =====================================================
-   LOGIN
+   LOADING / ERROR
 ===================================================== */
 
-.login-screen {
-    min-height: 280px;
+.status {
+    padding: 40px 20px;
 
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-    justify-content: center;
-}
-
-
-.connect-button {
-    padding: 9px 16px;
-
-    background: #ffffff;
-
-    border: 1px solid #e3e3e1;
-
-    border-radius: 5px;
-
-    color: #37352f;
-
-    font-size: 14px;
-
-    cursor: pointer;
-}
-
-
-.connect-button:hover {
-    background: #f7f7f5;
-}
-
-
-.login-message {
-    margin-top: 10px;
+    text-align: center;
 
     color: #9b9a97;
 
-    font-size: 12px;
+    font-size: 13px;
 }
 
-
 .error {
-    margin-top: 10px;
-
     color: #eb5757;
-
-    font-size: 12px;
 }
 
 
@@ -376,35 +306,27 @@ body {
         padding: 10px;
     }
 
-
     .month-title {
         font-size: 22px;
     }
-
 
     .weekday {
         font-size: 11px;
     }
 
-
     .day {
         height: 110px;
-
         padding: 5px;
     }
-
 
     .day-number {
         font-size: 13px;
     }
 
-
     .event {
         font-size: 10px;
-
         padding: 2px 4px;
     }
-
 
     .event-time {
         font-size: 10px;
@@ -413,53 +335,13 @@ body {
 }
 
 </style>
-
 </head>
 
 
 <body>
 
 
-<!-- ==================================================
-     LOGIN
-=================================================== -->
-
-<div
-    id="loginScreen"
-    class="login-screen"
->
-
-    <button
-        class="connect-button"
-        onclick="connectGoogle()"
-    >
-        Connect Google Calendar
-    </button>
-
-    <div class="login-message">
-        Sign in to display your calendars
-    </div>
-
-    <div
-        id="loginError"
-        class="error"
-    ></div>
-
-</div>
-
-
-
-<!-- ==================================================
-     CALENDAR
-=================================================== -->
-
-<div
-    id="calendarWidget"
-    style="display:none;"
->
-
-
-    <!-- HEADER -->
+<div id="calendarWidget">
 
     <div class="header">
 
@@ -470,7 +352,6 @@ body {
 
 
         <div class="controls">
-
 
             <button
                 class="control-button"
@@ -497,42 +378,37 @@ body {
                 ›
             </button>
 
-
         </div>
 
     </div>
 
 
-
-    <!-- WEEKDAYS -->
-
     <div class="weekdays">
 
         <div class="weekday">Sun</div>
-
         <div class="weekday">Mon</div>
-
         <div class="weekday">Tue</div>
-
         <div class="weekday">Wed</div>
-
         <div class="weekday">Thu</div>
-
         <div class="weekday">Fri</div>
-
         <div class="weekday">Sat</div>
 
     </div>
 
 
+    <div
+        id="status"
+        class="status"
+    >
+        Loading calendar…
+    </div>
 
-    <!-- CALENDAR -->
 
     <div
         id="calendar"
         class="calendar"
+        style="display:none;"
     ></div>
-
 
 </div>
 
@@ -540,303 +416,16 @@ body {
 
 <script>
 
-
 /* =====================================================
-   GOOGLE SETTINGS
+   BACKEND
 ===================================================== */
 
-const CLIENT_ID =
-"717633697063-cqlol5rt62977cmu29oa9ou3kmnmmrij.apps.googleusercontent.com";
+const API_URL =
+    "https://notion-calendar-api.nourmohsen12223.workers.dev/events";
 
-
-const SCOPES =
-"https://www.googleapis.com/auth/calendar.readonly";
-
-
-let accessToken = null;
-
-let tokenClient = null;
 
 let displayedDate =
     new Date();
-
-
-
-/* =====================================================
-   GOOGLE LOGIN
-===================================================== */
-
-function connectGoogle() {
-
-
-    document.getElementById(
-        "loginError"
-    ).textContent = "";
-
-
-    tokenClient =
-        google.accounts.oauth2.initTokenClient({
-
-
-            client_id:
-                CLIENT_ID,
-
-
-            scope:
-                SCOPES,
-
-
-            callback:
-                async response => {
-
-
-                    if (
-                        response.error
-                    ) {
-
-
-                        document.getElementById(
-                            "loginError"
-                        ).textContent =
-                            "Google authorization failed.";
-
-
-                        return;
-
-                    }
-
-
-                    accessToken =
-                        response.access_token;
-
-
-                    document.getElementById(
-                        "loginScreen"
-                    ).style.display =
-                        "none";
-
-
-                    document.getElementById(
-                        "calendarWidget"
-                    ).style.display =
-                        "block";
-
-
-                    await loadMonth();
-
-                }
-
-        });
-
-
-    tokenClient.requestAccessToken();
-
-}
-
-
-
-/* =====================================================
-   GET CALENDARS
-===================================================== */
-
-async function getCalendars() {
-
-
-    const response =
-        await fetch(
-
-            "https://www.googleapis.com/calendar/v3/users/me/calendarList",
-
-            {
-
-                headers: {
-
-                    Authorization:
-                        "Bearer " +
-                        accessToken
-
-                }
-
-            }
-
-        );
-
-
-    const data =
-        await response.json();
-
-
-    if (
-        !response.ok
-    ) {
-
-
-        throw new Error(
-
-            data.error?.message ||
-
-            "Unable to load calendars."
-
-        );
-
-    }
-
-
-
-    return (
-        data.items || []
-    ).filter(
-
-        calendar =>
-            calendar.selected !== false
-
-    );
-
-}
-
-
-
-/* =====================================================
-   GET EVENTS
-===================================================== */
-
-async function getCalendarEvents(
-    calendar,
-    start,
-    end
-) {
-
-
-    const url =
-
-        "https://www.googleapis.com/calendar/v3/calendars/" +
-
-        encodeURIComponent(
-            calendar.id
-        ) +
-
-        "/events" +
-
-        "?timeMin=" +
-
-        encodeURIComponent(
-            start.toISOString()
-        ) +
-
-        "&timeMax=" +
-
-        encodeURIComponent(
-            end.toISOString()
-        ) +
-
-        "&singleEvents=true" +
-
-        "&orderBy=startTime" +
-
-        "&maxResults=2500";
-
-
-
-    try {
-
-
-        const response =
-            await fetch(
-
-                url,
-
-                {
-
-                    headers: {
-
-                        Authorization:
-                            "Bearer " +
-                            accessToken
-
-                    }
-
-                }
-
-            );
-
-
-        const data =
-            await response.json();
-
-
-
-        if (
-            !response.ok
-        ) {
-
-
-            console.warn(
-
-                "Unable to load calendar:",
-
-                calendar.summary
-
-            );
-
-
-            return [];
-
-        }
-
-
-
-        return (
-            data.items || []
-        ).map(
-
-            event => ({
-
-
-                ...event,
-
-
-                calendarName:
-                    calendar.summary,
-
-
-                calendarColor:
-                    calendar.backgroundColor ||
-                    "#eeeeec",
-
-
-                calendarTextColor:
-                    calendar.foregroundColor ||
-                    "#37352f"
-
-
-            })
-
-        );
-
-
-    }
-
-    catch (
-        error
-    ) {
-
-
-        console.warn(
-
-            "Calendar error:",
-
-            calendar.summary,
-
-            error
-
-        );
-
-
-        return [];
-
-    }
-
-}
 
 
 
@@ -846,170 +435,157 @@ async function getCalendarEvents(
 
 async function loadMonth() {
 
+    const calendar =
+        document.getElementById("calendar");
+
+    const status =
+        document.getElementById("status");
+
+
+    calendar.style.display =
+        "none";
+
+    status.style.display =
+        "block";
+
+    status.className =
+        "status";
+
+    status.textContent =
+        "Loading calendar…";
+
 
     const year =
         displayedDate.getFullYear();
-
 
     const month =
         displayedDate.getMonth();
 
 
-
     const firstOfMonth =
         new Date(
-
             year,
-
             month,
-
             1
-
         );
-
 
 
     const lastOfMonth =
         new Date(
-
             year,
-
             month + 1,
-
             0
-
         );
 
 
+    /*
+       First visible Sunday
+    */
 
     const start =
         new Date(
             firstOfMonth
         );
 
-
     start.setDate(
-
         start.getDate() -
-
         start.getDay()
+    );
 
+    start.setHours(
+        0,
+        0,
+        0,
+        0
     );
 
 
+    /*
+       Day after final visible Saturday
+    */
 
     const end =
         new Date(
             lastOfMonth
         );
 
-
     end.setDate(
-
         end.getDate() +
-
         (6 - end.getDay()) +
-
         1
-
     );
 
+    end.setHours(
+        0,
+        0,
+        0,
+        0
+    );
 
 
     try {
 
-
-        const calendars =
-            await getCalendars();
-
+        const url =
+            new URL(API_URL);
 
 
-        const requests =
-            calendars.map(
-
-                calendar =>
-
-                    getCalendarEvents(
-
-                        calendar,
-
-                        start,
-
-                        end
-
-                    )
-
-            );
-
-
-
-        const results =
-            await Promise.all(
-                requests
-            );
-
-
-
-        const allEvents =
-            results.flat();
-
-
-
-        allEvents.sort(
-
-            (a, b) => {
-
-
-                const aStart =
-
-                    a.start?.dateTime ||
-
-                    a.start?.date ||
-
-                    "";
-
-
-                const bStart =
-
-                    b.start?.dateTime ||
-
-                    b.start?.date ||
-
-                    "";
-
-
-                return (
-
-                    new Date(aStart) -
-
-                    new Date(bStart)
-
-                );
-
-            }
-
+        url.searchParams.set(
+            "timeMin",
+            start.toISOString()
         );
 
+
+        url.searchParams.set(
+            "timeMax",
+            end.toISOString()
+        );
+
+
+        const response =
+            await fetch(
+                url.toString()
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Unable to load calendar."
+            );
+
+        }
 
 
         renderCalendar(
-            allEvents
+            data.events || []
         );
 
+
+        status.style.display =
+            "none";
+
+
+        calendar.style.display =
+            "grid";
 
     }
 
-    catch (
-        error
-    ) {
+    catch (error) {
+
+        console.error(error);
 
 
-        console.error(
-            error
-        );
+        status.className =
+            "status error";
 
 
-        renderCalendar([]);
+        status.textContent =
+            "Unable to load calendar.";
 
     }
 
@@ -1021,42 +597,26 @@ async function loadMonth() {
    RENDER CALENDAR
 ===================================================== */
 
-function renderCalendar(
-    events
-) {
-
+function renderCalendar(events) {
 
     const year =
         displayedDate.getFullYear();
 
-
     const month =
         displayedDate.getMonth();
 
-
-
-    /* MONTH TITLE */
 
     document.getElementById(
         "monthTitle"
     ).textContent =
 
         displayedDate.toLocaleDateString(
-
             "en-US",
-
             {
-
-                month:
-                    "long",
-
-                year:
-                    "numeric"
-
+                month: "long",
+                year: "numeric"
             }
-
         );
-
 
 
     const calendar =
@@ -1069,70 +629,52 @@ function renderCalendar(
         "";
 
 
-
-    /* FIRST VISIBLE SUNDAY */
+    /*
+       First visible Sunday
+    */
 
     const first =
         new Date(
-
             year,
-
             month,
-
             1
-
         );
 
 
     const gridStart =
-        new Date(
-            first
-        );
+        new Date(first);
 
 
     gridStart.setDate(
-
         1 -
-
         first.getDay()
-
     );
 
 
-
-    /* LAST VISIBLE SATURDAY */
+    /*
+       Last visible Saturday
+    */
 
     const last =
         new Date(
-
             year,
-
             month + 1,
-
             0
-
         );
 
 
     const gridEnd =
-        new Date(
-            last
-        );
+        new Date(last);
 
 
     gridEnd.setDate(
-
         last.getDate() +
-
         (6 - last.getDay())
-
     );
-
 
 
     const today =
         new Date();
-
 
 
     const cursor =
@@ -1141,17 +683,14 @@ function renderCalendar(
         );
 
 
-
     while (
         cursor <= gridEnd
     ) {
-
 
         const cellDate =
             new Date(
                 cursor
             );
-
 
 
         const cell =
@@ -1164,17 +703,12 @@ function renderCalendar(
             "day";
 
 
-
         /* WEEKEND */
 
         if (
-
             cellDate.getDay() === 0 ||
-
             cellDate.getDay() === 6
-
         ) {
-
 
             cell.classList.add(
                 "weekend"
@@ -1183,16 +717,12 @@ function renderCalendar(
         }
 
 
-
         /* OTHER MONTH */
 
         if (
-
             cellDate.getMonth() !==
             month
-
         ) {
-
 
             cell.classList.add(
                 "other-month"
@@ -1201,25 +731,20 @@ function renderCalendar(
         }
 
 
-
         /* TODAY */
 
         if (
-
             sameDate(
                 cellDate,
                 today
             )
-
         ) {
-
 
             cell.classList.add(
                 "current-day"
             );
 
         }
-
 
 
         /* DATE */
@@ -1234,7 +759,6 @@ function renderCalendar(
             "date-row";
 
 
-
         const number =
             document.createElement(
                 "div"
@@ -1245,41 +769,28 @@ function renderCalendar(
             "day-number";
 
 
-
         if (
             cellDate.getDate() === 1
         ) {
 
-
             number.textContent =
 
                 cellDate.toLocaleDateString(
-
                     "en-US",
-
                     {
-
-                        month:
-                            "short",
-
-                        day:
-                            "numeric"
-
+                        month: "short",
+                        day: "numeric"
                     }
-
                 );
-
 
         }
 
         else {
 
-
             number.textContent =
                 cellDate.getDate();
 
         }
-
 
 
         dateRow.appendChild(
@@ -1290,7 +801,6 @@ function renderCalendar(
         cell.appendChild(
             dateRow
         );
-
 
 
         /* EVENTS */
@@ -1305,33 +815,20 @@ function renderCalendar(
             "events";
 
 
-
         const dayEvents =
             events.filter(
-
                 event =>
-
                     eventOccursOnDate(
-
                         event,
-
                         cellDate
-
                     )
-
             );
 
 
-
         dayEvents
-            .slice(
-                0,
-                4
-            )
+            .slice(0, 4)
             .forEach(
-
                 event => {
-
 
                     const eventDiv =
                         document.createElement(
@@ -1343,7 +840,6 @@ function renderCalendar(
                         "event";
 
 
-
                     eventDiv.style.backgroundColor =
                         event.calendarColor;
 
@@ -1352,35 +848,22 @@ function renderCalendar(
                         event.calendarTextColor;
 
 
-
                     /* TIME */
 
                     if (
                         event.start?.dateTime
                     ) {
 
-
                         const time =
                             new Date(
-
                                 event.start.dateTime
-
                             ).toLocaleTimeString(
-
                                 [],
-
                                 {
-
-                                    hour:
-                                        "numeric",
-
-                                    minute:
-                                        "2-digit"
-
+                                    hour: "numeric",
+                                    minute: "2-digit"
                                 }
-
                             );
-
 
 
                         const timeSpan =
@@ -1404,7 +887,6 @@ function renderCalendar(
                     }
 
 
-
                     /* TITLE */
 
                     const title =
@@ -1418,9 +900,7 @@ function renderCalendar(
 
 
                     title.textContent =
-
                         event.summary ||
-
                         "Event";
 
 
@@ -1429,34 +909,23 @@ function renderCalendar(
                     );
 
 
-
                     eventDiv.title =
 
                         (
-
                             event.calendarName
-
                             ?
-
                             event.calendarName +
                             " — "
-
                             :
-
                             ""
-
                         )
 
                         +
 
                         (
-
                             event.summary ||
-
                             "Event"
-
                         );
-
 
 
                     eventsArea.appendChild(
@@ -1464,17 +933,14 @@ function renderCalendar(
                     );
 
                 }
-
             );
 
 
-
-        /* MORE EVENTS */
+        /* MORE */
 
         if (
             dayEvents.length > 4
         ) {
-
 
             const more =
                 document.createElement(
@@ -1507,7 +973,6 @@ function renderCalendar(
         }
 
 
-
         cell.appendChild(
             eventsArea
         );
@@ -1518,12 +983,8 @@ function renderCalendar(
         );
 
 
-
         cursor.setDate(
-
-            cursor.getDate() +
-            1
-
+            cursor.getDate() + 1
         );
 
     }
@@ -1541,23 +1002,18 @@ function eventOccursOnDate(
     date
 ) {
 
-
-    /* ALL-DAY EVENT */
+    /*
+       All-day event
+    */
 
     if (
         event.start?.date
     ) {
 
-
         const parts =
-
             event.start.date
-
                 .split("-")
-
-                .map(
-                    Number
-                );
+                .map(Number);
 
 
         return (
@@ -1580,32 +1036,26 @@ function eventOccursOnDate(
     }
 
 
-
-    /* TIMED EVENT */
+    /*
+       Timed event
+    */
 
     if (
         event.start?.dateTime
     ) {
 
-
         const eventDate =
             new Date(
-
                 event.start.dateTime
-
             );
 
 
         return sameDate(
-
             eventDate,
-
             date
-
         );
 
     }
-
 
 
     return false;
@@ -1622,7 +1072,6 @@ function sameDate(
     a,
     b
 ) {
-
 
     return (
 
@@ -1646,22 +1095,16 @@ function sameDate(
 
 
 /* =====================================================
-   PREVIOUS MONTH
+   NAVIGATION
 ===================================================== */
 
 function previousMonth() {
 
-
     displayedDate =
         new Date(
-
             displayedDate.getFullYear(),
-
-            displayedDate.getMonth() -
-            1,
-
+            displayedDate.getMonth() - 1,
             1
-
         );
 
 
@@ -1669,25 +1112,14 @@ function previousMonth() {
 
 }
 
-
-
-/* =====================================================
-   NEXT MONTH
-===================================================== */
 
 function nextMonth() {
 
-
     displayedDate =
         new Date(
-
             displayedDate.getFullYear(),
-
-            displayedDate.getMonth() +
-            1,
-
+            displayedDate.getMonth() + 1,
             1
-
         );
 
 
@@ -1696,13 +1128,7 @@ function nextMonth() {
 }
 
 
-
-/* =====================================================
-   TODAY
-===================================================== */
-
 function goToday() {
-
 
     displayedDate =
         new Date();
@@ -1711,6 +1137,14 @@ function goToday() {
     loadMonth();
 
 }
+
+
+
+/* =====================================================
+   START AUTOMATICALLY
+===================================================== */
+
+loadMonth();
 
 </script>
 
