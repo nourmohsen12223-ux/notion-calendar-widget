@@ -23,6 +23,7 @@ html,
 body {
     margin: 0;
     padding: 0;
+
     background: #ffffff;
     color: #37352f;
 
@@ -49,21 +50,34 @@ body {
     align-items: center;
     justify-content: space-between;
 
-    min-height: 40px;
+    min-height: 46px;
     margin-bottom: 14px;
 }
 
+
+/* MONTH + YEAR */
+
 .month-title {
-    font-size: 18px;
+    font-size: 26px;
     font-weight: 600;
+
     color: #37352f;
+
+    letter-spacing: -0.4px;
+
+    line-height: 1.2;
 }
+
+
+/* NAVIGATION */
 
 .controls {
     display: flex;
     align-items: center;
+
     gap: 5px;
 }
+
 
 .control-button {
     height: 34px;
@@ -87,9 +101,11 @@ body {
     cursor: pointer;
 }
 
+
 .control-button:hover {
     background: #f1f1ef;
 }
+
 
 .today-button {
     color: #37352f;
@@ -102,7 +118,7 @@ body {
 
 
 /* =====================================================
-   WEEKDAY HEADER
+   WEEKDAYS
 ===================================================== */
 
 .weekdays {
@@ -111,6 +127,7 @@ body {
     grid-template-columns:
         repeat(7, minmax(0, 1fr));
 }
+
 
 .weekday {
     height: 34px;
@@ -149,6 +166,7 @@ body {
     position: relative;
 
     min-width: 0;
+
     height: 135px;
 
     padding: 8px 9px 7px;
@@ -162,7 +180,7 @@ body {
 }
 
 
-/* Weekend */
+/* WEEKENDS */
 
 .day.weekend {
     background: #fafaf9;
@@ -175,6 +193,7 @@ body {
 
 .date-row {
     display: flex;
+
     justify-content: flex-end;
     align-items: center;
 
@@ -182,6 +201,7 @@ body {
 
     margin-bottom: 4px;
 }
+
 
 .day-number {
     height: 28px;
@@ -202,7 +222,7 @@ body {
 }
 
 
-/* Previous / next month */
+/* PREVIOUS / NEXT MONTH */
 
 .other-month .day-number {
     color: #b4b4b1;
@@ -210,7 +230,7 @@ body {
 
 
 /* =====================================================
-   CURRENT DAY
+   TODAY
 ===================================================== */
 
 .current-day .day-number {
@@ -220,6 +240,7 @@ body {
     padding: 0;
 
     background: #eb5757;
+
     color: #ffffff;
 
     font-weight: 600;
@@ -233,6 +254,7 @@ body {
 .events {
     width: 100%;
 }
+
 
 .event {
     width: 100%;
@@ -258,6 +280,7 @@ body {
     text-overflow: ellipsis;
 }
 
+
 .event-time {
     margin-right: 5px;
 
@@ -266,6 +289,7 @@ body {
 
     flex-shrink: 0;
 }
+
 
 .event-title {
     min-width: 0;
@@ -276,6 +300,7 @@ body {
 
     text-overflow: ellipsis;
 }
+
 
 .more {
     padding: 3px 5px;
@@ -300,6 +325,7 @@ body {
     justify-content: center;
 }
 
+
 .connect-button {
     padding: 9px 16px;
 
@@ -316,9 +342,11 @@ body {
     cursor: pointer;
 }
 
+
 .connect-button:hover {
     background: #f7f7f5;
 }
+
 
 .login-message {
     margin-top: 10px;
@@ -327,6 +355,7 @@ body {
 
     font-size: 12px;
 }
+
 
 .error {
     margin-top: 10px;
@@ -347,27 +376,35 @@ body {
         padding: 10px;
     }
 
+
     .month-title {
-        font-size: 17px;
+        font-size: 22px;
     }
+
 
     .weekday {
         font-size: 11px;
     }
 
+
     .day {
         height: 110px;
+
         padding: 5px;
     }
+
 
     .day-number {
         font-size: 13px;
     }
 
+
     .event {
         font-size: 10px;
+
         padding: 2px 4px;
     }
+
 
     .event-time {
         font-size: 10px;
@@ -376,6 +413,7 @@ body {
 }
 
 </style>
+
 </head>
 
 
@@ -383,7 +421,7 @@ body {
 
 
 <!-- ==================================================
-     LOGIN SCREEN
+     LOGIN
 =================================================== -->
 
 <div
@@ -433,6 +471,7 @@ body {
 
         <div class="controls">
 
+
             <button
                 class="control-button"
                 onclick="previousMonth()"
@@ -458,6 +497,7 @@ body {
                 ›
             </button>
 
+
         </div>
 
     </div>
@@ -469,18 +509,24 @@ body {
     <div class="weekdays">
 
         <div class="weekday">Sun</div>
+
         <div class="weekday">Mon</div>
+
         <div class="weekday">Tue</div>
+
         <div class="weekday">Wed</div>
+
         <div class="weekday">Thu</div>
+
         <div class="weekday">Fri</div>
+
         <div class="weekday">Sat</div>
 
     </div>
 
 
 
-    <!-- CALENDAR DAYS -->
+    <!-- CALENDAR -->
 
     <div
         id="calendar"
@@ -493,6 +539,7 @@ body {
 
 
 <script>
+
 
 /* =====================================================
    GOOGLE SETTINGS
@@ -510,7 +557,8 @@ let accessToken = null;
 
 let tokenClient = null;
 
-let displayedDate = new Date();
+let displayedDate =
+    new Date();
 
 
 
@@ -520,6 +568,7 @@ let displayedDate = new Date();
 
 function connectGoogle() {
 
+
     document.getElementById(
         "loginError"
     ).textContent = "";
@@ -528,22 +577,29 @@ function connectGoogle() {
     tokenClient =
         google.accounts.oauth2.initTokenClient({
 
+
             client_id:
                 CLIENT_ID,
 
+
             scope:
                 SCOPES,
+
 
             callback:
                 async response => {
 
 
-                    if (response.error) {
+                    if (
+                        response.error
+                    ) {
+
 
                         document.getElementById(
                             "loginError"
                         ).textContent =
                             "Google authorization failed.";
+
 
                         return;
 
@@ -580,7 +636,7 @@ function connectGoogle() {
 
 
 /* =====================================================
-   GET ALL SELECTED CALENDARS
+   GET CALENDARS
 ===================================================== */
 
 async function getCalendars() {
@@ -610,7 +666,10 @@ async function getCalendars() {
         await response.json();
 
 
-    if (!response.ok) {
+    if (
+        !response.ok
+    ) {
+
 
         throw new Error(
 
@@ -621,6 +680,7 @@ async function getCalendars() {
         );
 
     }
+
 
 
     return (
@@ -637,7 +697,7 @@ async function getCalendars() {
 
 
 /* =====================================================
-   GET EVENTS FROM ONE CALENDAR
+   GET EVENTS
 ===================================================== */
 
 async function getCalendarEvents(
@@ -676,6 +736,7 @@ async function getCalendarEvents(
         "&maxResults=2500";
 
 
+
     try {
 
 
@@ -703,7 +764,11 @@ async function getCalendarEvents(
             await response.json();
 
 
-        if (!response.ok) {
+
+        if (
+            !response.ok
+        ) {
+
 
             console.warn(
 
@@ -719,11 +784,13 @@ async function getCalendarEvents(
         }
 
 
+
         return (
             data.items || []
         ).map(
 
             event => ({
+
 
                 ...event,
 
@@ -741,6 +808,7 @@ async function getCalendarEvents(
                     calendar.foregroundColor ||
                     "#37352f"
 
+
             })
 
         );
@@ -748,7 +816,9 @@ async function getCalendarEvents(
 
     }
 
-    catch (error) {
+    catch (
+        error
+    ) {
 
 
         console.warn(
@@ -812,11 +882,6 @@ async function loadMonth() {
 
 
 
-    /*
-       Start at Sunday of the first
-       visible calendar week
-    */
-
     const start =
         new Date(
             firstOfMonth
@@ -832,10 +897,6 @@ async function loadMonth() {
     );
 
 
-
-    /*
-       End after final visible Saturday
-    */
 
     const end =
         new Date(
@@ -894,10 +955,6 @@ async function loadMonth() {
 
 
 
-        /*
-           Sort chronologically
-        */
-
         allEvents.sort(
 
             (a, b) => {
@@ -942,7 +999,9 @@ async function loadMonth() {
 
     }
 
-    catch (error) {
+    catch (
+        error
+    ) {
 
 
         console.error(
@@ -1011,9 +1070,7 @@ function renderCalendar(
 
 
 
-    /*
-       FIRST VISIBLE SUNDAY
-    */
+    /* FIRST VISIBLE SUNDAY */
 
     const first =
         new Date(
@@ -1043,9 +1100,7 @@ function renderCalendar(
 
 
 
-    /*
-       LAST VISIBLE SATURDAY
-    */
+    /* LAST VISIBLE SATURDAY */
 
     const last =
         new Date(
@@ -1077,6 +1132,7 @@ function renderCalendar(
 
     const today =
         new Date();
+
 
 
     const cursor =
@@ -1119,6 +1175,7 @@ function renderCalendar(
 
         ) {
 
+
             cell.classList.add(
                 "weekend"
             );
@@ -1135,6 +1192,7 @@ function renderCalendar(
             month
 
         ) {
+
 
             cell.classList.add(
                 "other-month"
@@ -1155,6 +1213,7 @@ function renderCalendar(
 
         ) {
 
+
             cell.classList.add(
                 "current-day"
             );
@@ -1163,7 +1222,7 @@ function renderCalendar(
 
 
 
-        /* DATE ROW */
+        /* DATE */
 
         const dateRow =
             document.createElement(
@@ -1186,11 +1245,6 @@ function renderCalendar(
             "day-number";
 
 
-
-        /*
-           Show month abbreviation on
-           the first day of a month
-        */
 
         if (
             cellDate.getDate() === 1
@@ -1224,7 +1278,6 @@ function renderCalendar(
             number.textContent =
                 cellDate.getDate();
 
-
         }
 
 
@@ -1240,7 +1293,7 @@ function renderCalendar(
 
 
 
-        /* EVENTS AREA */
+        /* EVENTS */
 
         const eventsArea =
             document.createElement(
@@ -1270,10 +1323,6 @@ function renderCalendar(
 
 
 
-        /*
-           SHOW UP TO FOUR EVENTS
-        */
-
         dayEvents
             .slice(
                 0,
@@ -1295,10 +1344,6 @@ function renderCalendar(
 
 
 
-                    /*
-                       GOOGLE CALENDAR COLOR
-                    */
-
                     eventDiv.style.backgroundColor =
                         event.calendarColor;
 
@@ -1308,9 +1353,7 @@ function renderCalendar(
 
 
 
-                    /*
-                       EVENT TIME
-                    */
+                    /* TIME */
 
                     if (
                         event.start?.dateTime
@@ -1362,7 +1405,7 @@ function renderCalendar(
 
 
 
-                    /* EVENT TITLE */
+                    /* TITLE */
 
                     const title =
                         document.createElement(
@@ -1386,10 +1429,6 @@ function renderCalendar(
                     );
 
 
-
-                    /*
-                       HOVER INFORMATION
-                    */
 
                     eventDiv.title =
 
@@ -1430,9 +1469,7 @@ function renderCalendar(
 
 
 
-        /*
-           MORE THAN FOUR EVENTS
-        */
+        /* MORE EVENTS */
 
         if (
             dayEvents.length > 4
@@ -1496,7 +1533,7 @@ function renderCalendar(
 
 
 /* =====================================================
-   CHECK IF EVENT OCCURS ON DATE
+   EVENT DATE CHECK
 ===================================================== */
 
 function eventOccursOnDate(
