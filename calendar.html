@@ -1,382 +1,1023 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calendar</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://accounts.google.com/gsi/client"></script>
+  <title>My Calendar</title>
 
-<style>
-* { box-sizing: border-box; }
+  <script src="https://accounts.google.com/gsi/client"></script>
 
-body {
-  margin: 0;
-  padding: 12px;
-  background: #ffffff;
-  color: #37352f;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-               Helvetica, Arial, sans-serif;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-.widget {
-  width: 100%;
-  border: 1px solid #e9e9e7;
-  border-radius: 14px;
-  padding: 18px;
-  background: #ffffff;
-}
+    body {
+      margin: 0;
+      padding: 12px;
+      background: #ffffff;
+      color: #37352f;
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Helvetica,
+        Arial,
+        sans-serif;
+    }
 
-.title {
-  font-size: 20px;
-  font-weight: 600;
-}
+    .widget {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #e9e9e7;
+      border-radius: 14px;
+      padding: 18px;
+    }
 
-.nav {
-  display: flex;
-  gap: 6px;
-}
+    /* HEADER */
 
-button {
-  background: #ffffff;
-  border: 1px solid #e5e5e3;
-  border-radius: 7px;
-  padding: 6px 10px;
-  cursor: pointer;
-  color: #37352f;
-}
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
 
-button:hover {
-  background: #f7f7f5;
-}
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+    }
 
-.weekdays,
-.calendar {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-}
+    .nav {
+      display: flex;
+      gap: 6px;
+    }
 
-.weekday {
-  text-align: center;
-  font-size: 10px;
-  font-weight: 600;
-  color: #9b9a97;
-  padding-bottom: 10px;
-}
+    button {
+      background: #ffffff;
+      border: 1px solid #e5e5e3;
+      border-radius: 7px;
+      padding: 6px 10px;
 
-.day {
-  min-height: 75px;
-  border-top: 1px solid #eeeeec;
-  padding: 7px;
-  font-size: 12px;
-  overflow: hidden;
-}
+      cursor: pointer;
 
-.day-number {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  margin-bottom: 4px;
-}
+      color: #37352f;
+      font-size: 12px;
+    }
 
-.today .day-number {
-  background: #37352f;
-  color: white;
-}
+    button:hover {
+      background: #f7f7f5;
+    }
 
-.event {
-  font-size: 10px;
-  background: #f1f1ef;
-  border-radius: 4px;
-  padding: 3px 5px;
-  margin-top: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+    /* CALENDAR */
 
-.login {
-  text-align: center;
-  padding: 45px 10px;
-}
+    .weekdays,
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
 
-.connect {
-  padding: 9px 15px;
-  font-size: 13px;
-}
+    .weekday {
+      text-align: center;
 
-.message {
-  color: #9b9a97;
-  font-size: 12px;
-  margin-top: 10px;
-}
-</style>
+      font-size: 10px;
+      font-weight: 600;
+
+      color: #9b9a97;
+
+      padding-bottom: 10px;
+    }
+
+    .day {
+      min-height: 85px;
+
+      border-top: 1px solid #eeeeec;
+
+      padding: 7px;
+
+      font-size: 12px;
+
+      overflow: hidden;
+    }
+
+    .day-number {
+      width: 24px;
+      height: 24px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      margin-bottom: 4px;
+    }
+
+    /* TODAY */
+
+    .today .day-number {
+      background: #37352f;
+      color: #ffffff;
+    }
+
+    /* EVENTS */
+
+    .event {
+      font-size: 10px;
+
+      border-radius: 4px;
+
+      padding: 3px 5px;
+      margin-top: 3px;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      color: #37352f;
+    }
+
+    .more {
+      font-size: 9px;
+      color: #9b9a97;
+
+      padding-top: 4px;
+    }
+
+    /* LOGIN */
+
+    .login {
+      text-align: center;
+      padding: 45px 10px;
+    }
+
+    .connect {
+      padding: 9px 15px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .message {
+      color: #9b9a97;
+      font-size: 12px;
+
+      margin-top: 10px;
+    }
+
+    /* ERROR */
+
+    .error {
+      margin-top: 12px;
+
+      color: #b42318;
+      font-size: 12px;
+    }
+
+    /* SMALL SCREENS */
+
+    @media (max-width: 650px) {
+
+      body {
+        padding: 5px;
+      }
+
+      .widget {
+        padding: 10px;
+      }
+
+      .day {
+        min-height: 65px;
+        padding: 4px;
+      }
+
+      .event {
+        font-size: 8px;
+        padding: 2px 3px;
+      }
+
+      .title {
+        font-size: 17px;
+      }
+
+      .weekday {
+        font-size: 8px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<div id="login" class="widget login">
-  <button class="connect" onclick="connectGoogle()">
-    Connect Google Calendar
-  </button>
+  <!-- LOGIN SCREEN -->
 
-  <div class="message">
-    Sign in once to display your calendar
-  </div>
-</div>
+  <div id="login" class="widget login">
 
-<div id="widget" class="widget" style="display:none">
+    <button
+      class="connect"
+      onclick="connectGoogle()"
+    >
+      Connect Google Calendar
+    </button>
 
-  <div class="header">
-
-    <div class="title" id="monthTitle"></div>
-
-    <div class="nav">
-      <button onclick="previousMonth()">‹</button>
-      <button onclick="goToday()">Today</button>
-      <button onclick="nextMonth()">›</button>
+    <div class="message">
+      Sign in to display your calendars
     </div>
 
+    <div
+      id="loginError"
+      class="error"
+    ></div>
+
   </div>
 
-  <div class="weekdays">
-    <div class="weekday">MON</div>
-    <div class="weekday">TUE</div>
-    <div class="weekday">WED</div>
-    <div class="weekday">THU</div>
-    <div class="weekday">FRI</div>
-    <div class="weekday">SAT</div>
-    <div class="weekday">SUN</div>
+
+  <!-- CALENDAR WIDGET -->
+
+  <div
+    id="widget"
+    class="widget"
+    style="display:none"
+  >
+
+    <div class="header">
+
+      <div
+        class="title"
+        id="monthTitle"
+      ></div>
+
+      <div class="nav">
+
+        <button onclick="previousMonth()">
+          ‹
+        </button>
+
+        <button onclick="goToday()">
+          Today
+        </button>
+
+        <button onclick="nextMonth()">
+          ›
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- WEEKDAY LABELS -->
+
+    <div class="weekdays">
+
+      <div class="weekday">MON</div>
+      <div class="weekday">TUE</div>
+      <div class="weekday">WED</div>
+      <div class="weekday">THU</div>
+      <div class="weekday">FRI</div>
+      <div class="weekday">SAT</div>
+      <div class="weekday">SUN</div>
+
+    </div>
+
+
+    <!-- CALENDAR DAYS -->
+
+    <div
+      id="calendar"
+      class="calendar"
+    ></div>
+
   </div>
 
-  <div id="calendar" class="calendar"></div>
-
-</div>
 
 <script>
 
-const CLIENT_ID =
-"717633697063-cqlol5rt62977cmu29oa9ou3kmnmmrij.apps.googleusercontent.com";
+  /* ----------------------------------
+     GOOGLE SETTINGS
+  ---------------------------------- */
 
-const SCOPES =
-"https://www.googleapis.com/auth/calendar.readonly";
+  const CLIENT_ID =
+    "717633697063-cqlol5rt62977cmu29oa9ou3kmnmmrij.apps.googleusercontent.com";
 
-let accessToken;
-let tokenClient;
+  const SCOPES =
+    "https://www.googleapis.com/auth/calendar.readonly";
 
-let displayedDate = new Date();
 
-function connectGoogle() {
+  /* ----------------------------------
+     VARIABLES
+  ---------------------------------- */
 
-  tokenClient = google.accounts.oauth2.initTokenClient({
+  let accessToken = null;
+  let tokenClient = null;
 
-    client_id: CLIENT_ID,
-    scope: SCOPES,
+  let displayedDate = new Date();
 
-    callback: async (response) => {
 
-      if (response.error) {
-        alert("Google authorization failed.");
-        return;
-      }
+  /* ----------------------------------
+     CONNECT GOOGLE
+  ---------------------------------- */
 
-      accessToken = response.access_token;
+  function connectGoogle() {
 
-      document.getElementById("login").style.display = "none";
-      document.getElementById("widget").style.display = "block";
+    document.getElementById("loginError").textContent = "";
 
-      await loadMonth();
-    }
+    tokenClient =
+      google.accounts.oauth2.initTokenClient({
 
-  });
+        client_id: CLIENT_ID,
 
-  tokenClient.requestAccessToken();
-}
+        scope: SCOPES,
 
-async function loadMonth() {
+        callback: async (response) => {
 
-  renderCalendar([]);
+          if (response.error) {
 
-  const year = displayedDate.getFullYear();
-  const month = displayedDate.getMonth();
+            document.getElementById(
+              "loginError"
+            ).textContent =
+              "Google authorization failed.";
 
-  const start = new Date(year, month, 1);
-  const end = new Date(year, month + 1, 1);
+            return;
+          }
 
-  const url =
-    "https://www.googleapis.com/calendar/v3/calendars/primary/events" +
-    "?timeMin=" + encodeURIComponent(start.toISOString()) +
-    "&timeMax=" + encodeURIComponent(end.toISOString()) +
-    "&singleEvents=true" +
-    "&orderBy=startTime";
+          accessToken =
+            response.access_token;
 
-  try {
 
-    const response = await fetch(url, {
-      headers: {
-        Authorization: "Bearer " + accessToken
-      }
-    });
+          document.getElementById(
+            "login"
+          ).style.display = "none";
 
-    const data = await response.json();
 
-    renderCalendar(data.items || []);
+          document.getElementById(
+            "widget"
+          ).style.display = "block";
 
-  } catch (error) {
 
-    console.error(error);
+          await loadMonth();
+
+        }
+
+      });
+
+
+    tokenClient.requestAccessToken();
 
   }
-}
 
-function renderCalendar(events) {
 
-  const year = displayedDate.getFullYear();
-  const month = displayedDate.getMonth();
+  /* ----------------------------------
+     LOAD ALL CALENDARS
+  ---------------------------------- */
 
-  document.getElementById("monthTitle").textContent =
-    displayedDate.toLocaleDateString("en-US", {
-      month: "long",
-      year: "numeric"
-    });
+  async function getCalendars() {
 
-  const calendar =
-    document.getElementById("calendar");
+    const response = await fetch(
 
-  calendar.innerHTML = "";
+      "https://www.googleapis.com/calendar/v3/users/me/calendarList",
 
-  const firstDay =
-    new Date(year, month, 1);
+      {
+        headers: {
+          Authorization:
+            "Bearer " + accessToken
+        }
+      }
 
-  let offset = firstDay.getDay();
+    );
 
-  offset = offset === 0 ? 6 : offset - 1;
 
-  const days =
-    new Date(year, month + 1, 0).getDate();
+    const data =
+      await response.json();
 
-  for (let i = 0; i < offset; i++) {
 
-    const blank =
-      document.createElement("div");
+    if (!response.ok) {
 
-    blank.className = "day";
-
-    calendar.appendChild(blank);
-  }
-
-  const today = new Date();
-
-  for (let day = 1; day <= days; day++) {
-
-    const cell =
-      document.createElement("div");
-
-    cell.className = "day";
-
-    if (
-      day === today.getDate() &&
-      month === today.getMonth() &&
-      year === today.getFullYear()
-    ) {
-      cell.classList.add("today");
-    }
-
-    const number =
-      document.createElement("div");
-
-    number.className = "day-number";
-    number.textContent = day;
-
-    cell.appendChild(number);
-
-    const dayEvents = events.filter(event => {
-
-      const start =
-        event.start?.dateTime ||
-        event.start?.date;
-
-      if (!start) return false;
-
-      const d = new Date(start);
-
-      return (
-        d.getDate() === day &&
-        d.getMonth() === month &&
-        d.getFullYear() === year
+      throw new Error(
+        data.error?.message ||
+        "Could not load calendar list."
       );
 
-    });
-
-    dayEvents.slice(0, 3).forEach(event => {
-
-      const eventDiv =
-        document.createElement("div");
-
-      eventDiv.className = "event";
-
-      eventDiv.textContent =
-        event.summary || "Event";
-
-      cell.appendChild(eventDiv);
-    });
-
-    if (dayEvents.length > 3) {
-
-      const more =
-        document.createElement("div");
-
-      more.className = "event";
-      more.textContent =
-        "+" + (dayEvents.length - 3) + " more";
-
-      cell.appendChild(more);
     }
 
-    calendar.appendChild(cell);
+
+    /*
+      Google returns calendars in the
+      user's Calendar list.
+
+      selected !== false means calendars
+      currently selected/visible.
+    */
+
+    return (data.items || []).filter(
+      calendar =>
+        calendar.selected !== false
+    );
+
   }
-}
 
-function previousMonth() {
 
-  displayedDate =
-    new Date(
-      displayedDate.getFullYear(),
-      displayedDate.getMonth() - 1,
-      1
-    );
+  /* ----------------------------------
+     LOAD EVENTS FROM ONE CALENDAR
+  ---------------------------------- */
 
-  loadMonth();
-}
+  async function getCalendarEvents(
+    calendar,
+    start,
+    end
+  ) {
 
-function nextMonth() {
+    const url =
 
-  displayedDate =
-    new Date(
-      displayedDate.getFullYear(),
-      displayedDate.getMonth() + 1,
-      1
-    );
+      "https://www.googleapis.com/calendar/v3/calendars/" +
 
-  loadMonth();
-}
+      encodeURIComponent(calendar.id) +
 
-function goToday() {
+      "/events" +
 
-  displayedDate = new Date();
+      "?timeMin=" +
+      encodeURIComponent(start.toISOString()) +
 
-  loadMonth();
-}
+      "&timeMax=" +
+      encodeURIComponent(end.toISOString()) +
+
+      "&singleEvents=true" +
+
+      "&orderBy=startTime" +
+
+      "&maxResults=2500";
+
+
+    try {
+
+      const response =
+        await fetch(
+          url,
+          {
+            headers: {
+              Authorization:
+                "Bearer " + accessToken
+            }
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        console.warn(
+          "Could not read:",
+          calendar.summary,
+          data
+        );
+
+        return [];
+
+      }
+
+
+      return (data.items || []).map(
+        event => ({
+
+          ...event,
+
+          calendarName:
+            calendar.summary,
+
+          calendarColor:
+            calendar.backgroundColor ||
+            "#eeeeec"
+
+        })
+      );
+
+
+    } catch (error) {
+
+      console.warn(
+        "Calendar failed:",
+        calendar.summary,
+        error
+      );
+
+      return [];
+
+    }
+
+  }
+
+
+  /* ----------------------------------
+     LOAD MONTH
+  ---------------------------------- */
+
+  async function loadMonth() {
+
+    renderCalendar([]);
+
+
+    const year =
+      displayedDate.getFullYear();
+
+    const month =
+      displayedDate.getMonth();
+
+
+    const start =
+      new Date(
+        year,
+        month,
+        1,
+        0,
+        0,
+        0
+      );
+
+
+    const end =
+      new Date(
+        year,
+        month + 1,
+        1,
+        0,
+        0,
+        0
+      );
+
+
+    try {
+
+      /*
+        STEP 1:
+        Get all selected calendars
+      */
+
+      const calendars =
+        await getCalendars();
+
+
+      /*
+        STEP 2:
+        Get events from every calendar
+        simultaneously
+      */
+
+      const requests =
+        calendars.map(
+          calendar =>
+            getCalendarEvents(
+              calendar,
+              start,
+              end
+            )
+        );
+
+
+      const results =
+        await Promise.all(requests);
+
+
+      /*
+        STEP 3:
+        Combine all events
+      */
+
+      const allEvents =
+        results.flat();
+
+
+      /*
+        STEP 4:
+        Sort events by start time
+      */
+
+      allEvents.sort(
+        (a, b) => {
+
+          const aStart =
+            a.start?.dateTime ||
+            a.start?.date ||
+            "";
+
+          const bStart =
+            b.start?.dateTime ||
+            b.start?.date ||
+            "";
+
+          return (
+            new Date(aStart) -
+            new Date(bStart)
+          );
+
+        }
+      );
+
+
+      /*
+        STEP 5:
+        Display everything
+      */
+
+      renderCalendar(allEvents);
+
+
+    } catch (error) {
+
+      console.error(
+        "Calendar loading error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  /* ----------------------------------
+     RENDER CALENDAR
+  ---------------------------------- */
+
+  function renderCalendar(events) {
+
+    const year =
+      displayedDate.getFullYear();
+
+    const month =
+      displayedDate.getMonth();
+
+
+    /*
+      MONTH TITLE
+    */
+
+    document.getElementById(
+      "monthTitle"
+    ).textContent =
+
+      displayedDate.toLocaleDateString(
+        "en-US",
+        {
+          month: "long",
+          year: "numeric"
+        }
+      );
+
+
+    const calendar =
+      document.getElementById(
+        "calendar"
+      );
+
+
+    calendar.innerHTML = "";
+
+
+    /*
+      FIND FIRST DAY OF MONTH
+    */
+
+    const firstDay =
+      new Date(
+        year,
+        month,
+        1
+      );
+
+
+    let offset =
+      firstDay.getDay();
+
+
+    /*
+      JavaScript:
+      Sunday = 0
+
+      Our calendar:
+      Monday = first column
+    */
+
+    offset =
+      offset === 0
+        ? 6
+        : offset - 1;
+
+
+    /*
+      NUMBER OF DAYS
+    */
+
+    const daysInMonth =
+      new Date(
+        year,
+        month + 1,
+        0
+      ).getDate();
+
+
+    /*
+      EMPTY CELLS BEFORE DAY 1
+    */
+
+    for (
+      let i = 0;
+      i < offset;
+      i++
+    ) {
+
+      const blank =
+        document.createElement("div");
+
+      blank.className = "day";
+
+      calendar.appendChild(blank);
+
+    }
+
+
+    const today =
+      new Date();
+
+
+    /*
+      CREATE EACH DAY
+    */
+
+    for (
+      let day = 1;
+      day <= daysInMonth;
+      day++
+    ) {
+
+      const cell =
+        document.createElement("div");
+
+
+      cell.className = "day";
+
+
+      /*
+        HIGHLIGHT TODAY
+      */
+
+      if (
+
+        day === today.getDate() &&
+
+        month === today.getMonth() &&
+
+        year === today.getFullYear()
+
+      ) {
+
+        cell.classList.add("today");
+
+      }
+
+
+      /*
+        DAY NUMBER
+      */
+
+      const number =
+        document.createElement("div");
+
+
+      number.className =
+        "day-number";
+
+
+      number.textContent =
+        day;
+
+
+      cell.appendChild(number);
+
+
+      /*
+        FIND EVENTS FOR THIS DAY
+      */
+
+      const dayEvents =
+        events.filter(
+          event => {
+
+            const start =
+              event.start?.dateTime ||
+              event.start?.date;
+
+
+            if (!start) {
+              return false;
+            }
+
+
+            /*
+              All-day Google events use
+              YYYY-MM-DD.
+
+              Timed events use ISO date/time.
+            */
+
+            if (event.start?.date) {
+
+              const [
+                eventYear,
+                eventMonth,
+                eventDay
+              ] =
+                event.start.date
+                  .split("-")
+                  .map(Number);
+
+
+              return (
+
+                eventDay === day &&
+
+                eventMonth ===
+                  month + 1 &&
+
+                eventYear === year
+
+              );
+
+            }
+
+
+            const eventDate =
+              new Date(start);
+
+
+            return (
+
+              eventDate.getDate() === day &&
+
+              eventDate.getMonth() === month &&
+
+              eventDate.getFullYear() === year
+
+            );
+
+          }
+        );
+
+
+      /*
+        DISPLAY UP TO 3 EVENTS
+      */
+
+      dayEvents
+        .slice(0, 3)
+        .forEach(
+          event => {
+
+            const eventDiv =
+              document.createElement(
+                "div"
+              );
+
+
+            eventDiv.className =
+              "event";
+
+
+            eventDiv.textContent =
+              event.summary ||
+              "Event";
+
+
+            /*
+              USE GOOGLE CALENDAR COLOR
+            */
+
+            eventDiv.style.backgroundColor =
+              event.calendarColor ||
+              "#eeeeec";
+
+
+            /*
+              TOOLTIP
+            */
+
+            eventDiv.title =
+
+              (event.calendarName
+                ? event.calendarName +
+                  " — "
+                : "") +
+
+              (event.summary ||
+                "Event");
+
+
+            cell.appendChild(
+              eventDiv
+            );
+
+          }
+        );
+
+
+      /*
+        MORE THAN 3 EVENTS
+      */
+
+      if (
+        dayEvents.length > 3
+      ) {
+
+        const more =
+          document.createElement(
+            "div"
+          );
+
+
+        more.className =
+          "more";
+
+
+        more.textContent =
+          "+" +
+          (dayEvents.length - 3) +
+          " more";
+
+
+        cell.appendChild(more);
+
+      }
+
+
+      calendar.appendChild(cell);
+
+    }
+
+  }
+
+
+  /* ----------------------------------
+     PREVIOUS MONTH
+  ---------------------------------- */
+
+  function previousMonth() {
+
+    displayedDate =
+      new Date(
+
+        displayedDate.getFullYear(),
+
+        displayedDate.getMonth() - 1,
+
+        1
+
+      );
+
+
+    loadMonth();
+
+  }
+
+
+  /* ----------------------------------
+     NEXT MONTH
+  ---------------------------------- */
+
+  function nextMonth() {
+
+    displayedDate =
+      new Date(
+
+        displayedDate.getFullYear(),
+
+        displayedDate.getMonth() + 1,
+
+        1
+
+      );
+
+
+    loadMonth();
+
+  }
+
+
+  /* ----------------------------------
+     RETURN TO TODAY
+  ---------------------------------- */
+
+  function goToday() {
+
+    displayedDate =
+      new Date();
+
+
+    loadMonth();
+
+  }
 
 </script>
 
