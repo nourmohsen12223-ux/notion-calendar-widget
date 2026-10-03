@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar</title>
+
+<script src="https://accounts.google.com/gsi/client"></script>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 12px;
+  background: #ffffff;
+  color: #37352f;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Helvetica, Arial, sans-serif;
+}
+
+.widget {
+  width: 100%;
+  border: 1px solid #e9e9e7;
+  border-radius: 14px;
+  padding: 18px;
+  background: #ffffff;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.nav {
+  display: flex;
+  gap: 6px;
+}
+
+button {
+  background: #ffffff;
+  border: 1px solid #e5e5e3;
+  border-radius: 7px;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: #37352f;
+}
+
+button:hover {
+  background: #f7f7f5;
+}
+
+.weekdays,
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.weekday {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #9b9a97;
+  padding-bottom: 10px;
+}
+
+.day {
+  min-height: 75px;
+  border-top: 1px solid #eeeeec;
+  padding: 7px;
+  font-size: 12px;
+  overflow: hidden;
+}
+
+.day-number {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-bottom: 4px;
+}
+
+.today .day-number {
+  background: #37352f;
+  color: white;
+}
+
+.event {
+  font-size: 10px;
+  background: #f1f1ef;
+  border-radius: 4px;
+  padding: 3px 5px;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.login {
+  text-align: center;
+  padding: 45px 10px;
+}
+
+.connect {
+  padding: 9px 15px;
+  font-size: 13px;
+}
+
+.message {
+  color: #9b9a97;
+  font-size: 12px;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="login" class="widget login">
+  <button class="connect" onclick="connectGoogle()">
+    Connect Google Calendar
+  </button>
+
+  <div class="message">
+    Sign in once to display your calendar
+  </div>
+</div>
+
+<div id="widget" class="widget" style="display:none">
+
+  <div class="header">
+
+    <div class="title" id="monthTitle"></div>
+
+    <div class="nav">
+      <button onclick="previousMonth()">‹</button>
+      <button onclick="goToday()">Today</button>
+      <button onclick="nextMonth()">›</button>
+    </div>
+
+  </div>
+
+  <div class="weekdays">
+    <div class="weekday">MON</div>
+    <div class="weekday">TUE</div>
+    <div class="weekday">WED</div>
+    <div class="weekday">THU</div>
+    <div class="weekday">FRI</div>
+    <div class="weekday">SAT</div>
+    <div class="weekday">SUN</div>
+  </div>
+
+  <div id="calendar" class="calendar"></div>
+
+</div>
+
+<script>
+
+const CLIENT_ID =
+"717633697063-cqlol5rt62977cmu29oa9ou3kmnmmrij.apps.googleusercontent.com";
+
+const SCOPES =
+"https://www.googleapis.com/auth/calendar.readonly";
+
+let accessToken;
+let tokenClient;
+
+let displayedDate = new Date();
+
+function connectGoogle() {
+
+  tokenClient = google.accounts.oauth2.initTokenClient({
+
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+
+    callback: async (response) => {
+
+      if (response.error) {
+        alert("Google authorization failed.");
+        return;
+      }
+
+      accessToken = response.access_token;
+
+      document.getElementById("login").style.display = "none";
+      document.getElementById("widget").style.display = "block";
+
+      await loadMonth();
+    }
+
+  });
+
+  tokenClient.requestAccessToken();
+}
+
+async function loadMonth() {
+
+  renderCalendar([]);
+
+  const year = displayedDate.getFullYear();
+  const month = displayedDate.getMonth();
+
+  const start = new Date(year, month, 1);
+  const end = new Date(year, month + 1, 1);
+
+  const url =
+    "https://www.googleapis.com/calendar/v3/calendars/primary/events" +
+    "?timeMin=" + encodeURIComponent(start.toISOString()) +
+    "&timeMax=" + encodeURIComponent(end.toISOString()) +
+    "&singleEvents=true" +
+    "&orderBy=startTime";
+
+  try {
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: "Bearer " + accessToken
+      }
+    });
+
+    const data = await response.json();
+
+    renderCalendar(data.items || []);
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+}
+
+function renderCalendar(events) {
+
+  const year = displayedDate.getFullYear();
+  const month = displayedDate.getMonth();
+
+  document.getElementById("monthTitle").textContent =
+    displayedDate.toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric"
+    });
+
+  const calendar =
+    document.getElementById("calendar");
+
+  calendar.innerHTML = "";
+
+  const firstDay =
+    new Date(year, month, 1);
+
+  let offset = firstDay.getDay();
+
+  offset = offset === 0 ? 6 : offset - 1;
+
+  const days =
+    new Date(year, month + 1, 0).getDate();
+
+  for (let i = 0; i < offset; i++) {
+
+    const blank =
+      document.createElement("div");
+
+    blank.className = "day";
+
+    calendar.appendChild(blank);
+  }
+
+  const today = new Date();
+
+  for (let day = 1; day <= days; day++) {
+
+    const cell =
+      document.createElement("div");
+
+    cell.className = "day";
+
+    if (
+      day === today.getDate() &&
+      month === today.getMonth() &&
+      year === today.getFullYear()
+    ) {
+      cell.classList.add("today");
+    }
+
+    const number =
+      document.createElement("div");
+
+    number.className = "day-number";
+    number.textContent = day;
+
+    cell.appendChild(number);
+
+    const dayEvents = events.filter(event => {
+
+      const start =
+        event.start?.dateTime ||
+        event.start?.date;
+
+      if (!start) return false;
+
+      const d = new Date(start);
+
+      return (
+        d.getDate() === day &&
+        d.getMonth() === month &&
+        d.getFullYear() === year
+      );
+
+    });
+
+    dayEvents.slice(0, 3).forEach(event => {
+
+      const eventDiv =
+        document.createElement("div");
+
+      eventDiv.className = "event";
+
+      eventDiv.textContent =
+        event.summary || "Event";
+
+      cell.appendChild(eventDiv);
+    });
+
+    if (dayEvents.length > 3) {
+
+      const more =
+        document.createElement("div");
+
+      more.className = "event";
+      more.textContent =
+        "+" + (dayEvents.length - 3) + " more";
+
+      cell.appendChild(more);
+    }
+
+    calendar.appendChild(cell);
+  }
+}
+
+function previousMonth() {
+
+  displayedDate =
+    new Date(
+      displayedDate.getFullYear(),
+      displayedDate.getMonth() - 1,
+      1
+    );
+
+  loadMonth();
+}
+
+function nextMonth() {
+
+  displayedDate =
+    new Date(
+      displayedDate.getFullYear(),
+      displayedDate.getMonth() + 1,
+      1
+    );
+
+  loadMonth();
+}
+
+function goToday() {
+
+  displayedDate = new Date();
+
+  loadMonth();
+}
+
+</script>
+
+</body>
+</html>
