@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,63 +11,85 @@
 
 <style>
 
+/* =====================================================
+   BASE
+===================================================== */
+
 * {
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
+
     background: #ffffff;
-    color: #191919;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                 Helvetica, Arial, sans-serif;
+
+    color: #37352f;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Helvetica,
+        Arial,
+        sans-serif;
 }
 
 body {
     padding: 18px 22px 24px;
 }
 
-/* =========================
+
+/* =====================================================
    HEADER
-========================= */
+===================================================== */
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
+
     min-height: 34px;
+
+    margin-bottom: 14px;
 }
 
 .month-title {
     font-size: 14px;
     font-weight: 600;
-    color: #191919;
+
+    color: #37352f;
 }
 
 .controls {
     display: flex;
     align-items: center;
-    gap: 7px;
+
+    gap: 4px;
 }
 
 .control-button {
-    border: none;
-    background: transparent;
-    color: #37352f;
-    cursor: pointer;
-
     height: 30px;
     min-width: 30px;
+
+    padding: 0 7px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
+    border: none;
     border-radius: 5px;
 
-    font-size: 14px;
+    background: transparent;
+
+    color: #787774;
+
+    font-size: 16px;
+
+    cursor: pointer;
 }
 
 .control-button:hover {
@@ -74,17 +97,23 @@ body {
 }
 
 .today-button {
-    padding: 0 8px;
+    color: #37352f;
+
     font-size: 12px;
+
+    padding: 0 9px;
 }
 
-/* =========================
+
+/* =====================================================
    WEEKDAYS
-========================= */
+===================================================== */
 
 .weekdays {
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+
+    grid-template-columns:
+        repeat(7, minmax(0, 1fr));
 }
 
 .weekday {
@@ -100,55 +129,64 @@ body {
     font-weight: 400;
 }
 
-/* =========================
+
+/* =====================================================
    CALENDAR GRID
-========================= */
+===================================================== */
 
 .calendar {
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
 
-    border-top: 1px solid #e3e3e1;
-    border-left: 1px solid #e3e3e1;
+    grid-template-columns:
+        repeat(7, minmax(0, 1fr));
+
+    border-top: 1px solid #e9e9e7;
+    border-left: 1px solid #e9e9e7;
 }
 
-/* =========================
-   DAY CELL
-========================= */
+
+/* =====================================================
+   DAY CELLS
+===================================================== */
 
 .day {
     position: relative;
 
     min-width: 0;
+
     height: 122px;
 
-    padding: 9px 9px 6px;
+    padding: 8px 9px 6px;
 
-    border-right: 1px solid #e3e3e1;
-    border-bottom: 1px solid #e3e3e1;
+    background: #fdfdfc;
 
-    background: #ffffff;
+    border-right: 1px solid #e9e9e7;
+    border-bottom: 1px solid #e9e9e7;
 
     overflow: hidden;
 }
 
-/* Weekend shading similar to screenshot */
+
+/* Weekend columns */
 
 .day.weekend {
-    background: #fafafa;
+    background: #fafaf9;
 }
 
-/* =========================
-   DATE NUMBER
-========================= */
+
+/* =====================================================
+   DATE
+===================================================== */
 
 .date-row {
     display: flex;
+
     justify-content: flex-end;
     align-items: center;
 
     min-height: 24px;
-    margin-bottom: 4px;
+
+    margin-bottom: 3px;
 }
 
 .day-number {
@@ -161,33 +199,42 @@ body {
     align-items: center;
     justify-content: center;
 
+    border-radius: 50%;
+
+    color: #37352f;
+
     font-size: 12px;
     font-weight: 400;
-
-    color: #191919;
-
-    border-radius: 50%;
 }
+
+
+/* Dates from previous / next month */
 
 .other-month .day-number {
-    color: #a6a6a6;
+    color: #b4b4b1;
 }
 
-/* Current day */
+
+/* =====================================================
+   TODAY
+===================================================== */
 
 .current-day .day-number {
     width: 24px;
+
     padding: 0;
 
     background: #eb5757;
+
     color: #ffffff;
 
     font-weight: 600;
 }
 
-/* =========================
+
+/* =====================================================
    EVENTS
-========================= */
+===================================================== */
 
 .events {
     width: 100%;
@@ -202,6 +249,7 @@ body {
     align-items: center;
 
     padding: 2px 5px;
+
     margin-bottom: 2px;
 
     border-radius: 3px;
@@ -210,47 +258,60 @@ body {
     line-height: 14px;
 
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 
-    color: #37352f;
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
 .event-time {
     margin-right: 4px;
+
     font-weight: 500;
+
+    flex-shrink: 0;
+}
+
+.event-title {
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
 .more {
-    font-size: 9px;
-    color: #787774;
-
     padding: 2px 4px;
 
-    cursor: default;
+    color: #9b9a97;
+
+    font-size: 9px;
 }
 
-/* =========================
+
+/* =====================================================
    LOGIN
-========================= */
+===================================================== */
 
 .login-screen {
     min-height: 250px;
 
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
     justify-content: center;
 }
 
 .connect-button {
+    padding: 8px 14px;
+
     background: #ffffff;
 
-    border: 1px solid #d8d8d6;
+    border: 1px solid #e3e3e1;
 
     border-radius: 5px;
-
-    padding: 8px 14px;
 
     color: #37352f;
 
@@ -279,9 +340,10 @@ body {
     font-size: 11px;
 }
 
-/* =========================
+
+/* =====================================================
    RESPONSIVE
-========================= */
+===================================================== */
 
 @media (max-width: 700px) {
 
@@ -291,11 +353,19 @@ body {
 
     .day {
         height: 95px;
-        padding: 6px;
+
+        padding: 5px;
     }
 
     .event {
         font-size: 9px;
+
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+
+    .weekday {
+        font-size: 10px;
     }
 
 }
@@ -307,9 +377,14 @@ body {
 <body>
 
 
-<!-- LOGIN -->
+<!-- ==================================================
+     LOGIN
+=================================================== -->
 
-<div id="loginScreen" class="login-screen">
+<div
+    id="loginScreen"
+    class="login-screen"
+>
 
     <button
         class="connect-button"
@@ -330,12 +405,18 @@ body {
 </div>
 
 
-<!-- CALENDAR -->
+
+<!-- ==================================================
+     CALENDAR
+=================================================== -->
 
 <div
     id="calendarWidget"
     style="display:none;"
 >
+
+
+    <!-- HEADER -->
 
     <div class="header">
 
@@ -355,12 +436,14 @@ body {
                 ‹
             </button>
 
+
             <button
                 class="control-button today-button"
                 onclick="goToday()"
             >
                 Today
             </button>
+
 
             <button
                 class="control-button"
@@ -375,6 +458,9 @@ body {
     </div>
 
 
+
+    <!-- WEEKDAYS -->
+
     <div class="weekdays">
 
         <div class="weekday">Sun</div>
@@ -388,36 +474,45 @@ body {
     </div>
 
 
+
+    <!-- DAYS -->
+
     <div
         id="calendar"
         class="calendar"
     ></div>
 
+
 </div>
+
 
 
 <script>
 
-/* =========================================
+/* =====================================================
    GOOGLE SETTINGS
-========================================= */
+===================================================== */
 
 const CLIENT_ID =
 "717633697063-cqlol5rt62977cmu29oa9ou3kmnmmrij.apps.googleusercontent.com";
+
 
 const SCOPES =
 "https://www.googleapis.com/auth/calendar.readonly";
 
 
 let accessToken = null;
+
 let tokenClient = null;
 
-let displayedDate = new Date();
+let displayedDate =
+    new Date();
 
 
-/* =========================================
+
+/* =====================================================
    GOOGLE LOGIN
-========================================= */
+===================================================== */
 
 function connectGoogle() {
 
@@ -429,41 +524,50 @@ function connectGoogle() {
     tokenClient =
         google.accounts.oauth2.initTokenClient({
 
-            client_id: CLIENT_ID,
+            client_id:
+                CLIENT_ID,
 
-            scope: SCOPES,
+            scope:
+                SCOPES,
 
-            callback: async response => {
 
-                if (response.error) {
+            callback:
+                async response => {
+
+
+                    if (
+                        response.error
+                    ) {
+
+                        document.getElementById(
+                            "loginError"
+                        ).textContent =
+                            "Google authorization failed.";
+
+                        return;
+
+                    }
+
+
+                    accessToken =
+                        response.access_token;
+
 
                     document.getElementById(
-                        "loginError"
-                    ).textContent =
-                        "Google authorization failed.";
+                        "loginScreen"
+                    ).style.display =
+                        "none";
 
-                    return;
+
+                    document.getElementById(
+                        "calendarWidget"
+                    ).style.display =
+                        "block";
+
+
+                    await loadMonth();
 
                 }
-
-
-                accessToken =
-                    response.access_token;
-
-
-                document.getElementById(
-                    "loginScreen"
-                ).style.display = "none";
-
-
-                document.getElementById(
-                    "calendarWidget"
-                ).style.display = "block";
-
-
-                await loadMonth();
-
-            }
 
         });
 
@@ -473,11 +577,13 @@ function connectGoogle() {
 }
 
 
-/* =========================================
-   GET GOOGLE CALENDARS
-========================================= */
+
+/* =====================================================
+   GET CALENDAR LIST
+===================================================== */
 
 async function getCalendars() {
+
 
     const response =
         await fetch(
@@ -485,12 +591,15 @@ async function getCalendars() {
             "https://www.googleapis.com/calendar/v3/users/me/calendarList",
 
             {
+
                 headers: {
 
                     Authorization:
-                        "Bearer " + accessToken
+                        "Bearer " +
+                        accessToken
 
                 }
+
             }
 
         );
@@ -500,38 +609,49 @@ async function getCalendars() {
         await response.json();
 
 
-    if (!response.ok) {
+    if (
+        !response.ok
+    ) {
 
         throw new Error(
+
             data.error?.message ||
+
             "Unable to load calendars."
+
         );
 
     }
 
 
     /*
-      Load calendars that are selected
-      in Google Calendar.
+       Only calendars currently selected
+       in Google Calendar.
     */
 
-    return (data.items || []).filter(
+    return (
+        data.items || []
+    ).filter(
+
         calendar =>
             calendar.selected !== false
+
     );
 
 }
 
 
-/* =========================================
+
+/* =====================================================
    GET EVENTS FROM ONE CALENDAR
-========================================= */
+===================================================== */
 
 async function getCalendarEvents(
     calendar,
     start,
     end
 ) {
+
 
     const url =
 
@@ -544,11 +664,13 @@ async function getCalendarEvents(
         "/events" +
 
         "?timeMin=" +
+
         encodeURIComponent(
             start.toISOString()
         ) +
 
         "&timeMax=" +
+
         encodeURIComponent(
             end.toISOString()
         ) +
@@ -562,10 +684,14 @@ async function getCalendarEvents(
 
     try {
 
+
         const response =
             await fetch(
+
                 url,
+
                 {
+
                     headers: {
 
                         Authorization:
@@ -573,7 +699,9 @@ async function getCalendarEvents(
                             accessToken
 
                     }
+
                 }
+
             );
 
 
@@ -581,45 +709,68 @@ async function getCalendarEvents(
             await response.json();
 
 
-        if (!response.ok) {
+        if (
+            !response.ok
+        ) {
 
             console.warn(
-                "Could not load:",
+
+                "Unable to load calendar:",
+
                 calendar.summary
+
             );
+
 
             return [];
 
         }
 
 
-        return (data.items || []).map(
+        return (
+            data.items || []
+        ).map(
+
             event => ({
 
                 ...event,
 
+
                 calendarName:
                     calendar.summary,
+
 
                 calendarColor:
                     calendar.backgroundColor ||
                     "#eeeeec",
+
 
                 calendarTextColor:
                     calendar.foregroundColor ||
                     "#37352f"
 
             })
+
         );
 
 
-    } catch (error) {
+    }
+
+    catch (
+        error
+    ) {
+
 
         console.warn(
+
             "Calendar error:",
+
             calendar.summary,
+
             error
+
         );
+
 
         return [];
 
@@ -628,40 +779,61 @@ async function getCalendarEvents(
 }
 
 
-/* =========================================
+
+/* =====================================================
    LOAD MONTH
-========================================= */
+===================================================== */
 
 async function loadMonth() {
 
-    /*
-      We include a few days from the previous
-      and following months because the visual
-      calendar displays them too.
-    */
 
     const year =
         displayedDate.getFullYear();
+
 
     const month =
         displayedDate.getMonth();
 
 
+
+    /*
+       First day of displayed month
+    */
+
     const firstOfMonth =
         new Date(
+
             year,
+
             month,
+
             1
+
         );
 
+
+
+    /*
+       Last day of displayed month
+    */
 
     const lastOfMonth =
         new Date(
+
             year,
+
             month + 1,
+
             0
+
         );
 
+
+
+    /*
+       Start on Sunday before
+       month begins
+    */
 
     const start =
         new Date(
@@ -670,10 +842,18 @@ async function loadMonth() {
 
 
     start.setDate(
+
         start.getDate() -
+
         start.getDay()
+
     );
 
+
+
+    /*
+       Finish after final Saturday
+    */
 
     const end =
         new Date(
@@ -682,27 +862,47 @@ async function loadMonth() {
 
 
     end.setDate(
+
         end.getDate() +
+
         (6 - end.getDay()) +
+
         1
+
     );
 
 
+
     try {
+
 
         const calendars =
             await getCalendars();
 
 
+
+        /*
+           Load every calendar
+           simultaneously
+        */
+
         const requests =
             calendars.map(
+
                 calendar =>
+
                     getCalendarEvents(
+
                         calendar,
+
                         start,
+
                         end
+
                     )
+
             );
+
 
 
         const results =
@@ -711,30 +911,51 @@ async function loadMonth() {
             );
 
 
+
         const allEvents =
             results.flat();
 
 
+
+        /*
+           Sort events chronologically
+        */
+
         allEvents.sort(
+
             (a, b) => {
 
+
                 const aStart =
+
                     a.start?.dateTime ||
+
                     a.start?.date ||
+
                     "";
+
 
                 const bStart =
+
                     b.start?.dateTime ||
+
                     b.start?.date ||
+
                     "";
 
+
                 return (
+
                     new Date(aStart) -
+
                     new Date(bStart)
+
                 );
 
             }
+
         );
+
 
 
         renderCalendar(
@@ -742,11 +963,17 @@ async function loadMonth() {
         );
 
 
-    } catch (error) {
+    }
+
+    catch (
+        error
+    ) {
+
 
         console.error(
             error
         );
+
 
         renderCalendar([]);
 
@@ -755,32 +982,49 @@ async function loadMonth() {
 }
 
 
-/* =========================================
-   RENDER CALENDAR
-========================================= */
 
-function renderCalendar(events) {
+/* =====================================================
+   RENDER CALENDAR
+===================================================== */
+
+function renderCalendar(
+    events
+) {
+
 
     const year =
         displayedDate.getFullYear();
+
 
     const month =
         displayedDate.getMonth();
 
 
-    /* HEADER */
+
+    /*
+       MONTH TITLE
+    */
 
     document.getElementById(
         "monthTitle"
     ).textContent =
 
         displayedDate.toLocaleDateString(
+
             "en-US",
+
             {
-                month: "long",
-                year: "numeric"
+
+                month:
+                    "long",
+
+                year:
+                    "numeric"
+
             }
+
         );
+
 
 
     const calendar =
@@ -789,67 +1033,97 @@ function renderCalendar(events) {
         );
 
 
-    calendar.innerHTML = "";
+    calendar.innerHTML =
+        "";
 
 
-    /* FIRST VISIBLE SUNDAY */
+
+    /*
+       FIRST VISIBLE SUNDAY
+    */
 
     const first =
         new Date(
+
             year,
+
             month,
+
             1
+
         );
 
 
     const gridStart =
-        new Date(first);
+        new Date(
+            first
+        );
 
 
     gridStart.setDate(
-        1 - first.getDay()
+
+        1 -
+
+        first.getDay()
+
     );
 
 
-    /* LAST VISIBLE SATURDAY */
+
+    /*
+       LAST VISIBLE SATURDAY
+    */
 
     const last =
         new Date(
+
             year,
+
             month + 1,
+
             0
+
         );
 
 
     const gridEnd =
-        new Date(last);
+        new Date(
+            last
+        );
 
 
     gridEnd.setDate(
+
         last.getDate() +
+
         (6 - last.getDay())
+
     );
+
 
 
     const today =
         new Date();
 
 
-    /*
-      Render every visible day.
-      Usually 35 or 42 cells.
-    */
 
     const cursor =
-        new Date(gridStart);
+        new Date(
+            gridStart
+        );
+
 
 
     while (
         cursor <= gridEnd
     ) {
 
+
         const cellDate =
-            new Date(cursor);
+            new Date(
+                cursor
+            );
+
 
 
         const cell =
@@ -862,11 +1136,17 @@ function renderCalendar(events) {
             "day";
 
 
-        /* WEEKENDS */
+
+        /*
+           WEEKEND
+        */
 
         if (
+
             cellDate.getDay() === 0 ||
+
             cellDate.getDay() === 6
+
         ) {
 
             cell.classList.add(
@@ -876,11 +1156,16 @@ function renderCalendar(events) {
         }
 
 
-        /* OTHER MONTH */
+
+        /*
+           PREVIOUS / NEXT MONTH
+        */
 
         if (
+
             cellDate.getMonth() !==
             month
+
         ) {
 
             cell.classList.add(
@@ -890,13 +1175,18 @@ function renderCalendar(events) {
         }
 
 
-        /* TODAY */
+
+        /*
+           TODAY
+        */
 
         if (
+
             sameDate(
                 cellDate,
                 today
             )
+
         ) {
 
             cell.classList.add(
@@ -906,7 +1196,10 @@ function renderCalendar(events) {
         }
 
 
-        /* DATE ROW */
+
+        /*
+           DATE ROW
+        */
 
         const dateRow =
             document.createElement(
@@ -916,6 +1209,7 @@ function renderCalendar(events) {
 
         dateRow.className =
             "date-row";
+
 
 
         const number =
@@ -928,32 +1222,47 @@ function renderCalendar(events) {
             "day-number";
 
 
+
         /*
-          Like the screenshot:
-          display month abbreviation
-          on the first day of a month.
+           First day of month:
+           "Oct 1"
         */
 
         if (
             cellDate.getDate() === 1
         ) {
 
+
             number.textContent =
 
                 cellDate.toLocaleDateString(
+
                     "en-US",
+
                     {
-                        month: "short",
-                        day: "numeric"
+
+                        month:
+                            "short",
+
+                        day:
+                            "numeric"
+
                     }
+
                 );
 
-        } else {
+
+        }
+
+        else {
+
 
             number.textContent =
                 cellDate.getDate();
 
+
         }
+
 
 
         dateRow.appendChild(
@@ -966,7 +1275,10 @@ function renderCalendar(events) {
         );
 
 
-        /* EVENTS AREA */
+
+        /*
+           EVENTS
+        */
 
         const eventsArea =
             document.createElement(
@@ -978,20 +1290,37 @@ function renderCalendar(events) {
             "events";
 
 
+
         const dayEvents =
             events.filter(
+
                 event =>
+
                     eventOccursOnDate(
+
                         event,
+
                         cellDate
+
                     )
+
             );
 
 
+
+        /*
+           DISPLAY FIRST FOUR
+        */
+
         dayEvents
-            .slice(0, 4)
+            .slice(
+                0,
+                4
+            )
             .forEach(
+
                 event => {
+
 
                     const eventDiv =
                         document.createElement(
@@ -1003,30 +1332,52 @@ function renderCalendar(events) {
                         "event";
 
 
+
+                    /*
+                       Use the actual
+                       Google calendar color
+                    */
+
                     eventDiv.style.backgroundColor =
                         event.calendarColor;
+
 
 
                     eventDiv.style.color =
                         event.calendarTextColor;
 
 
-                    /* EVENT TIME */
+
+                    /*
+                       TIME
+                    */
 
                     if (
                         event.start?.dateTime
                     ) {
 
+
                         const time =
                             new Date(
+
                                 event.start.dateTime
+
                             ).toLocaleTimeString(
+
                                 [],
+
                                 {
-                                    hour: "numeric",
-                                    minute: "2-digit"
+
+                                    hour:
+                                        "numeric",
+
+                                    minute:
+                                        "2-digit"
+
                                 }
+
                             );
+
 
 
                         const timeSpan =
@@ -1050,14 +1401,25 @@ function renderCalendar(events) {
                     }
 
 
+
+                    /*
+                       TITLE
+                    */
+
                     const title =
                         document.createElement(
                             "span"
                         );
 
 
+                    title.className =
+                        "event-title";
+
+
                     title.textContent =
+
                         event.summary ||
+
                         "Event";
 
 
@@ -1066,15 +1428,38 @@ function renderCalendar(events) {
                     );
 
 
+
+                    /*
+                       TOOLTIP
+                    */
+
                     eventDiv.title =
 
-                        (event.calendarName
-                            ? event.calendarName +
-                              " — "
-                            : "") +
+                        (
 
-                        (event.summary ||
-                         "Event");
+                            event.calendarName
+
+                            ?
+
+                            event.calendarName +
+                            " — "
+
+                            :
+
+                            ""
+
+                        )
+
+                        +
+
+                        (
+
+                            event.summary ||
+
+                            "Event"
+
+                        );
+
 
 
                     eventsArea.appendChild(
@@ -1082,14 +1467,19 @@ function renderCalendar(events) {
                     );
 
                 }
+
             );
 
 
-        /* MORE EVENTS */
+
+        /*
+           EXTRA EVENTS
+        */
 
         if (
             dayEvents.length > 4
         ) {
+
 
             const more =
                 document.createElement(
@@ -1104,7 +1494,14 @@ function renderCalendar(events) {
             more.textContent =
 
                 "+" +
-                (dayEvents.length - 4) +
+
+                (
+                    dayEvents.length -
+                    4
+                )
+
+                +
+
                 " more";
 
 
@@ -1113,6 +1510,7 @@ function renderCalendar(events) {
             );
 
         }
+
 
 
         cell.appendChild(
@@ -1125,8 +1523,16 @@ function renderCalendar(events) {
         );
 
 
+
+        /*
+           NEXT DAY
+        */
+
         cursor.setDate(
-            cursor.getDate() + 1
+
+            cursor.getDate() +
+            1
+
         );
 
     }
@@ -1134,34 +1540,48 @@ function renderCalendar(events) {
 }
 
 
-/* =========================================
-   EVENT DATE CHECK
-========================================= */
+
+/* =====================================================
+   EVENT DATE MATCHING
+===================================================== */
 
 function eventOccursOnDate(
     event,
     date
 ) {
 
-    /* ALL-DAY EVENT */
+
+    /*
+       ALL-DAY EVENT
+    */
 
     if (
         event.start?.date
     ) {
 
+
         const parts =
+
             event.start.date
+
                 .split("-")
-                .map(Number);
+
+                .map(
+                    Number
+                );
 
 
         return (
 
             parts[0] ===
-                date.getFullYear() &&
+                date.getFullYear()
+
+            &&
 
             parts[1] ===
-                date.getMonth() + 1 &&
+                date.getMonth() + 1
+
+            &&
 
             parts[2] ===
                 date.getDate()
@@ -1171,24 +1591,34 @@ function eventOccursOnDate(
     }
 
 
-    /* TIMED EVENT */
+
+    /*
+       TIMED EVENT
+    */
 
     if (
         event.start?.dateTime
     ) {
 
+
         const eventDate =
             new Date(
+
                 event.start.dateTime
+
             );
 
 
         return sameDate(
+
             eventDate,
+
             date
+
         );
 
     }
+
 
 
     return false;
@@ -1196,22 +1626,28 @@ function eventOccursOnDate(
 }
 
 
-/* =========================================
+
+/* =====================================================
    SAME DATE
-========================================= */
+===================================================== */
 
 function sameDate(
     a,
     b
 ) {
 
+
     return (
 
         a.getFullYear() ===
-            b.getFullYear() &&
+            b.getFullYear()
+
+        &&
 
         a.getMonth() ===
-            b.getMonth() &&
+            b.getMonth()
+
+        &&
 
         a.getDate() ===
             b.getDate()
@@ -1221,17 +1657,24 @@ function sameDate(
 }
 
 
-/* =========================================
-   NAVIGATION
-========================================= */
+
+/* =====================================================
+   PREVIOUS MONTH
+===================================================== */
 
 function previousMonth() {
 
+
     displayedDate =
         new Date(
+
             displayedDate.getFullYear(),
-            displayedDate.getMonth() - 1,
+
+            displayedDate.getMonth() -
+            1,
+
             1
+
         );
 
 
@@ -1239,14 +1682,25 @@ function previousMonth() {
 
 }
 
+
+
+/* =====================================================
+   NEXT MONTH
+===================================================== */
 
 function nextMonth() {
 
+
     displayedDate =
         new Date(
+
             displayedDate.getFullYear(),
-            displayedDate.getMonth() + 1,
+
+            displayedDate.getMonth() +
+            1,
+
             1
+
         );
 
 
@@ -1255,7 +1709,13 @@ function nextMonth() {
 }
 
 
+
+/* =====================================================
+   TODAY
+===================================================== */
+
 function goToday() {
+
 
     displayedDate =
         new Date();
@@ -1268,4 +1728,5 @@ function goToday() {
 </script>
 
 </body>
+
 </html>
