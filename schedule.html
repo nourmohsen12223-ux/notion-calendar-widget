@@ -98,6 +98,7 @@ body {
 
 .activity-cell.has-task {
     cursor: grab;
+    touch-action: none;
 }
 
 .activity-cell.has-task:active {
@@ -236,6 +237,8 @@ body {
     cursor: grab;
 
     user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
 
     transition:
         transform 0.12s ease,
@@ -474,6 +477,20 @@ const TASKS_KEY =
 
 const DATE_KEY =
     "noury-daily-schedule-date";
+
+/* =====================================================
+   CLOUD SYNC
+===================================================== */
+
+const SYNC_URL =
+    "https://notion-calendar-api.nourmohsen12223.workers.dev/schedule-data";
+
+const SYNC_INTERVAL_MS = 3000;
+
+let syncTimer = null;
+let saveTimer = null;
+let applyingRemoteData = false;
+let lastCloudSnapshot = "";
 
 
 let tasks = [];
@@ -758,6 +775,37 @@ function buildSchedule() {
                         hour
                     );
 
+                }
+            );
+
+            /* POINTER / TOUCH DRAG FROM SCHEDULE */
+            activityCell.addEventListener(
+                "pointerdown",
+                event => {
+
+                    if (
+                        event.pointerType === "mouse"
+                        || event.target !== activityCell
+                    ) {
+                        return;
+                    }
+
+                    const text =
+                        input.value.trim();
+
+                    if (!text) {
+                        return;
+                    }
+
+                    startPointerDrag(
+                        event,
+                        {
+                            type: "schedule",
+                            hour: hour,
+                            text: text,
+                            sourceElement: activityCell
+                        }
+                    );
                 }
             );
 
@@ -1079,6 +1127,30 @@ function renderTasks() {
 
                     resetDragState();
 
+                }
+            );
+
+            /* POINTER / TOUCH DRAG FOR IPAD / IPHONE */
+            item.addEventListener(
+                "pointerdown",
+                event => {
+
+                    if (
+                        event.pointerType === "mouse"
+                        || event.target.closest(".delete-task")
+                    ) {
+                        return;
+                    }
+
+                    startPointerDrag(
+                        event,
+                        {
+                            type: "task",
+                            taskId: task.id,
+                            text: task.text,
+                            sourceElement: item
+                        }
+                    );
                 }
             );
 
@@ -1436,6 +1508,438 @@ taskList.addEventListener(
 
 
 /* =====================================================
+   POINTER / TOUCH DRAG FOR IPAD / IPHONE
+===================================================== */
+
+function startPointerDrag(event, data) {
+
+    if (pointerDrag) {
+        return;
+    }
+
+    pointerDrag = {
+        ...data,
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        dragging: false
+    };
+
+    data.sourceElement.setPointerCapture?.(
+        event.pointerId
+    );
+
+    window.addEventListener(
+        "pointermove",
+        handlePointerMove,
+        { passive: false }
+    );
+
+    window.addEventListener(
+        "pointerup",
+        handlePointerUp,
+        { passive: false }
+    );
+
+    window.addEventListener(
+        "pointercancel",
+        handlePointerCancel,
+        { passive: false }
+    );
+}
+
+
+function handlePointerMove(event) {
+
+    if (
+        !pointerDrag
+        || event.pointerId !== pointerDrag.pointerId
+    ) {
+        return;
+    }
+
+    const dx =
+        event.clientX - pointerDrag.startX;
+
+    const dy =
+        event.clientY - pointerDrag.startY;
+
+    if (
+        !pointerDrag.dragging
+        && Math.hypot(dx, dy) < 8
+    ) {
+        return;
+    }
+
+    if (!pointerDrag.dragging) {
+
+        pointerDrag.dragging =
+            true;
+
+        pointerDrag.sourceElement
+            .classList.add("dragging");
+
+        createPointerGhost(
+            pointerDrag.text,
+            event.clientX,
+            event.clientY
+        );
+    }
+
+    event.preventDefault();
+
+    movePointerGhost(
+        event.clientX,
+        event.clientY
+    );
+
+    updatePointerDropTarget(
+        event.clientX,
+        event.clientY
+    );
+}
+
+
+function handlePointerUp(event) {
+
+    if (
+        !pointerDrag
+        || event.pointerId !== pointerDrag.pointerId
+    ) {
+        return;
+    }
+
+    if (pointerDrag.dragging) {
+
+        event.preventDefault();
+
+        suppressClickUntil =
+            Date.now() + 500;
+
+        performPointerDrop(
+            event.clientX,
+            event.clientY
+        );
+    }
+
+    finishPointerDrag();
+}
+
+
+function handlePointerCancel(event) {
+
+    if (
+        !pointerDrag
+        || event.pointerId !== pointerDrag.pointerId
+    ) {
+        return;
+    }
+
+    finishPointerDrag();
+}
+
+
+function createPointerGhost(
+    text,
+    x,
+    y
+) {
+
+    pointerGhost =
+        document.createElement("div");
+
+    pointerGhost.textContent =
+        text;
+
+    Object.assign(
+        pointerGhost.style,
+        {
+            position: "fixed",
+            left: "0",
+            top: "0",
+            zIndex: "99999",
+            maxWidth: "260px",
+            padding: "9px 12px",
+            borderRadius: "10px",
+            background: "#E8E4DE",
+            border: "1px solid rgba(55, 53, 47, 0.12)",
+            color: "#4B4945",
+            fontFamily: "inherit",
+            fontSize: "13px",
+            fontWeight: "500",
+            boxShadow: "0 8px 24px rgba(55, 53, 47, 0.14)",
+            pointerEvents: "none",
+            opacity: "0.96"
+        }
+    );
+
+    document.body.appendChild(
+        pointerGhost
+    );
+
+    movePointerGhost(x, y);
+}
+
+
+function movePointerGhost(x, y) {
+
+    if (!pointerGhost) {
+        return;
+    }
+
+    pointerGhost.style.transform =
+        `translate(${x + 14}px, ${y + 14}px)`;
+}
+
+
+function getPointerDropTarget(x, y) {
+
+    if (pointerGhost) {
+        pointerGhost.style.display =
+            "none";
+    }
+
+    const element =
+        document.elementFromPoint(
+            x,
+            y
+        );
+
+    if (pointerGhost) {
+        pointerGhost.style.display =
+            "";
+    }
+
+    if (!element) {
+        return null;
+    }
+
+    const cell =
+        element.closest(
+            ".activity-cell"
+        );
+
+    if (cell) {
+        return cell;
+    }
+
+    const list =
+        element.closest(
+            "#taskList"
+        );
+
+    if (list) {
+        return list;
+    }
+
+    return null;
+}
+
+
+function updatePointerDropTarget(x, y) {
+
+    const target =
+        getPointerDropTarget(
+            x,
+            y
+        );
+
+    if (
+        target === pointerDropTarget
+    ) {
+        return;
+    }
+
+    if (pointerDropTarget) {
+        pointerDropTarget.classList.remove(
+            "drag-over"
+        );
+    }
+
+    pointerDropTarget =
+        target;
+
+    if (pointerDropTarget) {
+        pointerDropTarget.classList.add(
+            "drag-over"
+        );
+    }
+}
+
+
+function performPointerDrop(x, y) {
+
+    const target =
+        getPointerDropTarget(
+            x,
+            y
+        );
+
+    if (!target || !pointerDrag) {
+        return;
+    }
+
+    if (
+        target.classList.contains(
+            "activity-cell"
+        )
+    ) {
+
+        const hour =
+            Number(
+                target.dataset.hour
+            );
+
+        if (
+            pointerDrag.type === "task"
+        ) {
+
+            draggedTaskId =
+                pointerDrag.taskId;
+
+            draggedScheduleHour =
+                null;
+
+            handleDropOnSchedule(
+                hour
+            );
+
+            return;
+        }
+
+        if (
+            pointerDrag.type === "schedule"
+        ) {
+
+            draggedTaskId =
+                null;
+
+            draggedScheduleHour =
+                pointerDrag.hour;
+
+            handleDropOnSchedule(
+                hour
+            );
+
+            return;
+        }
+    }
+
+    if (
+        target.id === "taskList"
+        && pointerDrag.type === "schedule"
+    ) {
+
+        moveScheduleHourBackToTasks(
+            pointerDrag.hour
+        );
+    }
+}
+
+
+function moveScheduleHourBackToTasks(
+    hour
+) {
+
+    const sourceInput =
+        document.querySelector(
+            `.activity-input[data-hour="${hour}"]`
+        );
+
+    if (!sourceInput) {
+        return;
+    }
+
+    const text =
+        sourceInput.value.trim();
+
+    if (!text) {
+        return;
+    }
+
+    tasks.push({
+        id:
+            Date.now().toString()
+            +
+            Math.random()
+                .toString(16)
+                .slice(2),
+        text: text
+    });
+
+    sourceInput.value =
+        "";
+
+    updateCellState(
+        sourceInput.closest(
+            ".activity-cell"
+        )
+    );
+
+    saveSchedule();
+    saveTasks();
+    renderTasks();
+}
+
+
+function finishPointerDrag() {
+
+    if (
+        pointerDrag
+        && pointerDrag.sourceElement
+    ) {
+        pointerDrag.sourceElement
+            .classList.remove(
+                "dragging"
+            );
+
+        try {
+            pointerDrag.sourceElement
+                .releasePointerCapture?.(
+                    pointerDrag.pointerId
+                );
+        } catch {}
+    }
+
+    if (pointerDropTarget) {
+        pointerDropTarget.classList.remove(
+            "drag-over"
+        );
+    }
+
+    if (pointerGhost) {
+        pointerGhost.remove();
+    }
+
+    pointerGhost =
+        null;
+
+    pointerDropTarget =
+        null;
+
+    pointerDrag =
+        null;
+
+    resetDragState();
+
+    window.removeEventListener(
+        "pointermove",
+        handlePointerMove
+    );
+
+    window.removeEventListener(
+        "pointerup",
+        handlePointerUp
+    );
+
+    window.removeEventListener(
+        "pointercancel",
+        handlePointerCancel
+    );
+}
+
+
+/* =====================================================
    RESET DRAG STATE
 ===================================================== */
 
@@ -1505,6 +2009,10 @@ function saveSchedule() {
         DATE_KEY,
         getTodayKey()
     );
+
+    if (!applyingRemoteData) {
+        queueCloudSave();
+    }
 }
 
 
@@ -1526,7 +2034,304 @@ function saveTasks() {
         DATE_KEY,
         getTodayKey()
     );
+
+    if (!applyingRemoteData) {
+        queueCloudSave();
+    }
 }
+
+
+/* =====================================================
+   CLOUD SYNC HELPERS
+===================================================== */
+
+function getCurrentScheduleObject() {
+
+    const schedule = {};
+
+    HOURS.forEach(
+        hour => {
+
+            const input =
+                document.querySelector(
+                    `.activity-input[data-hour="${hour}"]`
+                );
+
+            schedule[hour] =
+                input
+                    ? input.value
+                    : "";
+        }
+    );
+
+    return schedule;
+}
+
+
+function makeCloudPayload() {
+
+    return {
+        date: getTodayKey(),
+        tasks: tasks,
+        schedule: getCurrentScheduleObject(),
+        updatedAt: Date.now()
+    };
+}
+
+
+function queueCloudSave() {
+
+    clearTimeout(saveTimer);
+
+    saveTimer =
+        setTimeout(
+            saveToCloud,
+            250
+        );
+}
+
+
+async function saveToCloud() {
+
+    if (applyingRemoteData) {
+        return;
+    }
+
+    const payload =
+        makeCloudPayload();
+
+    try {
+
+        const response =
+            await fetch(
+                SYNC_URL,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+                }
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Cloud save failed"
+            );
+        }
+
+        lastCloudSnapshot =
+            JSON.stringify({
+                date: payload.date,
+                tasks: payload.tasks,
+                schedule: payload.schedule
+            });
+    }
+
+    catch (error) {
+
+        console.warn(
+            "Schedule cloud save unavailable:",
+            error
+        );
+    }
+}
+
+
+async function loadFromCloud() {
+
+    try {
+
+        const response =
+            await fetch(
+                SYNC_URL,
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Cloud load failed"
+            );
+        }
+
+        const data =
+            await response.json();
+
+        const today =
+            getTodayKey();
+
+        if (
+            !data
+            || data.date !== today
+        ) {
+
+            /*
+             * A stale/empty cloud record must not overwrite
+             * today's local data. If this device already has
+             * today's data, publish it; otherwise publish an
+             * empty day.
+             */
+            await saveToCloud();
+            return;
+        }
+
+        const normalized = {
+            date: today,
+            tasks:
+                Array.isArray(data.tasks)
+                    ? data.tasks
+                    : [],
+            schedule:
+                data.schedule
+                && typeof data.schedule === "object"
+                    ? data.schedule
+                    : {}
+        };
+
+        const snapshot =
+            JSON.stringify(
+                normalized
+            );
+
+        const localSnapshot =
+            JSON.stringify({
+                date: today,
+                tasks: tasks,
+                schedule:
+                    getCurrentScheduleObject()
+            });
+
+        if (
+            snapshot === localSnapshot
+        ) {
+
+            lastCloudSnapshot =
+                snapshot;
+
+            return;
+        }
+
+        applyingRemoteData =
+            true;
+
+        tasks =
+            normalized.tasks;
+
+        HOURS.forEach(
+            hour => {
+
+                const input =
+                    document.querySelector(
+                        `.activity-input[data-hour="${hour}"]`
+                    );
+
+                if (!input) {
+                    return;
+                }
+
+                input.value =
+                    normalized.schedule[hour]
+                    || "";
+
+                updateCellState(
+                    input.closest(
+                        ".activity-cell"
+                    )
+                );
+            }
+        );
+
+        renderTasks();
+
+        localStorage.setItem(
+            TASKS_KEY,
+            JSON.stringify(tasks)
+        );
+
+        localStorage.setItem(
+            SCHEDULE_KEY,
+            JSON.stringify(
+                normalized.schedule
+            )
+        );
+
+        localStorage.setItem(
+            DATE_KEY,
+            today
+        );
+
+        lastCloudSnapshot =
+            snapshot;
+
+        applyingRemoteData =
+            false;
+    }
+
+    catch (error) {
+
+        applyingRemoteData =
+            false;
+
+        console.warn(
+            "Schedule cloud sync unavailable:",
+            error
+        );
+    }
+}
+
+
+function startCloudSync() {
+
+    clearInterval(
+        syncTimer
+    );
+
+    loadFromCloud();
+
+    syncTimer =
+        setInterval(
+            () => {
+
+                if (
+                    document.visibilityState
+                    === "visible"
+                    && !pointerDrag
+                    && draggedTaskId === null
+                    && draggedScheduleHour === null
+                ) {
+                    loadFromCloud();
+                }
+            },
+            SYNC_INTERVAL_MS
+        );
+}
+
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+
+        if (
+            document.visibilityState
+            === "visible"
+        ) {
+            loadFromCloud();
+        }
+    }
+);
+
+
+window.addEventListener(
+    "focus",
+    loadFromCloud
+);
 
 
 /* =====================================================
@@ -1781,6 +2586,8 @@ setInterval(
 buildSchedule();
 
 loadData();
+
+startCloudSync();
 
 </script>
 
