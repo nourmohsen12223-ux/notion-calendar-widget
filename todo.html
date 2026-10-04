@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Daily To-Do</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    color: #37352f;
+}
+
+body {
+    padding: 1px 7px 8px;
+}
+
+
+/* =====================================================
+   WIDGET
+===================================================== */
+
+.todo-widget {
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e2e0;
+    border-radius: 11px;
+
+    padding:
+        21px
+        26px
+        18px;
+}
+
+
+/* =====================================================
+   TITLE
+===================================================== */
+
+.title {
+    margin-bottom: 38px;
+
+    color: #171717;
+
+    font-size: 20px;
+    font-weight: 600;
+
+    line-height: 1.2;
+}
+
+
+/* =====================================================
+   ROWS
+===================================================== */
+
+.todo-row {
+    display: flex;
+    align-items: center;
+
+    min-height: 40px;
+}
+
+
+/* =====================================================
+   CHECKBOX
+===================================================== */
+
+.checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 16px;
+    height: 16px;
+
+    flex: 0 0 16px;
+
+    margin: 0 11px 0 0;
+
+    background: #ffffff;
+
+    border: 1px solid #5f5f5f;
+    border-radius: 0;
+
+    cursor: pointer;
+}
+
+.checkbox:checked {
+    position: relative;
+
+    background: #37352f;
+    border-color: #37352f;
+}
+
+.checkbox:checked::after {
+    content: "";
+
+    position: absolute;
+
+    left: 4px;
+    top: 1px;
+
+    width: 4px;
+    height: 8px;
+
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+
+    transform: rotate(45deg);
+}
+
+
+/* =====================================================
+   TASK
+===================================================== */
+
+.task-wrapper {
+    position: relative;
+
+    flex: 1;
+    min-width: 0;
+
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+
+    border-bottom: 1px solid #dedede;
+}
+
+
+/* No bottom line on final item */
+
+.todo-row:last-child .task-wrapper {
+    border-bottom: none;
+}
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+.task-input {
+    width: 100%;
+
+    padding: 0;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #37352f;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.task-input::placeholder {
+    color: #37352f;
+    opacity: 1;
+}
+
+
+/* Completed task */
+
+.todo-row.completed .task-input {
+    color: #9b9a97;
+
+    text-decoration: line-through;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 500px) {
+
+    body {
+        padding: 1px 4px 6px;
+    }
+
+    .todo-widget {
+        padding:
+            19px
+            20px
+            16px;
+    }
+
+    .title {
+        margin-bottom: 31px;
+
+        font-size: 19px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="todo-widget">
+
+    <div class="title">
+        Daily to-do
+    </div>
+
+
+    <!-- ITEM 1 -->
+
+    <div class="todo-row">
+
+        <input
+            type="checkbox"
+            class="checkbox"
+            id="check1"
+        >
+
+        <div class="task-wrapper">
+
+            <input
+                type="text"
+                class="task-input"
+                id="task1"
+                placeholder="item 1"
+                autocomplete="off"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- ITEM 2 -->
+
+    <div class="todo-row">
+
+        <input
+            type="checkbox"
+            class="checkbox"
+            id="check2"
+        >
+
+        <div class="task-wrapper">
+
+            <input
+                type="text"
+                class="task-input"
+                id="task2"
+                placeholder="item 2"
+                autocomplete="off"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- ITEM 3 -->
+
+    <div class="todo-row">
+
+        <input
+            type="checkbox"
+            class="checkbox"
+            id="check3"
+        >
+
+        <div class="task-wrapper">
+
+            <input
+                type="text"
+                class="task-input"
+                id="task3"
+                placeholder="item 3"
+                autocomplete="off"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- ITEM 4 -->
+
+    <div class="todo-row">
+
+        <input
+            type="checkbox"
+            class="checkbox"
+            id="check4"
+        >
+
+        <div class="task-wrapper">
+
+            <input
+                type="text"
+                class="task-input"
+                id="task4"
+                placeholder="item 4"
+                autocomplete="off"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- ITEM 5 -->
+
+    <div class="todo-row">
+
+        <input
+            type="checkbox"
+            class="checkbox"
+            id="check5"
+        >
+
+        <div class="task-wrapper">
+
+            <input
+                type="text"
+                class="task-input"
+                id="task5"
+                placeholder="item 5"
+                autocomplete="off"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- ITEM 6 -->
+
+    <div class="todo-row">
+
+        <input
+            type="checkbox"
+            class="checkbox"
+            id="check6"
+        >
+
+        <div class="task-wrapper">
+
+            <input
+                type="text"
+                class="task-input"
+                id="task6"
+                placeholder="item 6"
+                autocomplete="off"
+            >
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+
+const STORAGE_KEY =
+    "noury-daily-todo";
+
+const DATE_KEY =
+    "noury-daily-todo-date";
+
+const TOTAL_ITEMS =
+    6;
+
+
+
+/* =====================================================
+   TODAY'S DATE
+===================================================== */
+
+function getTodayKey() {
+
+    const now =
+        new Date();
+
+
+    const year =
+        now.getFullYear();
+
+
+    const month =
+        String(
+            now.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const day =
+        String(
+            now.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return (
+        year +
+        "-" +
+        month +
+        "-" +
+        day
+    );
+
+}
+
+
+
+/* =====================================================
+   CLEAR OLD DAY
+===================================================== */
+
+function checkForNewDay() {
+
+    const today =
+        getTodayKey();
+
+
+    const savedDate =
+        localStorage.getItem(
+            DATE_KEY
+        );
+
+
+    if (
+        savedDate !== today
+    ) {
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+
+        localStorage.setItem(
+            DATE_KEY,
+            today
+        );
+
+
+        clearTodos();
+
+    }
+
+}
+
+
+
+/* =====================================================
+   CLEAR TODOS
+===================================================== */
+
+function clearTodos() {
+
+    for (
+        let i = 1;
+        i <= TOTAL_ITEMS;
+        i++
+    ) {
+
+        const task =
+            document.getElementById(
+                "task" + i
+            );
+
+
+        const checkbox =
+            document.getElementById(
+                "check" + i
+            );
+
+
+        task.value =
+            "";
+
+
+        checkbox.checked =
+            false;
+
+
+        checkbox
+            .closest(".todo-row")
+            .classList.remove(
+                "completed"
+            );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+function saveTodos() {
+
+    const todos =
+        [];
+
+
+    for (
+        let i = 1;
+        i <= TOTAL_ITEMS;
+        i++
+    ) {
+
+        todos.push({
+
+            text:
+                document.getElementById(
+                    "task" + i
+                ).value,
+
+            checked:
+                document.getElementById(
+                    "check" + i
+                ).checked
+
+        });
+
+    }
+
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(todos)
+    );
+
+
+    localStorage.setItem(
+        DATE_KEY,
+        getTodayKey()
+    );
+
+}
+
+
+
+/* =====================================================
+   LOAD
+===================================================== */
+
+function loadTodos() {
+
+    checkForNewDay();
+
+
+    const saved =
+        localStorage.getItem(
+            STORAGE_KEY
+        );
+
+
+    if (!saved) {
+        return;
+    }
+
+
+    try {
+
+        const todos =
+            JSON.parse(saved);
+
+
+        todos.forEach(
+            (todo, index) => {
+
+                const number =
+                    index + 1;
+
+
+                if (
+                    number > TOTAL_ITEMS
+                ) {
+                    return;
+                }
+
+
+                const task =
+                    document.getElementById(
+                        "task" + number
+                    );
+
+
+                const checkbox =
+                    document.getElementById(
+                        "check" + number
+                    );
+
+
+                task.value =
+                    todo.text || "";
+
+
+                checkbox.checked =
+                    Boolean(
+                        todo.checked
+                    );
+
+
+                updateCompletedState(
+                    checkbox
+                );
+
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   COMPLETED STYLE
+===================================================== */
+
+function updateCompletedState(
+    checkbox
+) {
+
+    const row =
+        checkbox.closest(
+            ".todo-row"
+        );
+
+
+    if (
+        checkbox.checked
+    ) {
+
+        row.classList.add(
+            "completed"
+        );
+
+    }
+
+    else {
+
+        row.classList.remove(
+            "completed"
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   EVENT LISTENERS
+===================================================== */
+
+for (
+    let i = 1;
+    i <= TOTAL_ITEMS;
+    i++
+) {
+
+    const task =
+        document.getElementById(
+            "task" + i
+        );
+
+
+    const checkbox =
+        document.getElementById(
+            "check" + i
+        );
+
+
+    task.addEventListener(
+        "input",
+        saveTodos
+    );
+
+
+    checkbox.addEventListener(
+        "change",
+        () => {
+
+            updateCompletedState(
+                checkbox
+            );
+
+
+            saveTodos();
+
+        }
+    );
+
+}
+
+
+
+/* =====================================================
+   MIDNIGHT CHECK
+===================================================== */
+
+/*
+Checks every minute.
+
+If the date has changed,
+the list automatically resets.
+*/
+
+setInterval(
+    checkForNewDay,
+    60000
+);
+
+
+
+/* =====================================================
+   START
+===================================================== */
+
+loadTodos();
+
+</script>
+
+
+</body>
+
+</html>
