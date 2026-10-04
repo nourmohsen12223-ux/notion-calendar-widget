@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Date</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: transparent;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    color: #37352F;
+}
+
+body {
+    padding: 12px;
+}
+
+
+/* =====================================================
+   DATE WIDGET
+===================================================== */
+
+.date-widget {
+
+    width: 100%;
+    min-height: 230px;
+
+    background: #F5F4F1;
+
+    border: 1px solid #E8E6E1;
+    border-radius: 16px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 25px;
+}
+
+
+/* DAY NAME */
+
+.weekday {
+
+    font-size: 12px;
+    font-weight: 600;
+
+    letter-spacing: 2.2px;
+
+    color: #8F8D88;
+
+    text-transform: uppercase;
+
+    margin-bottom: 5px;
+}
+
+
+/* BIG DATE NUMBER */
+
+.day-number {
+
+    font-size: 82px;
+    font-weight: 500;
+
+    line-height: 0.95;
+
+    letter-spacing: -4px;
+
+    color: #37352F;
+
+    margin: 7px 0 10px;
+}
+
+
+/* MONTH */
+
+.month {
+
+    font-size: 18px;
+    font-weight: 500;
+
+    letter-spacing: -0.2px;
+
+    color: #4D4B46;
+}
+
+
+/* YEAR */
+
+.year {
+
+    margin-top: 3px;
+
+    font-size: 12px;
+    font-weight: 400;
+
+    color: #9B9994;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 500px) {
+
+    body {
+        padding: 8px;
+    }
+
+    .date-widget {
+        min-height: 210px;
+        border-radius: 14px;
+    }
+
+    .day-number {
+        font-size: 72px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="date-widget">
+
+    <div
+        id="weekday"
+        class="weekday"
+    ></div>
+
+    <div
+        id="dayNumber"
+        class="day-number"
+    ></div>
+
+    <div
+        id="month"
+        class="month"
+    ></div>
+
+    <div
+        id="year"
+        class="year"
+    ></div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   CURRENT DATE
+===================================================== */
+
+function updateDate() {
+
+    const now = new Date();
+
+
+    /* WEEKDAY */
+
+    document.getElementById(
+        "weekday"
+    ).textContent =
+
+        now.toLocaleDateString(
+            "en-US",
+            {
+                weekday: "long"
+            }
+        );
+
+
+    /* DAY NUMBER */
+
+    document.getElementById(
+        "dayNumber"
+    ).textContent =
+
+        String(
+            now.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    /* MONTH */
+
+    document.getElementById(
+        "month"
+    ).textContent =
+
+        now.toLocaleDateString(
+            "en-US",
+            {
+                month: "long"
+            }
+        );
+
+
+    /* YEAR */
+
+    document.getElementById(
+        "year"
+    ).textContent =
+
+        now.getFullYear();
+
+}
+
+
+/* LOAD DATE */
+
+updateDate();
+
+
+/* CHECK PERIODICALLY SO IT UPDATES AFTER MIDNIGHT */
+
+setInterval(
+    updateDate,
+    60000
+);
+
+</script>
+
+
+</body>
+
+</html>
