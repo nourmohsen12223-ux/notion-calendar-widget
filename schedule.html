@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Daily Schedule</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    color: #37352f;
+}
+
+body {
+    padding: 18px 22px;
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.schedule {
+    width: 100%;
+
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    background: #ffffff;
+
+    border: 1px solid #dedede;
+}
+
+
+/* =====================================================
+   CELLS
+===================================================== */
+
+.schedule th,
+.schedule td {
+    height: 35px;
+
+    border-right: 1px solid #dedede;
+    border-bottom: 1px solid #dedede;
+
+    padding: 0 9px;
+
+    text-align: left;
+    vertical-align: middle;
+
+    font-size: 12px;
+    font-weight: 400;
+}
+
+
+/* remove final right border */
+
+.schedule th:last-child,
+.schedule td:last-child {
+    border-right: none;
+}
+
+
+/* remove final bottom border */
+
+.schedule tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.schedule th {
+    height: 35px;
+
+    background: #ffffff;
+
+    color: #37352f;
+
+    font-size: 12px;
+    font-weight: 400;
+
+    text-transform: lowercase;
+}
+
+
+/* =====================================================
+   TIME COLUMN
+===================================================== */
+
+.time-column {
+    width: 105px;
+
+    color: #37352f;
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   ACTIVITY INPUT
+===================================================== */
+
+.activity-cell {
+    padding: 0 !important;
+}
+
+.activity-input {
+    width: 100%;
+    height: 34px;
+
+    display: block;
+
+    padding: 0 10px;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #37352f;
+
+    font-family: inherit;
+
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.activity-input:focus {
+    background: #fafaf9;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 8px;
+    }
+
+    .time-column {
+        width: 82px;
+    }
+
+    .schedule th,
+    .schedule td {
+        font-size: 11px;
+    }
+
+    .activity-input {
+        font-size: 12px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<table class="schedule">
+
+    <thead>
+
+        <tr>
+
+            <th class="time-column">
+                time
+            </th>
+
+            <th>
+                activity
+            </th>
+
+        </tr>
+
+    </thead>
+
+
+    <tbody id="scheduleBody"></tbody>
+
+</table>
+
+
+
+<script>
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+
+const STORAGE_KEY =
+    "noury-daily-schedule";
+
+const DATE_KEY =
+    "noury-daily-schedule-date";
+
+
+/*
+7 AM → 6 AM next day
+*/
+
+const HOURS = [
+
+    7, 8, 9, 10, 11, 12,
+    13, 14, 15, 16, 17, 18,
+    19, 20, 21, 22, 23,
+
+    0, 1, 2, 3, 4, 5, 6
+
+];
+
+
+
+/* =====================================================
+   GET TODAY
+===================================================== */
+
+function getTodayKey() {
+
+    const now =
+        new Date();
+
+
+    const year =
+        now.getFullYear();
+
+
+    const month =
+        String(
+            now.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const day =
+        String(
+            now.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return (
+        year +
+        "-" +
+        month +
+        "-" +
+        day
+    );
+
+}
+
+
+
+/* =====================================================
+   FORMAT TIME
+===================================================== */
+
+function formatTime(hour) {
+
+    if (hour === 0) {
+        return "12:00 am";
+    }
+
+
+    if (hour < 12) {
+
+        return (
+            hour +
+            ":00 am"
+        );
+
+    }
+
+
+    if (hour === 12) {
+        return "12:00 pm";
+    }
+
+
+    return (
+        (hour - 12) +
+        ":00 pm"
+    );
+
+}
+
+
+
+/* =====================================================
+   CREATE TABLE
+===================================================== */
+
+function createSchedule() {
+
+    const body =
+        document.getElementById(
+            "scheduleBody"
+        );
+
+
+    HOURS.forEach(
+        (hour, index) => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            /* TIME */
+
+            const timeCell =
+                document.createElement(
+                    "td"
+                );
+
+
+            timeCell.className =
+                "time-column";
+
+
+            timeCell.textContent =
+                formatTime(hour);
+
+
+            /* ACTIVITY */
+
+            const activityCell =
+                document.createElement(
+                    "td"
+                );
+
+
+            activityCell.className =
+                "activity-cell";
+
+
+            const input =
+                document.createElement(
+                    "input"
+                );
+
+
+            input.type =
+                "text";
+
+
+            input.className =
+                "activity-input";
+
+
+            input.id =
+                "activity-" +
+                index;
+
+
+            input.autocomplete =
+                "off";
+
+
+            input.setAttribute(
+                "aria-label",
+                formatTime(hour) +
+                " activity"
+            );
+
+
+            input.addEventListener(
+                "input",
+                saveSchedule
+            );
+
+
+            activityCell.appendChild(
+                input
+            );
+
+
+            row.appendChild(
+                timeCell
+            );
+
+
+            row.appendChild(
+                activityCell
+            );
+
+
+            body.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =====================================================
+   CLEAR
+===================================================== */
+
+function clearSchedule() {
+
+    HOURS.forEach(
+        (hour, index) => {
+
+            const input =
+                document.getElementById(
+                    "activity-" +
+                    index
+                );
+
+
+            if (input) {
+
+                input.value =
+                    "";
+
+            }
+
+        }
+    );
+
+}
+
+
+
+/* =====================================================
+   NEW DAY CHECK
+===================================================== */
+
+function checkForNewDay() {
+
+    const today =
+        getTodayKey();
+
+
+    const savedDate =
+        localStorage.getItem(
+            DATE_KEY
+        );
+
+
+    if (
+        savedDate !== today
+    ) {
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+
+        localStorage.setItem(
+            DATE_KEY,
+            today
+        );
+
+
+        clearSchedule();
+
+    }
+
+}
+
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+function saveSchedule() {
+
+    const activities =
+        [];
+
+
+    HOURS.forEach(
+        (hour, index) => {
+
+            const input =
+                document.getElementById(
+                    "activity-" +
+                    index
+                );
+
+
+            activities.push(
+                input
+                    ? input.value
+                    : ""
+            );
+
+        }
+    );
+
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(
+            activities
+        )
+    );
+
+
+    localStorage.setItem(
+        DATE_KEY,
+        getTodayKey()
+    );
+
+}
+
+
+
+/* =====================================================
+   LOAD
+===================================================== */
+
+function loadSchedule() {
+
+    checkForNewDay();
+
+
+    const saved =
+        localStorage.getItem(
+            STORAGE_KEY
+        );
+
+
+    if (!saved) {
+        return;
+    }
+
+
+    try {
+
+        const activities =
+            JSON.parse(
+                saved
+            );
+
+
+        activities.forEach(
+            (activity, index) => {
+
+                const input =
+                    document.getElementById(
+                        "activity-" +
+                        index
+                    );
+
+
+                if (input) {
+
+                    input.value =
+                        activity || "";
+
+                }
+
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   CHECK FOR MIDNIGHT
+===================================================== */
+
+setInterval(
+    checkForNewDay,
+    60000
+);
+
+
+
+/* =====================================================
+   START
+===================================================== */
+
+createSchedule();
+
+loadSchedule();
+
+</script>
+
+
+</body>
+
+</html>
