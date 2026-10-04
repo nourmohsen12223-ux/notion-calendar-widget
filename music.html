@@ -1,36 +1,99 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Nour's Most Played</title>
 <style>
-:root{--bg:#202020;--panel:#292929;--text:#f7f7f7;--muted:#aaa7a3;--accent:#7A0026}
-*{box-sizing:border-box}html,body{margin:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--text)}body{padding:4px}
-.player{width:100%;overflow:hidden;border-radius:24px;background:var(--bg);box-shadow:0 10px 30px rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.06)}
-.hero{display:grid;grid-template-columns:120px 1fr;gap:18px;padding:20px;background:linear-gradient(145deg,#373737,#252525)}
-.cover{width:120px;height:120px;border-radius:16px;position:relative;background:radial-gradient(circle at 28% 25%,rgba(255,255,255,.28),transparent 25%),linear-gradient(145deg,#8f1738,#4b1023 50%,#171717);box-shadow:0 8px 22px rgba(0,0,0,.28)}
-.cover:before{content:"ن";position:absolute;inset:0;display:grid;place-items:center;font-family:Georgia,serif;font-size:58px;color:rgba(255,255,255,.92)}
-.meta{min-width:0;display:flex;flex-direction:column;justify-content:center}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:#bdbab6;margin-bottom:8px}
-.title{font-size:22px;font-weight:700;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.owner{font-size:13px;color:var(--muted);margin-top:6px}
-.controls{display:flex;align-items:center;gap:12px;margin-top:16px}.round{border:0;width:40px;height:40px;border-radius:50%;cursor:pointer;display:grid;place-items:center;background:#fff;color:#171717;font-size:17px}
-.secondary{width:34px;height:34px;background:rgba(255,255,255,.09);color:#fff}.open{border:1px solid rgba(255,255,255,.18);background:transparent;color:#fff;height:34px;border-radius:17px;padding:0 13px;font-size:12px;cursor:pointer}
-.list{padding:4px 12px 12px;background:#242424}.list-head{display:flex;justify-content:space-between;align-items:center;padding:14px 10px 9px}.list-head strong{font-size:13px}.list-head span{font-size:11px;color:var(--muted)}
-.track{display:grid;grid-template-columns:32px 42px minmax(0,1fr) 34px;gap:10px;align-items:center;padding:9px 8px;border-radius:14px;cursor:pointer;text-decoration:none;color:inherit;transition:background .15s ease}
-.track:hover,.track:active{background:rgba(255,255,255,.07)}.num{text-align:center;color:#8e8b87;font-size:12px}.thumb{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-family:Georgia,serif;font-size:19px;font-weight:700;color:white;background:linear-gradient(145deg,#8f1738,#35101d)}
-.track:nth-of-type(3) .thumb{background:linear-gradient(145deg,#73584d,#2e2521)}.track:nth-of-type(4) .thumb{background:linear-gradient(145deg,#6b4b74,#2c1e31)}.track:nth-of-type(5) .thumb{background:linear-gradient(145deg,#8a694a,#30251d)}
-.info{min-width:0}.song{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl;text-align:left}.artist{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl;text-align:left}.go{font-size:15px;color:#b9b6b2;text-align:center}
-.footer{padding:10px 20px 14px;color:#77736f;font-size:10px;text-align:center;background:#242424}
-@media(max-width:440px){.hero{grid-template-columns:92px 1fr;gap:14px;padding:16px}.cover{width:92px;height:92px;border-radius:14px}.cover:before{font-size:45px}.title{font-size:18px}.controls{margin-top:12px}.open{display:none}.player{border-radius:21px}}
-</style></head><body>
-<div class="player"><section class="hero"><div class="cover"></div><div class="meta"><div class="eyebrow">Nour Mohsen</div><div class="title" id="heroTitle">Most Played</div><div class="owner" id="heroArtist">Your Anghami favourites</div><div class="controls"><button class="round secondary" id="prev">‹</button><button class="round" id="play">▶</button><button class="round secondary" id="next">›</button><button class="open" id="profile">Open Anghami</button></div></div></section>
-<section class="list"><div class="list-head"><strong>Most Played</strong><span>ANGHAMI</span></div>
-<a class="track" data-title="أهواك" data-artist="فيروز" href="https://play.anghami.com/song/69301389" target="_blank"><div class="num">1</div><div class="thumb">ف</div><div class="info"><div class="song">أهواك</div><div class="artist">فيروز</div></div><div class="go">↗</div></a>
-<a class="track" data-title="حبّوا بعضهن" data-artist="فيروز" href="https://play.anghami.com/song/294834" target="_blank"><div class="num">2</div><div class="thumb">ف</div><div class="info"><div class="song">حبّوا بعضهن</div><div class="artist">فيروز</div></div><div class="go">↗</div></a>
-<a class="track" data-title="عمرى معاك" data-artist="أنغام" href="https://play.anghami.com/song/103016" target="_blank"><div class="num">3</div><div class="thumb">أ</div><div class="info"><div class="song">عمرى معاك</div><div class="artist">أنغام</div></div><div class="go">↗</div></a>
-<a class="track" data-title="برضه بتوحشني" data-artist="أنغام و وائل كفوري" href="https://play.anghami.com/song/1024471022" target="_blank"><div class="num">4</div><div class="thumb">و</div><div class="info"><div class="song">برضه بتوحشني</div><div class="artist">أنغام و وائل كفوري</div></div><div class="go">↗</div></a>
-</section><div class="footer">Tap a song to open it in Anghami</div></div>
-<script>
-const tracks=[...document.querySelectorAll(".track")];let current=0;const title=document.getElementById("heroTitle"),artist=document.getElementById("heroArtist");
-function select(i){current=(i+tracks.length)%tracks.length;const t=tracks[current];title.textContent=t.dataset.title;artist.textContent=t.dataset.artist}
-tracks.forEach((t,i)=>t.addEventListener("click",()=>select(i)));prev.onclick=()=>select(current-1);next.onclick=()=>select(current+1);play.onclick=()=>window.open(tracks[current].href,"_blank","noopener");profile.onclick=()=>window.open("https://play.anghami.com/profile/62680320","_blank","noopener");select(0);
-</script></body></html>
+*{box-sizing:border-box}
+html,body{margin:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#f5f5f5}
+body{padding:4px}
+.shell{
+  width:100%; background:#202020; border-radius:26px; overflow:hidden;
+  border:1px solid rgba(255,255,255,.07); box-shadow:0 12px 32px rgba(0,0,0,.16)
+}
+.header{
+  padding:20px 22px 16px; background:linear-gradient(145deg,#383838,#252525);
+  display:flex;align-items:center;gap:14px
+}
+.mark{
+  width:54px;height:54px;flex:0 0 54px;border-radius:16px;
+  display:grid;place-items:center;font-family:Georgia,serif;font-size:27px;
+  background:linear-gradient(145deg,#8f1738,#42101f);box-shadow:0 6px 18px rgba(0,0,0,.25)
+}
+h1{font-size:19px;margin:0 0 4px;font-weight:700}
+.sub{font-size:12px;color:#aaa7a3}
+.list{padding:10px}
+.track{padding:8px;border-radius:18px}
+.track+.track{margin-top:3px}
+.track-label{display:flex;align-items:center;gap:10px;padding:0 7px 7px}
+.num{font-size:11px;color:#817f7b;width:16px;text-align:center}
+.track-label strong{display:block;font-size:12px;font-weight:600;direction:rtl;text-align:left}
+.track-label small{display:block;margin-top:2px;font-size:10px;color:#989590;direction:rtl;text-align:left}
+.frame-wrap{border-radius:17px;overflow:hidden;background:#171717;height:190px}
+iframe{display:block;width:100%;height:190px;border:0}
+.note{font-size:10px;color:#77736f;text-align:center;padding:3px 15px 15px}
+@media(max-width:500px){
+  .shell{border-radius:22px}.header{padding:16px 17px 13px}
+  .mark{width:46px;height:46px;flex-basis:46px;border-radius:14px;font-size:23px}
+  h1{font-size:17px}.list{padding:7px}
+  .track{padding:6px}.frame-wrap,iframe{height:190px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="header">
+    <div class="mark">ن</div>
+    <div><h1>Nour's Most Played</h1><div class="sub">Play directly with Anghami</div></div>
+  </div>
+  <div class="list">
+    <div class="track">
+  <div class="track-label"><span class="num">1</span><div><strong>أهواك</strong><small>فيروز</small></div></div>
+  <div class="frame-wrap">
+    <iframe
+      src="https://widget.anghami.com/song/69301389/?theme=fulldark&layout=wide&lang=en"
+      scrolling="no" frameborder="0"
+      allow="autoplay; encrypted-media"
+      loading="lazy"
+      title="أهواك — فيروز"></iframe>
+  </div>
+</div>
+<div class="track">
+  <div class="track-label"><span class="num">2</span><div><strong>حبّوا بعضهن</strong><small>فيروز</small></div></div>
+  <div class="frame-wrap">
+    <iframe
+      src="https://widget.anghami.com/song/294834/?theme=fulldark&layout=wide&lang=en"
+      scrolling="no" frameborder="0"
+      allow="autoplay; encrypted-media"
+      loading="lazy"
+      title="حبّوا بعضهن — فيروز"></iframe>
+  </div>
+</div>
+<div class="track">
+  <div class="track-label"><span class="num">3</span><div><strong>عمرى معاك</strong><small>أنغام</small></div></div>
+  <div class="frame-wrap">
+    <iframe
+      src="https://widget.anghami.com/song/103016/?theme=fulldark&layout=wide&lang=en"
+      scrolling="no" frameborder="0"
+      allow="autoplay; encrypted-media"
+      loading="lazy"
+      title="عمرى معاك — أنغام"></iframe>
+  </div>
+</div>
+<div class="track">
+  <div class="track-label"><span class="num">4</span><div><strong>برضه بتوحشني</strong><small>أنغام و وائل كفوري</small></div></div>
+  <div class="frame-wrap">
+    <iframe
+      src="https://widget.anghami.com/song/1024471022/?theme=fulldark&layout=wide&lang=en"
+      scrolling="no" frameborder="0"
+      allow="autoplay; encrypted-media"
+      loading="lazy"
+      title="برضه بتوحشني — أنغام و وائل كفوري"></iframe>
+  </div>
+</div>
+  </div>
+  <div class="note">Playback is provided by Anghami's official embedded player.</div>
+</div>
+</body>
+</html>
