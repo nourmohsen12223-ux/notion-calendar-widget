@@ -9,31 +9,38 @@
   html, body {
     margin: 0;
     padding: 0;
-    background: transparent;
     width: 100%;
     min-height: 100%;
+    background: transparent;
   }
   body {
     padding: 4px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
   }
+
   .anghami-rounded {
     width: 100%;
     max-width: 600px;
     height: 450px;
+
+    /* Gray like the reference, visible through Anghami's transparent theme */
+    background: #363636;
+
     border-radius: 28px;
     overflow: hidden;
-    background: transparent;
-    box-shadow: 0 10px 28px rgba(0,0,0,.14);
+
+    /* Helps iPad/Safari clip iframe corners cleanly */
     transform: translateZ(0);
     -webkit-mask-image: -webkit-radial-gradient(white, black);
   }
+
   .anghami-rounded iframe {
     display: block;
     width: 100%;
     height: 100%;
-    border: 0;
     margin: 0;
+    border: 0;
+    background: transparent;
   }
 </style>
 </head>
