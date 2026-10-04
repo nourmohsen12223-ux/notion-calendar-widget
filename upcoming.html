@@ -9,7 +9,7 @@
   content="width=device-width, initial-scale=1.0"
 >
 
-<title>Dashboard</title>
+<title>Upcoming</title>
 
 <style>
 
@@ -21,7 +21,6 @@ html,
 body {
   margin: 0;
   padding: 0;
-
   background: transparent;
 
   font-family:
@@ -34,12 +33,12 @@ body {
 }
 
 body {
-  padding: 2px;
+  padding: 4px;
 }
 
 
 /* =========================
-   GRID
+   2 × 2 GRID
 ========================= */
 
 .grid {
@@ -50,32 +49,38 @@ body {
   grid-template-columns:
     repeat(2, minmax(0, 1fr));
 
-  column-gap: 42px;
-
-  row-gap: 34px;
+  gap: 14px;
 }
 
 
 /* =========================
-   SECTION
+   ROUNDED BOX
 ========================= */
 
-.section {
+.card {
   min-width: 0;
+
+  height: 245px;
+
+  padding: 19px 21px 17px;
+
+  background: #F8F7F5;
+
+  border:
+    1px solid #E8E6E1;
+
+  border-radius: 18px;
+
+  overflow: hidden;
 }
 
-.section-header {
-  display: flex;
 
-  align-items: center;
+/* =========================
+   HEADING
+========================= */
 
-  gap: 10px;
-
-  margin-bottom: 5px;
-}
-
-.section-title {
-  margin: 0;
+.card-title {
+  margin: 0 0 9px 0;
 
   color: #57544F;
 
@@ -83,24 +88,14 @@ body {
 
   font-weight: 650;
 
-  letter-spacing: 0.7px;
+  letter-spacing: 0.75px;
 
   text-transform: uppercase;
-
-  white-space: nowrap;
-}
-
-.section-line {
-  flex: 1;
-
-  height: 1px;
-
-  background: #E8E6E1;
 }
 
 
 /* =========================
-   LIST
+   ITEMS
 ========================= */
 
 .items {
@@ -112,12 +107,12 @@ body {
 
   align-items: flex-start;
 
-  gap: 14px;
+  gap: 13px;
 
-  padding: 13px 0;
+  padding: 10px 0;
 
   border-bottom:
-    1px solid #F0EFEC;
+    1px solid #EDEBE7;
 }
 
 .item:last-child {
@@ -160,12 +155,12 @@ body {
 
   font-weight: 600;
 
-  line-height: 1.1;
+  line-height: 1.05;
 }
 
 
 /* =========================
-   CONTENT
+   TEXT
 ========================= */
 
 .content {
@@ -174,7 +169,7 @@ body {
   min-width: 0;
 }
 
-.title {
+.item-title {
   overflow: hidden;
 
   color: #45423E;
@@ -183,7 +178,7 @@ body {
 
   font-weight: 550;
 
-  line-height: 1.4;
+  line-height: 1.35;
 
   text-overflow: ellipsis;
 
@@ -201,7 +196,7 @@ body {
 
   font-weight: 400;
 
-  line-height: 1.4;
+  line-height: 1.35;
 
   text-overflow: ellipsis;
 
@@ -210,23 +205,23 @@ body {
 
 
 /* =========================
-   EMPTY
+   EMPTY BOX
 ========================= */
 
 .empty {
-  min-height: 92px;
+  height: 175px;
 
   display: flex;
 
   align-items: center;
 
-  padding: 17px 0;
+  justify-content: center;
 
-  color: #AAA7A2;
+  color: #A7A49F;
 
   font-size: 11px;
 
-  font-style: italic;
+  text-align: center;
 }
 
 
@@ -235,15 +230,15 @@ body {
 ========================= */
 
 .loading {
-  min-height: 92px;
+  height: 175px;
 
   display: flex;
 
   align-items: center;
 
-  padding: 17px 0;
+  justify-content: center;
 
-  color: #AAA7A2;
+  color: #A7A49F;
 
   font-size: 11px;
 }
@@ -254,30 +249,35 @@ body {
 ========================= */
 
 .error {
-  min-height: 92px;
+  height: 175px;
 
   display: flex;
 
   align-items: center;
 
-  padding: 17px 0;
+  justify-content: center;
 
   color: #7A0026;
 
   font-size: 11px;
+
+  text-align: center;
 }
 
 
 /* =========================
-   MOBILE
+   PHONE ONLY
 ========================= */
 
-@media (max-width: 560px) {
+@media (max-width: 520px) {
 
   .grid {
     grid-template-columns: 1fr;
+  }
 
-    row-gap: 28px;
+  .card {
+    height: auto;
+    min-height: 220px;
   }
 
 }
@@ -293,17 +293,11 @@ body {
 
   <!-- EVENTS -->
 
-  <section class="section">
+  <section class="card">
 
-    <div class="section-header">
-
-      <h2 class="section-title">
-        Events
-      </h2>
-
-      <div class="section-line"></div>
-
-    </div>
+    <h2 class="card-title">
+      Events
+    </h2>
 
     <div
       class="items"
@@ -319,17 +313,11 @@ body {
 
   <!-- TUTORING -->
 
-  <section class="section">
+  <section class="card">
 
-    <div class="section-header">
-
-      <h2 class="section-title">
-        Tutoring
-      </h2>
-
-      <div class="section-line"></div>
-
-    </div>
+    <h2 class="card-title">
+      Tutoring
+    </h2>
 
     <div
       class="items"
@@ -345,17 +333,11 @@ body {
 
   <!-- EXPENSES -->
 
-  <section class="section">
+  <section class="card">
 
-    <div class="section-header">
-
-      <h2 class="section-title">
-        Expenses
-      </h2>
-
-      <div class="section-line"></div>
-
-    </div>
+    <h2 class="card-title">
+      Expenses
+    </h2>
 
     <div
       class="items"
@@ -371,17 +353,11 @@ body {
 
   <!-- DEADLINES -->
 
-  <section class="section">
+  <section class="card">
 
-    <div class="section-header">
-
-      <h2 class="section-title">
-        Deadlines
-      </h2>
-
-      <div class="section-line"></div>
-
-    </div>
+    <h2 class="card-title">
+      Deadlines
+    </h2>
 
     <div
       class="items"
@@ -411,7 +387,7 @@ const MAX_ITEMS = 4;
 
 
 /* =========================
-   BASIC HELPERS
+   HELPERS
 ========================= */
 
 function getStart(item) {
@@ -497,7 +473,7 @@ function timeText(date) {
 
 
 /* =========================
-   HTML SAFETY
+   SAFE HTML
 ========================= */
 
 function escapeHTML(value) {
@@ -529,7 +505,7 @@ function escapeHTML(value) {
 
 
 /* =========================
-   REMOVE DUPLICATE EVENTS
+   DEDUPLICATE EVENTS
 ========================= */
 
 function deduplicateEvents(items) {
@@ -539,12 +515,10 @@ function deduplicateEvents(items) {
   return items.filter(
     function(item) {
 
-      const key = [
-        item.id || "",
-        item.title || "",
-        item.start || "",
-        item.end || ""
-      ].join("|");
+      const key =
+        (item.id || "") +
+        "|" +
+        (item.start || "");
 
       if (seen.has(key)) {
         return false;
@@ -559,7 +533,7 @@ function deduplicateEvents(items) {
 
 
 /* =========================
-   CLEAN SOLOMON TITLES
+   CLEAN TUTORING
 ========================= */
 
 function cleanTutoring(item) {
@@ -568,6 +542,7 @@ function cleanTutoring(item) {
     String(
       item.title || ""
     );
+
 
   const firstLine =
     original
@@ -643,7 +618,7 @@ function cleanTutoring(item) {
 
 
 /* =========================
-   EVENT META
+   EVENT DETAILS
 ========================= */
 
 function eventMeta(item) {
@@ -653,8 +628,23 @@ function eventMeta(item) {
       item.start
     );
 
+
   if (!start) {
     return "";
+  }
+
+
+  let source =
+    item.calendar || "";
+
+
+  if (
+    source ===
+    "DEPH Training"
+  ) {
+
+    source =
+      "DEPH";
   }
 
 
@@ -662,41 +652,17 @@ function eventMeta(item) {
 
     return [
       weekdayText(start),
-      item.calendar || ""
+      source
     ]
       .filter(Boolean)
       .join(" · ");
   }
 
 
-  let calendarName =
-    item.calendar || "";
-
-
-  if (
-    calendarName ===
-    "DEPH Training"
-  ) {
-
-    calendarName =
-      "DEPH";
-  }
-
-
-  if (
-    calendarName ===
-    "Personal"
-  ) {
-
-    calendarName =
-      "Personal";
-  }
-
-
   return [
     weekdayText(start),
     timeText(start),
-    calendarName
+    source
   ]
     .filter(Boolean)
     .join(" · ");
@@ -704,7 +670,7 @@ function eventMeta(item) {
 
 
 /* =========================
-   TUTORING META
+   TUTORING DETAILS
 ========================= */
 
 function tutoringMeta(
@@ -753,7 +719,7 @@ function tutoringMeta(
 
 
 /* =========================
-   EXPENSE META
+   EXPENSE DETAILS
 ========================= */
 
 function expenseMeta(item) {
@@ -764,16 +730,18 @@ function expenseMeta(item) {
     item.amount !== ""
   ) {
 
-    const currency =
-      item.currency
-        ? " " +
-          item.currency
-        : "";
+    if (item.amountDisplay) {
 
-    return (
-      item.amount +
-      currency
-    );
+      return item.amountDisplay;
+    }
+
+
+    return [
+      item.amount,
+      item.currency || ""
+    ]
+      .filter(Boolean)
+      .join(" ");
   }
 
 
@@ -785,7 +753,7 @@ function expenseMeta(item) {
 
 
 /* =========================
-   DEADLINE META
+   DEADLINE COUNTDOWN
 ========================= */
 
 function deadlineMeta(item) {
@@ -862,7 +830,7 @@ function deadlineMeta(item) {
 
 
 /* =========================
-   CREATE ROW
+   CREATE ITEM
 ========================= */
 
 function createItem(
@@ -949,7 +917,7 @@ function createItem(
 
       <div class="content">
 
-        <div class="title">
+        <div class="item-title">
           ${escapeHTML(title)}
         </div>
 
@@ -1017,7 +985,7 @@ function sortByDate(items) {
 
 
 /* =========================
-   REMOVE PAST
+   REMOVE PAST ITEMS
 ========================= */
 
 function futureOnly(items) {
@@ -1083,7 +1051,7 @@ function futureOnly(items) {
 
 
 /* =========================
-   RENDER
+   RENDER SECTION
 ========================= */
 
 function renderSection(
@@ -1179,7 +1147,7 @@ function showError() {
 
 
 /* =========================
-   LOAD
+   FETCH DATA
 ========================= */
 
 async function loadUpcoming() {
@@ -1243,6 +1211,7 @@ async function loadUpcoming() {
   } catch (error) {
 
     console.error(
+      "Upcoming widget:",
       error
     );
 
@@ -1258,6 +1227,8 @@ async function loadUpcoming() {
 loadUpcoming();
 
 
+/* Refresh every 5 minutes */
+
 setInterval(
   loadUpcoming,
   5 * 60 * 1000
@@ -1266,4 +1237,5 @@ setInterval(
 </script>
 
 </body>
+
 </html>
