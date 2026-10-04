@@ -396,24 +396,25 @@ body {
    SETTINGS
 ===================================================== */
 
-const STORAGE_KEY =
-    "noury-prayers";
-
-const DATE_KEY =
-    "noury-prayers-date";
-
+const STORAGE_KEY = "noury-prayers";
+const DATE_KEY = "noury-prayers-date";
 
 const prayerIds = [
-
     "fajr",
     "dhuhr",
     "asr",
     "maghrib",
     "isha",
     "witr"
-
 ];
 
+const SYNC_URL =
+    "https://notion-calendar-api.nourmohsen12223.workers.dev/prayers-data";
+
+const SYNC_INTERVAL_MS = 3000;
+
+let saveTimer = null;
+let cloudBusy = false;
 
 
 /* =====================================================
@@ -422,78 +423,43 @@ const prayerIds = [
 
 function getTodayKey() {
 
-    const now =
-        new Date();
+    const now = new Date();
 
+    const year = now.getFullYear();
 
-    const year =
-        now.getFullYear();
+    const month = String(
+        now.getMonth() + 1
+    ).padStart(2, "0");
 
+    const day = String(
+        now.getDate()
+    ).padStart(2, "0");
 
-    const month =
-        String(
-            now.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const day =
-        String(
-            now.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    return (
-        year +
-        "-" +
-        month +
-        "-" +
-        day
-    );
-
+    return year + "-" + month + "-" + day;
 }
-
 
 
 /* =====================================================
    UPDATE ROW
 ===================================================== */
 
-function updateRow(
-    checkbox
-) {
+function updateRow(checkbox) {
 
     const row =
         checkbox.closest(
             ".prayer-row"
         );
 
-
-    if (
-        checkbox.checked
-    ) {
-
+    if (checkbox.checked) {
         row.classList.add(
             "completed"
         );
-
-    }
-
-    else {
-
+    } else {
         row.classList.remove(
             "completed"
         );
-
     }
-
 }
-
 
 
 /* =====================================================
@@ -507,46 +473,31 @@ function updateProgress() {
             ".checkbox.obligatory"
         );
 
-
-    let completed =
-        0;
-
+    let completed = 0;
 
     obligatory.forEach(
         checkbox => {
 
-            if (
-                checkbox.checked
-            ) {
-
+            if (checkbox.checked) {
                 completed++;
-
             }
-
         }
     );
-
 
     document.getElementById(
         "progress"
     ).textContent =
-
-        completed +
-        " / 5";
-
+        completed + " / 5";
 }
 
 
-
 /* =====================================================
-   SAVE
+   STATE
 ===================================================== */
 
-function savePrayers() {
+function getPrayerState() {
 
-    const state =
-        {};
-
+    const state = {};
 
     prayerIds.forEach(
         id => {
@@ -555,33 +506,35 @@ function savePrayers() {
                 document.getElementById(
                     id
                 ).checked;
-
         }
     );
 
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(
-            state
-        )
-    );
-
-
-    localStorage.setItem(
-        DATE_KEY,
-        getTodayKey()
-    );
-
+    return state;
 }
 
 
+function normalizePrayerState(state) {
 
-/* =====================================================
-   CLEAR
-===================================================== */
+    const normalized = {};
 
-function clearPrayers() {
+    prayerIds.forEach(
+        id => {
+            normalized[id] =
+                Boolean(
+                    state &&
+                    state[id]
+                );
+        }
+    );
+
+    return normalized;
+}
+
+
+function applyPrayerState(state) {
+
+    const normalized =
+        normalizePrayerState(state);
 
     prayerIds.forEach(
         id => {
@@ -591,121 +544,174 @@ function clearPrayers() {
                     id
                 );
 
-
             checkbox.checked =
-                false;
-
+                normalized[id];
 
             updateRow(
                 checkbox
             );
-
         }
     );
 
-
     updateProgress();
-
 }
 
 
-
 /* =====================================================
-   NEW DAY
+   CLEAR
 ===================================================== */
 
-function checkForNewDay() {
+function clearPrayers() {
+
+    applyPrayerState({});
+}
+
+
+/* =====================================================
+   LOCAL SAVE
+===================================================== */
+
+function saveLocalPrayers() {
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(
+            getPrayerState()
+        )
+    );
+
+    localStorage.setItem(
+        DATE_KEY,
+        getTodayKey()
+    );
+}
+
+
+/* =====================================================
+   CLOUD SAVE
+===================================================== */
+
+async function saveToCloud() {
+
+    const payload = {
+        date: getTodayKey(),
+        prayers: getPrayerState(),
+        updatedAt: Date.now()
+    };
+
+    try {
+
+        const response =
+            await fetch(
+                SYNC_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        ),
+
+                    cache: "no-store"
+                }
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Cloud save failed"
+            );
+        }
+    }
+
+    catch (error) {
+
+        console.warn(
+            "Prayer cloud save failed:",
+            error
+        );
+    }
+}
+
+
+function queueCloudSave() {
+
+    clearTimeout(saveTimer);
+
+    saveTimer =
+        setTimeout(
+            saveToCloud,
+            250
+        );
+}
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+function savePrayers() {
+
+    saveLocalPrayers();
+    queueCloudSave();
+}
+
+
+/* =====================================================
+   LOCAL LOAD
+===================================================== */
+
+function loadLocalPrayers() {
 
     const today =
         getTodayKey();
-
 
     const savedDate =
         localStorage.getItem(
             DATE_KEY
         );
 
-
-    if (
-        savedDate !== today
-    ) {
+    if (savedDate !== today) {
 
         localStorage.removeItem(
             STORAGE_KEY
         );
-
 
         localStorage.setItem(
             DATE_KEY,
             today
         );
 
-
         clearPrayers();
 
+        return false;
     }
-
-}
-
-
-
-/* =====================================================
-   LOAD
-===================================================== */
-
-function loadPrayers() {
-
-    checkForNewDay();
-
 
     const saved =
         localStorage.getItem(
             STORAGE_KEY
         );
 
-
     if (!saved) {
 
-        updateProgress();
-
-        return;
-
+        clearPrayers();
+        return false;
     }
-
 
     try {
 
         const state =
-            JSON.parse(
-                saved
-            );
+            JSON.parse(saved);
 
-
-        prayerIds.forEach(
-            id => {
-
-                const checkbox =
-                    document.getElementById(
-                        id
-                    );
-
-
-                checkbox.checked =
-                    Boolean(
-                        state[id]
-                    );
-
-
-                updateRow(
-                    checkbox
-                );
-
-            }
+        applyPrayerState(
+            state
         );
 
-
-        updateProgress();
-
+        return true;
     }
 
     catch (error) {
@@ -714,13 +720,121 @@ function loadPrayers() {
             STORAGE_KEY
         );
 
-
         clearPrayers();
 
+        return false;
     }
-
 }
 
+
+/* =====================================================
+   CLOUD LOAD / SYNC
+===================================================== */
+
+async function loadFromCloud(
+    firstLoad = false
+) {
+
+    if (cloudBusy) {
+        return;
+    }
+
+    cloudBusy = true;
+
+    try {
+
+        const response =
+            await fetch(
+                SYNC_URL +
+                "?t=" +
+                Date.now(),
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Cloud load failed"
+            );
+        }
+
+        const data =
+            await response.json();
+
+        const today =
+            getTodayKey();
+
+        /*
+         * Today's cloud state is shared
+         * across all devices.
+         */
+        if (
+            data &&
+            data.date === today &&
+            data.prayers &&
+            typeof data.prayers === "object"
+        ) {
+
+            applyPrayerState(
+                data.prayers
+            );
+
+            saveLocalPrayers();
+
+            return;
+        }
+
+        /*
+         * First migration: if this device
+         * already has today's prayer state,
+         * preserve it by uploading it.
+         */
+        if (firstLoad) {
+
+            const savedDate =
+                localStorage.getItem(
+                    DATE_KEY
+                );
+
+            const saved =
+                localStorage.getItem(
+                    STORAGE_KEY
+                );
+
+            if (
+                savedDate === today &&
+                saved
+            ) {
+
+                await saveToCloud();
+                return;
+            }
+        }
+
+        /*
+         * New day: reset and publish
+         * the empty prayer state.
+         */
+        clearPrayers();
+        saveLocalPrayers();
+        await saveToCloud();
+    }
+
+    catch (error) {
+
+        console.warn(
+            "Prayer cloud sync failed:",
+            error
+        );
+    }
+
+    finally {
+
+        cloudBusy = false;
+    }
+}
 
 
 /* =====================================================
@@ -735,7 +849,6 @@ prayerIds.forEach(
                 id
             );
 
-
         checkbox.addEventListener(
             "change",
             () => {
@@ -744,43 +857,94 @@ prayerIds.forEach(
                     checkbox
                 );
 
-
                 updateProgress();
 
-
                 savePrayers();
-
             }
         );
-
     }
 );
-
 
 
 /* =====================================================
    AUTOMATIC DAILY RESET
 ===================================================== */
 
-/*
-Check once every minute.
+async function checkForNewDay() {
 
-When the date changes,
-all prayer checkboxes reset.
-*/
+    const today =
+        getTodayKey();
 
-setInterval(
-    checkForNewDay,
-    60000
-);
+    const savedDate =
+        localStorage.getItem(
+            DATE_KEY
+        );
 
+    if (savedDate !== today) {
+
+        clearPrayers();
+        saveLocalPrayers();
+
+        /*
+         * Check the cloud before publishing
+         * an empty state, in case another
+         * device already has today's data.
+         */
+        await loadFromCloud(false);
+    }
+}
 
 
 /* =====================================================
    START
 ===================================================== */
 
-loadPrayers();
+async function startPrayerWidget() {
+
+    loadLocalPrayers();
+
+    await loadFromCloud(true);
+
+    setInterval(
+        () => {
+
+            if (
+                document.visibilityState ===
+                "visible"
+            ) {
+                loadFromCloud(false);
+            }
+        },
+        SYNC_INTERVAL_MS
+    );
+
+    setInterval(
+        checkForNewDay,
+        60000
+    );
+
+    document.addEventListener(
+        "visibilitychange",
+        () => {
+
+            if (
+                document.visibilityState ===
+                "visible"
+            ) {
+                loadFromCloud(false);
+            }
+        }
+    );
+
+    window.addEventListener(
+        "focus",
+        () => {
+            loadFromCloud(false);
+        }
+    );
+}
+
+startPrayerWidget();
 
 </script>
 
