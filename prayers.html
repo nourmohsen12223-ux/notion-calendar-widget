@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Prayers</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    color: #37352f;
+}
+
+body {
+    padding: 1px 7px 8px;
+}
+
+
+/* =====================================================
+   WIDGET
+===================================================== */
+
+.prayer-widget {
+
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e2e0;
+    border-radius: 11px;
+
+    padding: 21px 26px 18px;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.header {
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 38px;
+}
+
+
+.title {
+
+    color: #171717;
+
+    font-size: 20px;
+    font-weight: 600;
+
+    line-height: 1.2;
+}
+
+
+.progress {
+
+    color: #9b9a97;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* =====================================================
+   PRAYER ROWS
+===================================================== */
+
+.prayer-row {
+
+    display: flex;
+    align-items: center;
+
+    min-height: 40px;
+}
+
+
+/* =====================================================
+   CHECKBOX
+===================================================== */
+
+.checkbox {
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 16px;
+    height: 16px;
+
+    flex: 0 0 16px;
+
+    margin: 0 11px 0 0;
+
+    background: #ffffff;
+
+    border: 1px solid #5f5f5f;
+    border-radius: 0;
+
+    cursor: pointer;
+}
+
+
+.checkbox:checked {
+
+    position: relative;
+
+    background: #37352f;
+
+    border-color: #37352f;
+}
+
+
+.checkbox:checked::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 4px;
+    top: 1px;
+
+    width: 4px;
+    height: 8px;
+
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+
+    transform: rotate(45deg);
+}
+
+
+/* =====================================================
+   PRAYER NAME
+===================================================== */
+
+.prayer-name {
+
+    flex: 1;
+
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+
+    border-bottom: 1px solid #dedede;
+
+    color: #37352f;
+
+    font-size: 14px;
+    font-weight: 400;
+
+    transition:
+        color 0.15s ease,
+        opacity 0.15s ease;
+}
+
+
+/* Remove final line */
+
+.prayer-row:last-child .prayer-name {
+
+    border-bottom: none;
+}
+
+
+/* =====================================================
+   COMPLETED
+===================================================== */
+
+.prayer-row.completed .prayer-name {
+
+    color: #aaa8a4;
+
+    text-decoration: line-through;
+
+    opacity: 0.75;
+}
+
+
+/* =====================================================
+   WITR
+===================================================== */
+
+.prayer-row.witr {
+
+    margin-top: 4px;
+}
+
+
+.prayer-row.witr .prayer-name {
+
+    color: #777570;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 500px) {
+
+    body {
+
+        padding: 1px 4px 6px;
+    }
+
+
+    .prayer-widget {
+
+        padding: 19px 20px 16px;
+    }
+
+
+    .header {
+
+        margin-bottom: 31px;
+    }
+
+
+    .title {
+
+        font-size: 19px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="prayer-widget">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="title">
+            Prayers
+        </div>
+
+        <div
+            id="progress"
+            class="progress"
+        >
+            0 / 5
+        </div>
+
+    </div>
+
+
+
+    <!-- FAJR -->
+
+    <div class="prayer-row">
+
+        <input
+            type="checkbox"
+            class="checkbox obligatory"
+            id="fajr"
+        >
+
+        <div class="prayer-name">
+            Fajr
+        </div>
+
+    </div>
+
+
+
+    <!-- DHUHR -->
+
+    <div class="prayer-row">
+
+        <input
+            type="checkbox"
+            class="checkbox obligatory"
+            id="dhuhr"
+        >
+
+        <div class="prayer-name">
+            Dhuhr
+        </div>
+
+    </div>
+
+
+
+    <!-- ASR -->
+
+    <div class="prayer-row">
+
+        <input
+            type="checkbox"
+            class="checkbox obligatory"
+            id="asr"
+        >
+
+        <div class="prayer-name">
+            Asr
+        </div>
+
+    </div>
+
+
+
+    <!-- MAGHRIB -->
+
+    <div class="prayer-row">
+
+        <input
+            type="checkbox"
+            class="checkbox obligatory"
+            id="maghrib"
+        >
+
+        <div class="prayer-name">
+            Maghrib
+        </div>
+
+    </div>
+
+
+
+    <!-- ISHA -->
+
+    <div class="prayer-row">
+
+        <input
+            type="checkbox"
+            class="checkbox obligatory"
+            id="isha"
+        >
+
+        <div class="prayer-name">
+            Isha
+        </div>
+
+    </div>
+
+
+
+    <!-- WITR -->
+
+    <div class="prayer-row witr">
+
+        <input
+            type="checkbox"
+            class="checkbox"
+            id="witr"
+        >
+
+        <div class="prayer-name">
+            Witr
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+
+const STORAGE_KEY =
+    "noury-prayers";
+
+const DATE_KEY =
+    "noury-prayers-date";
+
+
+const prayerIds = [
+
+    "fajr",
+    "dhuhr",
+    "asr",
+    "maghrib",
+    "isha",
+    "witr"
+
+];
+
+
+
+/* =====================================================
+   TODAY
+===================================================== */
+
+function getTodayKey() {
+
+    const now =
+        new Date();
+
+
+    const year =
+        now.getFullYear();
+
+
+    const month =
+        String(
+            now.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const day =
+        String(
+            now.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return (
+        year +
+        "-" +
+        month +
+        "-" +
+        day
+    );
+
+}
+
+
+
+/* =====================================================
+   UPDATE ROW
+===================================================== */
+
+function updateRow(
+    checkbox
+) {
+
+    const row =
+        checkbox.closest(
+            ".prayer-row"
+        );
+
+
+    if (
+        checkbox.checked
+    ) {
+
+        row.classList.add(
+            "completed"
+        );
+
+    }
+
+    else {
+
+        row.classList.remove(
+            "completed"
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+function updateProgress() {
+
+    const obligatory =
+        document.querySelectorAll(
+            ".checkbox.obligatory"
+        );
+
+
+    let completed =
+        0;
+
+
+    obligatory.forEach(
+        checkbox => {
+
+            if (
+                checkbox.checked
+            ) {
+
+                completed++;
+
+            }
+
+        }
+    );
+
+
+    document.getElementById(
+        "progress"
+    ).textContent =
+
+        completed +
+        " / 5";
+
+}
+
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+function savePrayers() {
+
+    const state =
+        {};
+
+
+    prayerIds.forEach(
+        id => {
+
+            state[id] =
+                document.getElementById(
+                    id
+                ).checked;
+
+        }
+    );
+
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(
+            state
+        )
+    );
+
+
+    localStorage.setItem(
+        DATE_KEY,
+        getTodayKey()
+    );
+
+}
+
+
+
+/* =====================================================
+   CLEAR
+===================================================== */
+
+function clearPrayers() {
+
+    prayerIds.forEach(
+        id => {
+
+            const checkbox =
+                document.getElementById(
+                    id
+                );
+
+
+            checkbox.checked =
+                false;
+
+
+            updateRow(
+                checkbox
+            );
+
+        }
+    );
+
+
+    updateProgress();
+
+}
+
+
+
+/* =====================================================
+   NEW DAY
+===================================================== */
+
+function checkForNewDay() {
+
+    const today =
+        getTodayKey();
+
+
+    const savedDate =
+        localStorage.getItem(
+            DATE_KEY
+        );
+
+
+    if (
+        savedDate !== today
+    ) {
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+
+        localStorage.setItem(
+            DATE_KEY,
+            today
+        );
+
+
+        clearPrayers();
+
+    }
+
+}
+
+
+
+/* =====================================================
+   LOAD
+===================================================== */
+
+function loadPrayers() {
+
+    checkForNewDay();
+
+
+    const saved =
+        localStorage.getItem(
+            STORAGE_KEY
+        );
+
+
+    if (!saved) {
+
+        updateProgress();
+
+        return;
+
+    }
+
+
+    try {
+
+        const state =
+            JSON.parse(
+                saved
+            );
+
+
+        prayerIds.forEach(
+            id => {
+
+                const checkbox =
+                    document.getElementById(
+                        id
+                    );
+
+
+                checkbox.checked =
+                    Boolean(
+                        state[id]
+                    );
+
+
+                updateRow(
+                    checkbox
+                );
+
+            }
+        );
+
+
+        updateProgress();
+
+    }
+
+    catch (error) {
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+
+        clearPrayers();
+
+    }
+
+}
+
+
+
+/* =====================================================
+   CHECKBOX EVENTS
+===================================================== */
+
+prayerIds.forEach(
+    id => {
+
+        const checkbox =
+            document.getElementById(
+                id
+            );
+
+
+        checkbox.addEventListener(
+            "change",
+            () => {
+
+                updateRow(
+                    checkbox
+                );
+
+
+                updateProgress();
+
+
+                savePrayers();
+
+            }
+        );
+
+    }
+);
+
+
+
+/* =====================================================
+   AUTOMATIC DAILY RESET
+===================================================== */
+
+/*
+Check once every minute.
+
+When the date changes,
+all prayer checkboxes reset.
+*/
+
+setInterval(
+    checkForNewDay,
+    60000
+);
+
+
+
+/* =====================================================
+   START
+===================================================== */
+
+loadPrayers();
+
+</script>
+
+
+</body>
+
+</html>
