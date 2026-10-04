@@ -73,7 +73,7 @@ body {
 }
 
 
-/* remove final right border */
+/* Remove final right border */
 
 .schedule th:last-child,
 .schedule td:last-child {
@@ -81,7 +81,7 @@ body {
 }
 
 
-/* remove final bottom border */
+/* Remove final bottom border */
 
 .schedule tr:last-child td {
     border-bottom: none;
@@ -102,7 +102,7 @@ body {
     font-size: 12px;
     font-weight: 400;
 
-    text-transform: lowercase;
+    text-transform: none;
 }
 
 
@@ -193,11 +193,11 @@ body {
         <tr>
 
             <th class="time-column">
-                time
+                Time
             </th>
 
             <th>
-                activity
+                Activity
             </th>
 
         </tr>
@@ -291,7 +291,9 @@ function getTodayKey() {
 function formatTime(hour) {
 
     if (hour === 0) {
+
         return "12:00 am";
+
     }
 
 
@@ -306,7 +308,9 @@ function formatTime(hour) {
 
 
     if (hour === 12) {
+
         return "12:00 pm";
+
     }
 
 
@@ -431,7 +435,7 @@ function createSchedule() {
 
 
 /* =====================================================
-   CLEAR
+   CLEAR SCHEDULE
 ===================================================== */
 
 function clearSchedule() {
@@ -461,7 +465,7 @@ function clearSchedule() {
 
 
 /* =====================================================
-   NEW DAY CHECK
+   CHECK FOR NEW DAY
 ===================================================== */
 
 function checkForNewDay() {
@@ -562,7 +566,9 @@ function loadSchedule() {
 
 
     if (!saved) {
+
         return;
+
     }
 
 
@@ -609,8 +615,15 @@ function loadSchedule() {
 
 
 /* =====================================================
-   CHECK FOR MIDNIGHT
+   AUTOMATIC DAILY RESET
 ===================================================== */
+
+/*
+Checks once every minute.
+
+When the calendar date changes,
+all activities are automatically cleared.
+*/
 
 setInterval(
     checkForNewDay,
