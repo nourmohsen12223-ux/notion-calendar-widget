@@ -23,7 +23,7 @@ body {
     padding: 0;
 
     background: #ffffff;
-    color: #e8e4d8;
+    color: #37352f;
 
     font-family:
         -apple-system,
@@ -249,6 +249,20 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    cursor: pointer;
+
+    transition:
+        filter 0.15s ease,
+        transform 0.1s ease;
+}
+
+.event:hover {
+    filter: brightness(0.96);
+}
+
+.event:active {
+    transform: scale(0.985);
 }
 
 .event-time {
@@ -274,6 +288,193 @@ body {
     color: #9b9a97;
 
     font-size: 11px;
+}
+
+
+/* =====================================================
+   EVENT DETAILS OVERLAY
+===================================================== */
+
+.event-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 22px;
+
+    background: rgba(55, 53, 47, 0.18);
+
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+.event-overlay.open {
+    display: flex;
+}
+
+
+/* =====================================================
+   EVENT DETAILS CARD
+===================================================== */
+
+.event-details {
+    position: relative;
+
+    width: min(420px, 100%);
+
+    max-height: 80vh;
+
+    overflow-y: auto;
+
+    padding: 26px 28px 27px;
+
+    background: #F5F4F1;
+
+    border: 1px solid #E8E6E1;
+    border-radius: 16px;
+
+    box-shadow:
+        0 12px 35px rgba(55, 53, 47, 0.12);
+}
+
+
+/* CLOSE */
+
+.close-button {
+    position: absolute;
+
+    top: 13px;
+    right: 13px;
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: #8f8d88;
+
+    font-size: 22px;
+    font-weight: 300;
+
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.close-button:hover {
+    background: #ebe9e4;
+
+    color: #37352f;
+}
+
+
+/* COLOR DOT */
+
+.detail-calendar-row {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 11px;
+
+    padding-right: 35px;
+}
+
+.detail-color {
+    width: 9px;
+    height: 9px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+}
+
+.detail-calendar {
+    color: #8f8d88;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    letter-spacing: 0.2px;
+}
+
+
+/* TITLE */
+
+.detail-title {
+    padding-right: 28px;
+
+    color: #37352f;
+
+    font-size: 21px;
+    font-weight: 600;
+
+    line-height: 1.3;
+
+    letter-spacing: -0.25px;
+}
+
+
+/* DATE & TIME */
+
+.detail-time {
+    margin-top: 10px;
+
+    color: #686762;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* EXTRA INFORMATION */
+
+.detail-section {
+    margin-top: 20px;
+    padding-top: 17px;
+
+    border-top: 1px solid #e4e2dc;
+}
+
+.detail-label {
+    margin-bottom: 6px;
+
+    color: #9b9994;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    letter-spacing: 0.8px;
+
+    text-transform: uppercase;
+}
+
+.detail-value {
+    color: #4d4b46;
+
+    font-size: 13px;
+
+    line-height: 1.55;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
 
@@ -330,6 +531,20 @@ body {
 
     .event-time {
         font-size: 10px;
+    }
+
+    .event-overlay {
+        padding: 14px;
+    }
+
+    .event-details {
+        padding: 23px 21px 24px;
+
+        border-radius: 14px;
+    }
+
+    .detail-title {
+        font-size: 19px;
     }
 
 }
@@ -414,6 +629,100 @@ body {
 
 
 
+<!-- =====================================================
+     EVENT DETAILS
+===================================================== -->
+
+<div
+    id="eventOverlay"
+    class="event-overlay"
+    aria-hidden="true"
+>
+
+    <div
+        class="event-details"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detailTitle"
+    >
+
+        <button
+            id="closeEvent"
+            class="close-button"
+            aria-label="Close event details"
+        >
+            ×
+        </button>
+
+
+        <div class="detail-calendar-row">
+
+            <div
+                id="detailColor"
+                class="detail-color"
+            ></div>
+
+            <div
+                id="detailCalendar"
+                class="detail-calendar"
+            ></div>
+
+        </div>
+
+
+        <div
+            id="detailTitle"
+            class="detail-title"
+        ></div>
+
+
+        <div
+            id="detailTime"
+            class="detail-time"
+        ></div>
+
+
+        <div
+            id="locationSection"
+            class="detail-section"
+            style="display:none;"
+        >
+
+            <div class="detail-label">
+                Location
+            </div>
+
+            <div
+                id="detailLocation"
+                class="detail-value"
+            ></div>
+
+        </div>
+
+
+        <div
+            id="descriptionSection"
+            class="detail-section"
+            style="display:none;"
+        >
+
+            <div class="detail-label">
+                Notes
+            </div>
+
+            <div
+                id="detailDescription"
+                class="detail-value"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
 <script>
 
 /* =====================================================
@@ -478,9 +787,7 @@ async function loadMonth() {
         );
 
 
-    /*
-       First visible Sunday
-    */
+    /* First visible Sunday */
 
     const start =
         new Date(
@@ -500,9 +807,7 @@ async function loadMonth() {
     );
 
 
-    /*
-       Day after final visible Saturday
-    */
+    /* Day after final visible Saturday */
 
     const end =
         new Date(
@@ -629,9 +934,7 @@ function renderCalendar(events) {
         "";
 
 
-    /*
-       First visible Sunday
-    */
+    /* First visible Sunday */
 
     const first =
         new Date(
@@ -651,9 +954,7 @@ function renderCalendar(events) {
     );
 
 
-    /*
-       Last visible Saturday
-    */
+    /* Last visible Saturday */
 
     const last =
         new Date(
@@ -841,11 +1142,25 @@ function renderCalendar(events) {
 
 
                     eventDiv.style.backgroundColor =
-                        event.calendarColor;
+                        event.calendarColor ||
+                        "#e9e9e7";
 
 
                     eventDiv.style.color =
-                        event.calendarTextColor;
+                        event.calendarTextColor ||
+                        "#37352f";
+
+
+                    eventDiv.setAttribute(
+                        "role",
+                        "button"
+                    );
+
+
+                    eventDiv.setAttribute(
+                        "tabindex",
+                        "0"
+                    );
 
 
                     /* TIME */
@@ -909,23 +1224,37 @@ function renderCalendar(events) {
                     );
 
 
-                    eventDiv.title =
+                    /* OPEN DETAILS ON TAP */
 
-                        (
-                            event.calendarName
-                            ?
-                            event.calendarName +
-                            " — "
-                            :
-                            ""
-                        )
+                    eventDiv.addEventListener(
+                        "click",
+                        () => {
+                            openEventDetails(event);
+                        }
+                    );
 
-                        +
 
-                        (
-                            event.summary ||
-                            "Event"
-                        );
+                    /* KEYBOARD SUPPORT */
+
+                    eventDiv.addEventListener(
+                        "keydown",
+                        eventKey => {
+
+                            if (
+                                eventKey.key === "Enter" ||
+                                eventKey.key === " "
+                            ) {
+
+                                eventKey.preventDefault();
+
+                                openEventDetails(
+                                    event
+                                );
+
+                            }
+
+                        }
+                    );
 
 
                     eventsArea.appendChild(
@@ -994,6 +1323,365 @@ function renderCalendar(events) {
 
 
 /* =====================================================
+   OPEN EVENT DETAILS
+===================================================== */
+
+function openEventDetails(event) {
+
+    const overlay =
+        document.getElementById(
+            "eventOverlay"
+        );
+
+
+    const color =
+        document.getElementById(
+            "detailColor"
+        );
+
+
+    const calendar =
+        document.getElementById(
+            "detailCalendar"
+        );
+
+
+    const title =
+        document.getElementById(
+            "detailTitle"
+        );
+
+
+    const time =
+        document.getElementById(
+            "detailTime"
+        );
+
+
+    const locationSection =
+        document.getElementById(
+            "locationSection"
+        );
+
+
+    const location =
+        document.getElementById(
+            "detailLocation"
+        );
+
+
+    const descriptionSection =
+        document.getElementById(
+            "descriptionSection"
+        );
+
+
+    const description =
+        document.getElementById(
+            "detailDescription"
+        );
+
+
+    /* CALENDAR */
+
+    color.style.backgroundColor =
+        event.calendarColor ||
+        "#9b9a97";
+
+
+    calendar.textContent =
+        event.calendarName ||
+        "Calendar";
+
+
+    /* TITLE */
+
+    title.textContent =
+        event.summary ||
+        "Event";
+
+
+    /* DATE & TIME */
+
+    time.textContent =
+        formatEventDateTime(
+            event
+        );
+
+
+    /* LOCATION */
+
+    if (
+        event.location &&
+        event.location.trim()
+    ) {
+
+        location.textContent =
+            event.location;
+
+        locationSection.style.display =
+            "block";
+
+    }
+
+    else {
+
+        location.textContent =
+            "";
+
+        locationSection.style.display =
+            "none";
+
+    }
+
+
+    /* DESCRIPTION */
+
+    if (
+        event.description &&
+        event.description.trim()
+    ) {
+
+        description.textContent =
+            event.description;
+
+        descriptionSection.style.display =
+            "block";
+
+    }
+
+    else {
+
+        description.textContent =
+            "";
+
+        descriptionSection.style.display =
+            "none";
+
+    }
+
+
+    overlay.classList.add(
+        "open"
+    );
+
+
+    overlay.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    document.getElementById(
+        "closeEvent"
+    ).focus();
+
+}
+
+
+
+/* =====================================================
+   FORMAT EVENT DATE & TIME
+===================================================== */
+
+function formatEventDateTime(event) {
+
+    /* ALL-DAY */
+
+    if (
+        event.start?.date
+    ) {
+
+        const parts =
+            event.start.date
+                .split("-")
+                .map(Number);
+
+
+        const date =
+            new Date(
+                parts[0],
+                parts[1] - 1,
+                parts[2]
+            );
+
+
+        return (
+            date.toLocaleDateString(
+                "en-US",
+                {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric"
+                }
+            )
+            +
+            " · All day"
+        );
+
+    }
+
+
+    /* TIMED EVENT */
+
+    if (
+        event.start?.dateTime
+    ) {
+
+        const start =
+            new Date(
+                event.start.dateTime
+            );
+
+
+        const dateText =
+            start.toLocaleDateString(
+                "en-US",
+                {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric"
+                }
+            );
+
+
+        const startTime =
+            start.toLocaleTimeString(
+                [],
+                {
+                    hour: "numeric",
+                    minute: "2-digit"
+                }
+            );
+
+
+        if (
+            event.end?.dateTime
+        ) {
+
+            const end =
+                new Date(
+                    event.end.dateTime
+                );
+
+
+            const endTime =
+                end.toLocaleTimeString(
+                    [],
+                    {
+                        hour: "numeric",
+                        minute: "2-digit"
+                    }
+                );
+
+
+            return (
+                dateText +
+                " · " +
+                startTime +
+                " – " +
+                endTime
+            );
+
+        }
+
+
+        return (
+            dateText +
+            " · " +
+            startTime
+        );
+
+    }
+
+
+    return "";
+
+}
+
+
+
+/* =====================================================
+   CLOSE EVENT DETAILS
+===================================================== */
+
+function closeEventDetails() {
+
+    const overlay =
+        document.getElementById(
+            "eventOverlay"
+        );
+
+
+    overlay.classList.remove(
+        "open"
+    );
+
+
+    overlay.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+}
+
+
+
+/* CLOSE BUTTON */
+
+document.getElementById(
+    "closeEvent"
+).addEventListener(
+    "click",
+    closeEventDetails
+);
+
+
+
+/* CLICK OUTSIDE CARD */
+
+document.getElementById(
+    "eventOverlay"
+).addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target.id ===
+            "eventOverlay"
+        ) {
+
+            closeEventDetails();
+
+        }
+
+    }
+);
+
+
+
+/* ESC KEY */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeEventDetails();
+
+        }
+
+    }
+);
+
+
+
+/* =====================================================
    EVENT DATE CHECK
 ===================================================== */
 
@@ -1002,9 +1690,7 @@ function eventOccursOnDate(
     date
 ) {
 
-    /*
-       All-day event
-    */
+    /* ALL-DAY EVENT */
 
     if (
         event.start?.date
@@ -1036,9 +1722,7 @@ function eventOccursOnDate(
     }
 
 
-    /*
-       Timed event
-    */
+    /* TIMED EVENT */
 
     if (
         event.start?.dateTime
