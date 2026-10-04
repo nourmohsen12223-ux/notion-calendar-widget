@@ -43,7 +43,9 @@ body {
 ========================= */
 
 .grid {
-  width: 100%;
+  width: 94%;
+
+  margin: 0 auto;
 
   display: grid;
 
@@ -277,6 +279,8 @@ body {
 @media (max-width: 520px) {
 
   .grid {
+    width: 94%;
+
     grid-template-columns: 1fr;
   }
 
@@ -1231,7 +1235,7 @@ async function loadUpcoming() {
 loadUpcoming();
 
 
-/* Refresh automatically every 5 minutes */
+/* Refresh every 5 minutes */
 
 setInterval(
   loadUpcoming,
@@ -1241,4 +1245,5 @@ setInterval(
 </script>
 
 </body>
+
 </html>
