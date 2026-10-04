@@ -9,6 +9,10 @@
 
 <style>
 
+/* =====================================================
+   BASE
+===================================================== */
+
 * {
     box-sizing: border-box;
 }
@@ -46,56 +50,104 @@ body {
 .date-widget {
 
     width: 100%;
-    min-height: 230px;
+    height: 150px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 22px 38px;
 
     background: #F5F4F1;
 
     border: 1px solid #E8E6E1;
     border-radius: 16px;
 
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   LEFT SIDE
+===================================================== */
+
+.date-left {
+
+    width: 285px;
+
     display: flex;
     flex-direction: column;
 
-    align-items: center;
     justify-content: center;
 
-    text-align: center;
-
-    padding: 25px;
+    padding-left: 20px;
 }
 
 
-/* DAY NAME */
+/* WEEKDAY */
 
 .weekday {
 
-    font-size: 8px;
-    font-weight: 600;
-
-    letter-spacing: 2.2px;
+    margin-bottom: 3px;
 
     color: #8F8D88;
 
-    text-transform: uppercase;
+    font-family: Georgia, "Times New Roman", serif;
 
-    margin-bottom: 5px;
+    font-size: 15px;
+    font-weight: 400;
+
+    letter-spacing: 4px;
+
+    text-transform: uppercase;
 }
 
 
-/* BIG DATE NUMBER */
+/* LARGE DAY NUMBER */
 
 .day-number {
 
-    font-size: 54px;
-    font-weight: 500;
+    color: #7A0026;
 
-    line-height: 0.95;
+    font-family: Georgia, "Times New Roman", serif;
 
-    letter-spacing: -4px;
+    font-size: 74px;
+    font-weight: 400;
 
-    color: #37352F;
+    line-height: 0.92;
 
-    margin: 7px 0 10px;
+    letter-spacing: -3px;
+}
+
+
+/* =====================================================
+   DIVIDER
+===================================================== */
+
+.divider {
+
+    width: 1px;
+    height: 105px;
+
+    margin: 0 48px 0 15px;
+
+    background: #DDDAD3;
+
+    flex-shrink: 0;
+}
+
+
+/* =====================================================
+   RIGHT SIDE
+===================================================== */
+
+.date-right {
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+
+    min-width: 0;
 }
 
 
@@ -103,12 +155,18 @@ body {
 
 .month {
 
-    font-size: 12px;
-    font-weight: 500;
+    color: #37352F;
 
-    letter-spacing: -0.2px;
+    font-family: Georgia, "Times New Roman", serif;
 
-    color: #4D4B46;
+    font-size: 24px;
+    font-weight: 400;
+
+    letter-spacing: 6px;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
 }
 
 
@@ -116,34 +174,79 @@ body {
 
 .year {
 
-    margin-top: 3px;
-
-    font-size: 12px;
-    font-weight: 400;
+    margin-top: 11px;
 
     color: #9B9994;
 
-    letter-spacing: 0.5px;
+    font-family: Georgia, "Times New Roman", serif;
+
+    font-size: 17px;
+    font-weight: 400;
+
+    letter-spacing: 5px;
 }
 
 
 /* =====================================================
-   MOBILE
+   RESPONSIVE
 ===================================================== */
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
 
     body {
         padding: 8px;
     }
 
     .date-widget {
-        min-height: 210px;
+
+        height: 135px;
+
+        padding: 18px 22px;
+
         border-radius: 14px;
     }
 
+    .date-left {
+
+        width: 155px;
+
+        padding-left: 5px;
+    }
+
+    .weekday {
+
+        font-size: 11px;
+
+        letter-spacing: 3px;
+    }
+
     .day-number {
-        font-size: 72px;
+
+        font-size: 62px;
+    }
+
+    .divider {
+
+        height: 90px;
+
+        margin-left: 8px;
+        margin-right: 28px;
+    }
+
+    .month {
+
+        font-size: 18px;
+
+        letter-spacing: 4px;
+    }
+
+    .year {
+
+        margin-top: 8px;
+
+        font-size: 13px;
+
+        letter-spacing: 4px;
     }
 
 }
@@ -158,38 +261,64 @@ body {
 
 <div class="date-widget">
 
-    <div
-        id="weekday"
-        class="weekday"
-    ></div>
 
-    <div
-        id="dayNumber"
-        class="day-number"
-    ></div>
+    <!-- LEFT SIDE -->
 
-    <div
-        id="month"
-        class="month"
-    ></div>
+    <div class="date-left">
 
-    <div
-        id="year"
-        class="year"
-    ></div>
+        <div
+            id="weekday"
+            class="weekday"
+        ></div>
+
+        <div
+            id="dayNumber"
+            class="day-number"
+        ></div>
+
+    </div>
+
+
+
+    <!-- DIVIDER -->
+
+    <div class="divider"></div>
+
+
+
+    <!-- RIGHT SIDE -->
+
+    <div class="date-right">
+
+        <div
+            id="month"
+            class="month"
+        ></div>
+
+        <div
+            id="year"
+            class="year"
+        ></div>
+
+    </div>
+
 
 </div>
+
 
 
 <script>
 
 /* =====================================================
-   CURRENT DATE
+   UPDATE DATE
 ===================================================== */
 
 function updateDate() {
 
-    const now = new Date();
+
+    const now =
+        new Date();
+
 
 
     /* WEEKDAY */
@@ -206,6 +335,7 @@ function updateDate() {
         );
 
 
+
     /* DAY NUMBER */
 
     document.getElementById(
@@ -218,6 +348,7 @@ function updateDate() {
             2,
             "0"
         );
+
 
 
     /* MONTH */
@@ -234,6 +365,7 @@ function updateDate() {
         );
 
 
+
     /* YEAR */
 
     document.getElementById(
@@ -242,15 +374,22 @@ function updateDate() {
 
         now.getFullYear();
 
+
 }
 
 
-/* LOAD DATE */
+
+/* =====================================================
+   LOAD
+===================================================== */
 
 updateDate();
 
 
-/* CHECK PERIODICALLY SO IT UPDATES AFTER MIDNIGHT */
+
+/* =====================================================
+   KEEP DATE CURRENT
+===================================================== */
 
 setInterval(
     updateDate,
