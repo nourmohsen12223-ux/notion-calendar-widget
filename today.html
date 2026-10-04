@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,15 +9,22 @@
 
 <style>
 
+/* =====================================================
+   BASE
+===================================================== */
+
 * {
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
+
     background: transparent;
-    color: #e8e4d8;
+
+    color: #37352f;
 
     font-family:
         -apple-system,
@@ -39,9 +47,10 @@ body {
 .widget-container {
     width: 100%;
 
-    background: #F5EBDD;
+    background: #e8e4d8;
 
-    border: 1px solid #E7D8C5;
+    border: 1px solid #d8d3c7;
+
     border-radius: 16px;
 
     overflow: hidden;
@@ -60,6 +69,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     gap: 15px;
 }
 
@@ -68,6 +78,7 @@ body {
     font-weight: 600;
 
     letter-spacing: -0.45px;
+
     line-height: 1.2;
 
     color: #37352f;
@@ -80,21 +91,22 @@ body {
 
     border-radius: 20px;
 
-    background: #EADBC8;
+    background: #dcd7ca;
 
-    color: #756A5E;
+    color: #6f6a61;
 
     font-size: 10px;
     font-weight: 600;
 
     letter-spacing: 0.5px;
+
     text-transform: uppercase;
 }
 
 .date {
     margin-top: 6px;
 
-    color: #8E8377;
+    color: #7f7a71;
 
     font-size: 13px;
 }
@@ -107,7 +119,7 @@ body {
 .events {
     width: 100%;
 
-    border-top: 1px solid #E7D8C5;
+    border-top: 1px solid #d8d3c7;
 }
 
 
@@ -131,9 +143,10 @@ body {
 
     padding: 11px 24px;
 
-    border-bottom: 1px solid #E7D8C5;
+    border-bottom: 1px solid #d8d3c7;
 
-    transition: background-color 0.15s ease;
+    transition:
+        background-color 0.15s ease;
 }
 
 .event:last-child {
@@ -141,7 +154,7 @@ body {
 }
 
 .event:hover {
-    background: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.25);
 }
 
 
@@ -151,13 +164,14 @@ body {
 
 .time-column {
     font-size: 12px;
+
     line-height: 1.4;
 
-    color: #81766A;
+    color: #777269;
 }
 
 .start-time {
-    color: #4B453F;
+    color: #45423d;
 
     font-weight: 600;
 }
@@ -165,22 +179,23 @@ body {
 .end-time {
     margin-top: 1px;
 
-    color: #9D9185;
+    color: #928d84;
 }
 
 .all-day {
-    color: #756A5E;
+    color: #6f6a61;
 
     font-weight: 500;
 }
 
 
 /* =====================================================
-   CALENDAR DOT
+   CALENDAR COLOR DOT
 ===================================================== */
 
 .dot-column {
     display: flex;
+
     align-items: center;
 }
 
@@ -204,6 +219,7 @@ body {
 
 .event-title {
     display: flex;
+
     align-items: center;
 
     min-width: 0;
@@ -211,6 +227,7 @@ body {
     color: #37352f;
 
     font-size: 14px;
+
     font-weight: 550;
 
     line-height: 1.35;
@@ -220,7 +237,9 @@ body {
     min-width: 0;
 
     white-space: nowrap;
+
     overflow: hidden;
+
     text-overflow: ellipsis;
 }
 
@@ -228,18 +247,21 @@ body {
     margin-top: 4px;
 
     display: flex;
+
     align-items: center;
 
     min-width: 0;
 
-    color: #8E8377;
+    color: #7f7a71;
 
     font-size: 11px;
 }
 
 .calendar-name {
     white-space: nowrap;
+
     overflow: hidden;
+
     text-overflow: ellipsis;
 }
 
@@ -249,7 +271,7 @@ body {
 ===================================================== */
 
 .event.current {
-    background: rgba(255, 255, 255, 0.38);
+    background: rgba(255, 255, 255, 0.34);
 }
 
 .event.current::before {
@@ -258,6 +280,7 @@ body {
     position: absolute;
 
     left: 0;
+
     top: 12px;
     bottom: 12px;
 
@@ -265,20 +288,22 @@ body {
 
     border-radius: 0 3px 3px 0;
 
-    background: #EB5757;
+    background: #eb5757;
 }
 
 .now {
     display: inline-flex;
+
     align-items: center;
 
     flex-shrink: 0;
 
     margin-left: 9px;
 
-    color: #EB5757;
+    color: #eb5757;
 
     font-size: 9px;
+
     font-weight: 700;
 
     letter-spacing: 0.5px;
@@ -292,20 +317,20 @@ body {
 
     border-radius: 50%;
 
-    background: #EB5757;
+    background: #eb5757;
 }
 
 
 /* =====================================================
-   STATUS
+   LOADING / EMPTY / ERROR
 ===================================================== */
 
 .status {
     padding: 42px 20px;
 
-    border-top: 1px solid #E7D8C5;
+    border-top: 1px solid #d8d3c7;
 
-    color: #8E8377;
+    color: #7f7a71;
 
     font-size: 13px;
 
@@ -315,13 +340,13 @@ body {
 .empty-icon {
     margin-bottom: 8px;
 
-    color: #B5A695;
+    color: #9d988e;
 
     font-size: 20px;
 }
 
 .error {
-    color: #EB5757;
+    color: #eb5757;
 }
 
 
@@ -359,10 +384,12 @@ body {
 }
 
 </style>
+
 </head>
 
 
 <body>
+
 
 <div class="widget-container">
 
@@ -457,14 +484,22 @@ document.getElementById(
 async function loadToday() {
 
     const status =
-        document.getElementById("status");
+        document.getElementById(
+            "status"
+        );
+
 
     const container =
-        document.getElementById("events");
+        document.getElementById(
+            "events"
+        );
 
+
+    /* START OF TODAY */
 
     const start =
         new Date();
+
 
     start.setHours(
         0,
@@ -474,8 +509,13 @@ async function loadToday() {
     );
 
 
+    /* START OF TOMORROW */
+
     const end =
-        new Date(start);
+        new Date(
+            start
+        );
+
 
     end.setDate(
         end.getDate() + 1
@@ -484,8 +524,11 @@ async function loadToday() {
 
     try {
 
+
         const url =
-            new URL(API_URL);
+            new URL(
+                API_URL
+            );
 
 
         url.searchParams.set(
@@ -524,52 +567,75 @@ async function loadToday() {
             data.events || [];
 
 
-        if (events.length === 0) {
+        /* NO EVENTS */
+
+        if (
+            events.length === 0
+        ) {
+
 
             container.style.display =
                 "none";
 
+
             status.style.display =
                 "block";
 
+
             status.className =
                 "status";
+
 
             status.innerHTML =
                 '<div class="empty-icon">○</div>' +
                 'Nothing scheduled for today';
 
+
             return;
+
         }
 
 
+        /* EVENTS FOUND */
+
         status.style.display =
             "none";
+
 
         container.style.display =
             "block";
 
 
-        renderEvents(events);
+        renderEvents(
+            events
+        );
+
 
     }
 
     catch (error) {
 
-        console.error(error);
+
+        console.error(
+            error
+        );
 
 
         container.style.display =
             "none";
 
+
         status.style.display =
             "block";
+
 
         status.className =
             "status error";
 
+
         status.textContent =
             "Unable to load today's schedule.";
+
 
     }
 
@@ -580,7 +646,10 @@ async function loadToday() {
    RENDER EVENTS
 ===================================================== */
 
-function renderEvents(events) {
+function renderEvents(
+    events
+) {
+
 
     const container =
         document.getElementById(
@@ -588,325 +657,407 @@ function renderEvents(events) {
         );
 
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
 
-    events.forEach(event => {
+    events.forEach(
+        event => {
 
 
-        const card =
-            document.createElement(
-                "div"
-            );
+            /* EVENT ROW */
 
-        card.className =
-            "event";
-
-
-        let isCurrent =
-            false;
-
-
-        if (
-            event.start?.dateTime &&
-            event.end?.dateTime
-        ) {
-
-            const now =
-                new Date();
-
-            const eventStart =
-                new Date(
-                    event.start.dateTime
-                );
-
-            const eventEnd =
-                new Date(
-                    event.end.dateTime
-                );
-
-
-            if (
-                now >= eventStart &&
-                now < eventEnd
-            ) {
-
-                isCurrent =
-                    true;
-
-                card.classList.add(
-                    "current"
-                );
-
-            }
-
-        }
-
-
-        /* TIME */
-
-        const timeColumn =
-            document.createElement(
-                "div"
-            );
-
-        timeColumn.className =
-            "time-column";
-
-
-        if (event.start?.dateTime) {
-
-            const startTime =
-                new Date(
-                    event.start.dateTime
-                );
-
-
-            const endTime =
-                event.end?.dateTime
-                    ? new Date(
-                        event.end.dateTime
-                    )
-                    : null;
-
-
-            const startDiv =
+            const card =
                 document.createElement(
                     "div"
                 );
 
-            startDiv.className =
-                "start-time";
 
-            startDiv.textContent =
-                formatTime(
-                    startTime
+            card.className =
+                "event";
+
+
+            let isCurrent =
+                false;
+
+
+
+            /* CHECK CURRENT EVENT */
+
+            if (
+                event.start?.dateTime &&
+                event.end?.dateTime
+            ) {
+
+
+                const now =
+                    new Date();
+
+
+                const eventStart =
+                    new Date(
+                        event.start.dateTime
+                    );
+
+
+                const eventEnd =
+                    new Date(
+                        event.end.dateTime
+                    );
+
+
+                if (
+                    now >= eventStart &&
+                    now < eventEnd
+                ) {
+
+
+                    isCurrent =
+                        true;
+
+
+                    card.classList.add(
+                        "current"
+                    );
+
+
+                }
+
+            }
+
+
+
+            /* TIME COLUMN */
+
+            const timeColumn =
+                document.createElement(
+                    "div"
                 );
 
 
-            timeColumn.appendChild(
-                startDiv
-            );
+            timeColumn.className =
+                "time-column";
 
 
-            if (endTime) {
+            if (
+                event.start?.dateTime
+            ) {
 
-                const endDiv =
+
+                const startTime =
+                    new Date(
+                        event.start.dateTime
+                    );
+
+
+                const endTime =
+                    event.end?.dateTime
+                        ?
+                        new Date(
+                            event.end.dateTime
+                        )
+                        :
+                        null;
+
+
+
+                /* START TIME */
+
+                const startDiv =
                     document.createElement(
                         "div"
                     );
 
-                endDiv.className =
-                    "end-time";
 
-                endDiv.textContent =
+                startDiv.className =
+                    "start-time";
+
+
+                startDiv.textContent =
                     formatTime(
-                        endTime
+                        startTime
                     );
 
 
                 timeColumn.appendChild(
-                    endDiv
+                    startDiv
                 );
+
+
+
+                /* END TIME */
+
+                if (
+                    endTime
+                ) {
+
+
+                    const endDiv =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    endDiv.className =
+                        "end-time";
+
+
+                    endDiv.textContent =
+                        formatTime(
+                            endTime
+                        );
+
+
+                    timeColumn.appendChild(
+                        endDiv
+                    );
+
+
+                }
+
 
             }
 
-        }
+            else {
 
-        else {
 
-            const allDay =
+                /* ALL DAY */
+
+                const allDay =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                allDay.className =
+                    "all-day";
+
+
+                allDay.textContent =
+                    "All day";
+
+
+                timeColumn.appendChild(
+                    allDay
+                );
+
+
+            }
+
+
+
+            /* CALENDAR COLOR DOT */
+
+            const dotColumn =
                 document.createElement(
                     "div"
                 );
 
-            allDay.className =
-                "all-day";
 
-            allDay.textContent =
-                "All day";
+            dotColumn.className =
+                "dot-column";
 
 
-            timeColumn.appendChild(
-                allDay
+            const dot =
+                document.createElement(
+                    "div"
+                );
+
+
+            dot.className =
+                "calendar-dot";
+
+
+            dot.style.backgroundColor =
+                event.calendarColor ||
+                "#8d887e";
+
+
+            dotColumn.appendChild(
+                dot
             );
 
-        }
 
 
-        /* COLOR DOT */
+            /* CONTENT */
 
-        const dotColumn =
-            document.createElement(
-                "div"
-            );
-
-        dotColumn.className =
-            "dot-column";
+            const content =
+                document.createElement(
+                    "div"
+                );
 
 
-        const dot =
-            document.createElement(
-                "div"
-            );
-
-        dot.className =
-            "calendar-dot";
-
-        dot.style.backgroundColor =
-            event.calendarColor ||
-            "#9B8B78";
+            content.className =
+                "event-content";
 
 
-        dotColumn.appendChild(
-            dot
-        );
+
+            /* TITLE */
+
+            const title =
+                document.createElement(
+                    "div"
+                );
 
 
-        /* CONTENT */
-
-        const content =
-            document.createElement(
-                "div"
-            );
-
-        content.className =
-            "event-content";
+            title.className =
+                "event-title";
 
 
-        const title =
-            document.createElement(
-                "div"
-            );
-
-        title.className =
-            "event-title";
-
-
-        const titleText =
-            document.createElement(
-                "span"
-            );
-
-        titleText.className =
-            "event-title-text";
-
-        titleText.textContent =
-            event.summary ||
-            "Event";
-
-
-        title.appendChild(
-            titleText
-        );
-
-
-        /* NOW */
-
-        if (isCurrent) {
-
-            const now =
+            const titleText =
                 document.createElement(
                     "span"
                 );
 
-            now.className =
-                "now";
+
+            titleText.className =
+                "event-title-text";
 
 
-            const nowDot =
-                document.createElement(
-                    "span"
-                );
-
-            nowDot.className =
-                "now-dot";
-
-
-            now.appendChild(
-                nowDot
-            );
-
-            now.appendChild(
-                document.createTextNode(
-                    "NOW"
-                )
-            );
+            titleText.textContent =
+                event.summary ||
+                "Event";
 
 
             title.appendChild(
-                now
+                titleText
             );
 
-        }
 
 
-        /* CALENDAR NAME */
+            /* NOW INDICATOR */
 
-        const meta =
-            document.createElement(
-                "div"
-            );
-
-        meta.className =
-            "event-meta";
+            if (
+                isCurrent
+            ) {
 
 
-        if (event.calendarName) {
+                const now =
+                    document.createElement(
+                        "span"
+                    );
 
-            const calendarName =
-                document.createElement(
-                    "span"
+
+                now.className =
+                    "now";
+
+
+                const nowDot =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                nowDot.className =
+                    "now-dot";
+
+
+                now.appendChild(
+                    nowDot
                 );
 
-            calendarName.className =
-                "calendar-name";
 
-            calendarName.textContent =
-                event.calendarName;
-
-
-            meta.appendChild(
-                calendarName
-            );
-
-        }
+                now.appendChild(
+                    document.createTextNode(
+                        "NOW"
+                    )
+                );
 
 
-        content.appendChild(
-            title
-        );
+                title.appendChild(
+                    now
+                );
 
 
-        if (event.calendarName) {
+            }
+
+
+
+            /* CALENDAR NAME */
+
+            const meta =
+                document.createElement(
+                    "div"
+                );
+
+
+            meta.className =
+                "event-meta";
+
+
+            if (
+                event.calendarName
+            ) {
+
+
+                const calendarName =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                calendarName.className =
+                    "calendar-name";
+
+
+                calendarName.textContent =
+                    event.calendarName;
+
+
+                meta.appendChild(
+                    calendarName
+                );
+
+
+            }
+
+
+
+            /* BUILD CONTENT */
 
             content.appendChild(
-                meta
+                title
             );
 
+
+            if (
+                event.calendarName
+            ) {
+
+
+                content.appendChild(
+                    meta
+                );
+
+
+            }
+
+
+
+            /* BUILD EVENT */
+
+            card.appendChild(
+                timeColumn
+            );
+
+
+            card.appendChild(
+                dotColumn
+            );
+
+
+            card.appendChild(
+                content
+            );
+
+
+            container.appendChild(
+                card
+            );
+
+
         }
-
-
-        /* BUILD */
-
-        card.appendChild(
-            timeColumn
-        );
-
-        card.appendChild(
-            dotColumn
-        );
-
-        card.appendChild(
-            content
-        );
-
-
-        container.appendChild(
-            card
-        );
-
-    });
+    );
 
 }
 
@@ -915,7 +1066,10 @@ function renderEvents(events) {
    FORMAT TIME
 ===================================================== */
 
-function formatTime(date) {
+function formatTime(
+    date
+) {
+
 
     return date.toLocaleTimeString(
         [],
@@ -924,6 +1078,7 @@ function formatTime(date) {
             minute: "2-digit"
         }
     );
+
 
 }
 
@@ -936,5 +1091,7 @@ loadToday();
 
 </script>
 
+
 </body>
+
 </html>
