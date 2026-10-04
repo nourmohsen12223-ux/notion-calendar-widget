@@ -1,3 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>Upcoming</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: #37352F;
+}
+
+body {
+  padding: 4px;
+}
+
+
+/* =========================
+   2 × 2 GRID
+========================= */
+
 .grid {
   width: 94%;
   margin: 0 auto;
@@ -11,6 +54,32 @@
   align-items: stretch;
 }
 
+
+/* =========================
+   ROUNDED BOX
+========================= */
+
+.card {
+  min-width: 0;
+
+  background: #FFFFFF;
+
+  border: 1px solid #E8E6E1;
+  border-radius: 18px;
+
+  padding: 20px 22px;
+
+  height: auto;
+  min-height: 290px;
+
+  overflow: visible;
+}
+
+
+/* =========================
+   HEADING
+========================= */
+
 .card-title {
   margin: 0 0 12px 0;
 
@@ -22,3 +91,1070 @@
   letter-spacing: 0.75px;
   text-transform: uppercase;
 }
+
+
+/* =========================
+   ITEMS
+========================= */
+
+.items {
+  width: 100%;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 14px;
+
+  padding: 13px 0;
+
+  border-bottom: 1px solid #F0EFEC;
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+
+/* =========================
+   DATE
+========================= */
+
+.date {
+  flex: 0 0 44px;
+  padding-top: 1px;
+}
+
+.month {
+  display: block;
+
+  color: #7A0026;
+
+  font-size: 8.5px;
+  font-weight: 700;
+
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+
+.day {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #37352F;
+
+  font-size: 19px;
+  font-weight: 600;
+
+  line-height: 1.05;
+}
+
+
+/* =========================
+   TEXT
+========================= */
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-title {
+  color: #45423E;
+
+  font-size: 12.5px;
+  font-weight: 550;
+
+  line-height: 1.4;
+
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  margin-top: 4px;
+
+  color: #96938E;
+
+  font-size: 10.5px;
+  font-weight: 400;
+
+  line-height: 1.4;
+
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty {
+  min-height: 215px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  color: #A7A49F;
+
+  font-size: 11px;
+  text-align: center;
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+.loading {
+  min-height: 215px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #A7A49F;
+
+  font-size: 11px;
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+.error {
+  min-height: 215px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  color: #7A0026;
+
+  font-size: 11px;
+  text-align: center;
+}
+
+
+/* =========================
+   PHONE
+========================= */
+
+@media (max-width: 520px) {
+
+  .grid {
+    width: 94%;
+
+    grid-template-columns: 1fr;
+
+    row-gap: 18px;
+  }
+
+  .card {
+    min-height: 260px;
+  }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="grid">
+
+
+  <!-- EVENTS -->
+
+  <section class="card">
+
+    <h2 class="card-title">
+      Events
+    </h2>
+
+    <div
+      class="items"
+      id="events"
+    >
+      <div class="loading">
+        Loading…
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- TUTORING -->
+
+  <section class="card">
+
+    <h2 class="card-title">
+      Tutoring
+    </h2>
+
+    <div
+      class="items"
+      id="tutoring"
+    >
+      <div class="loading">
+        Loading…
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- EXPENSES -->
+
+  <section class="card">
+
+    <h2 class="card-title">
+      Expenses
+    </h2>
+
+    <div
+      class="items"
+      id="expenses"
+    >
+      <div class="loading">
+        Loading…
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- DEADLINES -->
+
+  <section class="card">
+
+    <h2 class="card-title">
+      Deadlines
+    </h2>
+
+    <div
+      class="items"
+      id="deadlines"
+    >
+      <div class="loading">
+        Loading…
+      </div>
+    </div>
+
+  </section>
+
+
+</div>
+
+
+<script>
+
+/* =========================
+   SETTINGS
+========================= */
+
+const API_URL =
+  "https://notion-calendar-api.nourmohsen12223.workers.dev/upcoming-data";
+
+const MAX_ITEMS = 4;
+
+
+/* =========================
+   DATE HELPERS
+========================= */
+
+function getStart(item) {
+
+  return (
+    item.start ||
+    item.date ||
+    item.due ||
+    ""
+  );
+}
+
+
+function parseDate(value) {
+
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date;
+}
+
+
+function monthText(date) {
+
+  return date
+    .toLocaleDateString(
+      "en-US",
+      {
+        month: "short"
+      }
+    )
+    .toUpperCase();
+}
+
+
+function dayText(date) {
+
+  return date
+    .toLocaleDateString(
+      "en-US",
+      {
+        day: "2-digit"
+      }
+    );
+}
+
+
+function weekdayText(date) {
+
+  return date
+    .toLocaleDateString(
+      "en-US",
+      {
+        weekday: "short"
+      }
+    );
+}
+
+
+function timeText(date) {
+
+  return date
+    .toLocaleTimeString(
+      "en-US",
+      {
+        hour: "numeric",
+        minute: "2-digit"
+      }
+    );
+}
+
+
+/* =========================
+   SAFE HTML
+========================= */
+
+function escapeHTML(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* =========================
+   DEDUPLICATE EVENTS
+========================= */
+
+function deduplicateEvents(items) {
+
+  const seen = new Set();
+
+  return items.filter(
+    function(item) {
+
+      const key =
+        (item.id || "") +
+        "|" +
+        (item.start || "");
+
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+
+      return true;
+    }
+  );
+}
+
+
+/* =========================
+   CLEAN TUTORING
+========================= */
+
+function cleanTutoring(item) {
+
+  const original =
+    String(item.title || "");
+
+
+  const firstLine =
+    original
+      .split(/\r?\n/)[0]
+      .trim();
+
+
+  const nameMatch =
+    firstLine.match(
+      /^([^,]+),\s*([^(]+)/
+    );
+
+
+  let name = firstLine;
+
+
+  if (nameMatch) {
+
+    const lastName =
+      nameMatch[1].trim();
+
+    const firstName =
+      nameMatch[2].trim();
+
+    name =
+      firstName +
+      " " +
+      lastName;
+
+  } else {
+
+    name =
+      name
+        .replace(
+          /\s*\(Private Lesson\).*$/i,
+          ""
+        )
+        .trim();
+  }
+
+
+  const subjectMatch =
+    original.match(
+      /Subject:\s*([^\r\n]+)/i
+    );
+
+
+  const gradeMatch =
+    original.match(
+      /Grade:\s*([^\r\n]+)/i
+    );
+
+
+  return {
+
+    title:
+      name ||
+      "Tutoring Session",
+
+    subject:
+      subjectMatch
+        ? subjectMatch[1].trim()
+        : "",
+
+    grade:
+      gradeMatch
+        ? gradeMatch[1].trim()
+        : ""
+
+  };
+}
+
+
+/* =========================
+   EVENT DETAILS
+========================= */
+
+function eventMeta(item) {
+
+  const start =
+    parseDate(item.start);
+
+
+  if (!start) {
+    return "";
+  }
+
+
+  let source =
+    item.calendar || "";
+
+
+  if (source === "DEPH Training") {
+    source = "DEPH";
+  }
+
+
+  if (item.allDay) {
+
+    return [
+      weekdayText(start),
+      source
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }
+
+
+  return [
+    weekdayText(start),
+    timeText(start),
+    source
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+
+/* =========================
+   TUTORING DETAILS
+========================= */
+
+function tutoringMeta(
+  item,
+  cleaned
+) {
+
+  const start =
+    parseDate(item.start);
+
+
+  const details = [];
+
+
+  if (cleaned.subject) {
+    details.push(cleaned.subject);
+  }
+
+
+  if (cleaned.grade) {
+
+    details.push(
+      "Grade " +
+      cleaned.grade
+    );
+  }
+
+
+  if (start) {
+
+    details.push(
+      weekdayText(start) +
+      " · " +
+      timeText(start)
+    );
+  }
+
+
+  return details.join(" · ");
+}
+
+
+/* =========================
+   EXPENSE DETAILS
+========================= */
+
+function expenseMeta(item) {
+
+  if (
+    item.amount !== undefined &&
+    item.amount !== null &&
+    item.amount !== ""
+  ) {
+
+    if (item.amountDisplay) {
+      return item.amountDisplay;
+    }
+
+
+    return [
+      item.amount,
+      item.currency || ""
+    ]
+      .filter(Boolean)
+      .join(" ");
+  }
+
+
+  return item.meta || "";
+}
+
+
+/* =========================
+   DEADLINE DETAILS
+========================= */
+
+function deadlineMeta(item) {
+
+  const date =
+    parseDate(
+      getStart(item)
+    );
+
+
+  if (!date) {
+    return item.meta || "";
+  }
+
+
+  const now =
+    new Date();
+
+
+  const today =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
+
+  const due =
+    new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+
+
+  const difference =
+    Math.round(
+      (
+        due.getTime() -
+        today.getTime()
+      ) /
+      86400000
+    );
+
+
+  if (difference === 0) {
+    return "Due today";
+  }
+
+
+  if (difference === 1) {
+    return "Due tomorrow";
+  }
+
+
+  if (difference > 1) {
+
+    return (
+      "In " +
+      difference +
+      " days"
+    );
+  }
+
+
+  return "";
+}
+
+
+/* =========================
+   CREATE ITEM
+========================= */
+
+function createItem(
+  item,
+  type
+) {
+
+  const date =
+    parseDate(
+      getStart(item)
+    );
+
+
+  if (!date) {
+    return "";
+  }
+
+
+  let title =
+    item.title ||
+    item.name ||
+    "Untitled";
+
+
+  let meta = "";
+
+
+  if (type === "event") {
+
+    meta =
+      eventMeta(item);
+  }
+
+
+  if (type === "tutoring") {
+
+    const cleaned =
+      cleanTutoring(item);
+
+    title =
+      cleaned.title;
+
+    meta =
+      tutoringMeta(
+        item,
+        cleaned
+      );
+  }
+
+
+  if (type === "expense") {
+
+    meta =
+      expenseMeta(item);
+  }
+
+
+  if (type === "deadline") {
+
+    meta =
+      deadlineMeta(item);
+  }
+
+
+  return `
+    <div class="item">
+
+      <div class="date">
+
+        <span class="month">
+          ${escapeHTML(
+            monthText(date)
+          )}
+        </span>
+
+        <span class="day">
+          ${escapeHTML(
+            dayText(date)
+          )}
+        </span>
+
+      </div>
+
+
+      <div class="content">
+
+        <div class="item-title">
+          ${escapeHTML(title)}
+        </div>
+
+        ${
+          meta
+            ? `
+              <div class="meta">
+                ${escapeHTML(meta)}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+    </div>
+  `;
+}
+
+
+/* =========================
+   SORT
+========================= */
+
+function sortByDate(items) {
+
+  return [...items]
+    .sort(
+      function(a, b) {
+
+        const aDate =
+          parseDate(
+            getStart(a)
+          );
+
+
+        const bDate =
+          parseDate(
+            getStart(b)
+          );
+
+
+        if (!aDate && !bDate) {
+          return 0;
+        }
+
+
+        if (!aDate) {
+          return 1;
+        }
+
+
+        if (!bDate) {
+          return -1;
+        }
+
+
+        return (
+          aDate.getTime() -
+          bDate.getTime()
+        );
+      }
+    );
+}
+
+
+/* =========================
+   REMOVE PAST
+========================= */
+
+function futureOnly(items) {
+
+  const now =
+    new Date();
+
+
+  return items.filter(
+    function(item) {
+
+      const start =
+        parseDate(
+          getStart(item)
+        );
+
+
+      if (!start) {
+        return false;
+      }
+
+
+      if (item.allDay) {
+
+        const endOfDay =
+          new Date(
+            start.getFullYear(),
+            start.getMonth(),
+            start.getDate(),
+            23,
+            59,
+            59,
+            999
+          );
+
+
+        return endOfDay >= now;
+      }
+
+
+      const end =
+        parseDate(item.end);
+
+
+      if (end) {
+        return end >= now;
+      }
+
+
+      return start >= now;
+    }
+  );
+}
+
+
+/* =========================
+   RENDER
+========================= */
+
+function renderSection(
+  id,
+  items,
+  type,
+  emptyText
+) {
+
+  const container =
+    document.getElementById(id);
+
+
+  let processed =
+    futureOnly(
+      sortByDate(
+        items || []
+      )
+    );
+
+
+  if (type === "event") {
+
+    processed =
+      deduplicateEvents(
+        processed
+      );
+  }
+
+
+  if (!processed.length) {
+
+    container.innerHTML =
+      `
+        <div class="empty">
+          ${escapeHTML(emptyText)}
+        </div>
+      `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    processed
+      .slice(
+        0,
+        MAX_ITEMS
+      )
+      .map(
+        function(item) {
+
+          return createItem(
+            item,
+            type
+          );
+        }
+      )
+      .join("");
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+function showError() {
+
+  [
+    "events",
+    "tutoring",
+    "expenses",
+    "deadlines"
+  ]
+    .forEach(
+      function(id) {
+
+        document
+          .getElementById(id)
+          .innerHTML =
+          `
+            <div class="error">
+              Unable to load
+            </div>
+          `;
+      }
+    );
+}
+
+
+/* =========================
+   LOAD DATA
+========================= */
+
+async function loadUpcoming() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          cache: "no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+      throw new Error("Request failed");
+    }
+
+
+    const data =
+      await response.json();
+
+
+    renderSection(
+      "events",
+      data.events || [],
+      "event",
+      "No upcoming events"
+    );
+
+
+    renderSection(
+      "tutoring",
+      data.tutoring || [],
+      "tutoring",
+      "No upcoming tutoring sessions"
+    );
+
+
+    renderSection(
+      "expenses",
+      data.expenses || [],
+      "expense",
+      "No upcoming expenses"
+    );
+
+
+    renderSection(
+      "deadlines",
+      data.deadlines || [],
+      "deadline",
+      "No upcoming deadlines"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Upcoming widget:",
+      error
+    );
+
+    showError();
+  }
+}
+
+
+/* =========================
+   START
+========================= */
+
+loadUpcoming();
+
+
+/* Refresh every 5 minutes */
+
+setInterval(
+  loadUpcoming,
+  5 * 60 * 1000
+);
+
+</script>
+
+</body>
+
+</html>
