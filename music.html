@@ -3,97 +3,95 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Nour's Most Played</title>
+<title>Nour's Music</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#f5f5f5}
+html,body{margin:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#fff}
 body{padding:4px}
-.shell{
-  width:100%; background:#202020; border-radius:26px; overflow:hidden;
-  border:1px solid rgba(255,255,255,.07); box-shadow:0 12px 32px rgba(0,0,0,.16)
-}
-.header{
-  padding:20px 22px 16px; background:linear-gradient(145deg,#383838,#252525);
-  display:flex;align-items:center;gap:14px
-}
-.mark{
-  width:54px;height:54px;flex:0 0 54px;border-radius:16px;
-  display:grid;place-items:center;font-family:Georgia,serif;font-size:27px;
-  background:linear-gradient(145deg,#8f1738,#42101f);box-shadow:0 6px 18px rgba(0,0,0,.25)
-}
-h1{font-size:19px;margin:0 0 4px;font-weight:700}
-.sub{font-size:12px;color:#aaa7a3}
-.list{padding:10px}
-.track{padding:8px;border-radius:18px}
-.track+.track{margin-top:3px}
-.track-label{display:flex;align-items:center;gap:10px;padding:0 7px 7px}
-.num{font-size:11px;color:#817f7b;width:16px;text-align:center}
-.track-label strong{display:block;font-size:12px;font-weight:600;direction:rtl;text-align:left}
-.track-label small{display:block;margin-top:2px;font-size:10px;color:#989590;direction:rtl;text-align:left}
-.frame-wrap{border-radius:17px;overflow:hidden;background:#171717;height:190px}
-iframe{display:block;width:100%;height:190px;border:0}
-.note{font-size:10px;color:#77736f;text-align:center;padding:3px 15px 15px}
-@media(max-width:500px){
-  .shell{border-radius:22px}.header{padding:16px 17px 13px}
-  .mark{width:46px;height:46px;flex-basis:46px;border-radius:14px;font-size:23px}
-  h1{font-size:17px}.list{padding:7px}
-  .track{padding:6px}.frame-wrap,iframe{height:190px}
-}
+.player{background:#181818;border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.06)}
+.now{display:grid;grid-template-columns:150px minmax(0,1fr);gap:22px;padding:22px;background:linear-gradient(145deg,#353535 0%,#202020 70%)}
+.art{width:150px;height:150px;border-radius:22px;background:linear-gradient(145deg,#861536,#35101e);display:grid;place-items:center;box-shadow:0 12px 28px rgba(0,0,0,.35);font-family:Georgia,serif;font-size:66px}
+.details{min-width:0;display:flex;flex-direction:column;justify-content:center}
+.brand{font-size:10px;letter-spacing:.18em;color:#aaa;text-transform:uppercase;margin-bottom:10px}
+h1{font-size:25px;line-height:1.1;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.artist{font-size:13px;color:#aaa;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.controls{display:flex;align-items:center;gap:11px;margin-top:17px}
+.icon{border:0;background:rgba(255,255,255,.08);color:#fff;border-radius:50%;width:35px;height:35px;font-size:17px;cursor:pointer}
+.play-label{font-size:11px;color:#bdbdbd;margin-left:2px}
+.real-player{margin-top:15px;border-radius:15px;overflow:hidden;height:72px;background:#111}
+.real-player iframe{display:block;width:100%;height:72px;border:0}
+.queue{background:#202020;padding:8px 13px 14px}
+.queue-head{display:flex;justify-content:space-between;padding:10px 10px 8px;color:#aaa;font-size:11px;text-transform:uppercase;letter-spacing:.11em}
+.row{display:grid;grid-template-columns:28px 46px minmax(0,1fr) 28px;align-items:center;gap:10px;padding:8px;border-radius:14px;cursor:pointer}
+.row:hover,.row.active{background:rgba(255,255,255,.07)}
+.n{font-size:11px;color:#777;text-align:center}
+.thumb{width:46px;height:46px;border-radius:11px;display:grid;place-items:center;font-family:Georgia,serif;font-size:20px;background:linear-gradient(145deg,#79142f,#31101b)}
+.info{min-width:0}.song{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.who{font-size:11px;color:#929292;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arrow{color:#888;text-align:center}.foot{text-align:center;color:#666;font-size:9px;padding:1px 10px 12px;background:#202020}
+@media(max-width:520px){.now{grid-template-columns:105px minmax(0,1fr);gap:15px;padding:16px}.art{width:105px;height:105px;border-radius:18px;font-size:48px}h1{font-size:19px}.real-player{grid-column:1/-1;margin-top:2px}.details .real-player{display:none}.player{border-radius:23px}}
 </style>
 </head>
 <body>
-<div class="shell">
-  <div class="header">
-    <div class="mark">ن</div>
-    <div><h1>Nour's Most Played</h1><div class="sub">Play directly with Anghami</div></div>
-  </div>
-  <div class="list">
-    <div class="track">
-  <div class="track-label"><span class="num">1</span><div><strong>أهواك</strong><small>فيروز</small></div></div>
-  <div class="frame-wrap">
-    <iframe
-      src="https://widget.anghami.com/song/69301389/?theme=fulldark&layout=wide&lang=en"
-      scrolling="no" frameborder="0"
-      allow="autoplay; encrypted-media"
-      loading="lazy"
-      title="أهواك — فيروز"></iframe>
-  </div>
+<div class="player">
+  <section class="now">
+    <div class="art" id="art">ف</div>
+    <div class="details">
+      <div class="brand">Nour Mohsen · Most Played</div>
+      <h1 id="title">أهواك</h1>
+      <div class="artist" id="artist">فيروز</div>
+      <div class="controls">
+        <button class="icon" id="prev" aria-label="Previous">‹</button>
+        <button class="icon" id="next" aria-label="Next">›</button>
+        <span class="play-label">Use ▶ in the mini player to play here</span>
+      </div>
+      <div class="real-player" id="desktopPlayer"></div>
+    </div>
+    <div class="real-player" id="mobilePlayer" style="display:none"></div>
+  </section>
+
+  <section class="queue">
+    <div class="queue-head"><span>Most Played</span><span>Anghami</span></div>
+    <div id="rows"></div>
+  </section>
+  <div class="foot">Real playback is provided by Anghami.</div>
 </div>
-<div class="track">
-  <div class="track-label"><span class="num">2</span><div><strong>حبّوا بعضهن</strong><small>فيروز</small></div></div>
-  <div class="frame-wrap">
-    <iframe
-      src="https://widget.anghami.com/song/294834/?theme=fulldark&layout=wide&lang=en"
-      scrolling="no" frameborder="0"
-      allow="autoplay; encrypted-media"
-      loading="lazy"
-      title="حبّوا بعضهن — فيروز"></iframe>
-  </div>
-</div>
-<div class="track">
-  <div class="track-label"><span class="num">3</span><div><strong>عمرى معاك</strong><small>أنغام</small></div></div>
-  <div class="frame-wrap">
-    <iframe
-      src="https://widget.anghami.com/song/103016/?theme=fulldark&layout=wide&lang=en"
-      scrolling="no" frameborder="0"
-      allow="autoplay; encrypted-media"
-      loading="lazy"
-      title="عمرى معاك — أنغام"></iframe>
-  </div>
-</div>
-<div class="track">
-  <div class="track-label"><span class="num">4</span><div><strong>برضه بتوحشني</strong><small>أنغام و وائل كفوري</small></div></div>
-  <div class="frame-wrap">
-    <iframe
-      src="https://widget.anghami.com/song/1024471022/?theme=fulldark&layout=wide&lang=en"
-      scrolling="no" frameborder="0"
-      allow="autoplay; encrypted-media"
-      loading="lazy"
-      title="برضه بتوحشني — أنغام و وائل كفوري"></iframe>
-  </div>
-</div>
-  </div>
-  <div class="note">Playback is provided by Anghami's official embedded player.</div>
-</div>
+
+<script>
+const songs=[
+ {title:"أهواك",artist:"فيروز",id:"69301389",letter:"ف"},
+ {title:"حبّوا بعضهن",artist:"فيروز",id:"294834",letter:"ف"},
+ {title:"عمرى معاك",artist:"أنغام",id:"103016",letter:"أ"},
+ {title:"برضه بتوحشني",artist:"أنغام و وائل كفوري",id:"1024471022",letter:"و"}
+];
+let current=0;
+const rows=document.getElementById("rows");
+songs.forEach((s,i)=>{
+ const r=document.createElement("div");
+ r.className="row"; r.innerHTML=`<div class="n">${i+1}</div><div class="thumb">${s.letter}</div><div class="info"><div class="song">${s.title}</div><div class="who">${s.artist}</div></div><div class="arrow">›</div>`;
+ r.onclick=()=>select(i); rows.appendChild(r);
+});
+function embed(s){
+ const src=`https://widget.anghami.com/song/${s.id}/?theme=fulldark&layout=wide&lang=en`;
+ return `<iframe src="${src}" scrolling="no" frameborder="0" allow="autoplay; encrypted-media" title="${s.title}"></iframe>`;
+}
+function select(i){
+ current=(i+songs.length)%songs.length; const s=songs[current];
+ document.getElementById("title").textContent=s.title;
+ document.getElementById("artist").textContent=s.artist;
+ document.getElementById("art").textContent=s.letter;
+ [...rows.children].forEach((r,j)=>r.classList.toggle("active",j===current));
+ const html=embed(s);
+ document.getElementById("desktopPlayer").innerHTML=html;
+ document.getElementById("mobilePlayer").innerHTML=html;
+}
+document.getElementById("prev").onclick=()=>select(current-1);
+document.getElementById("next").onclick=()=>select(current+1);
+function responsive(){
+ const mobile=innerWidth<=520;
+ document.getElementById("mobilePlayer").style.display=mobile?"block":"none";
+ document.getElementById("desktopPlayer").style.display=mobile?"none":"block";
+}
+addEventListener("resize",responsive); responsive(); select(0);
+</script>
 </body>
 </html>
