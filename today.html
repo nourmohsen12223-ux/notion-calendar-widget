@@ -23,8 +23,7 @@ body {
     padding: 0;
 
     background: transparent;
-
-    color: #37352f;
+    color: #37352F;
 
     font-family:
         -apple-system,
@@ -47,10 +46,9 @@ body {
 .widget-container {
     width: 100%;
 
-    background: #e8e4d8;
+    background: #F5F4F1;
 
-    border: 1px solid #d8d3c7;
-
+    border: 1px solid #E8E6E1;
     border-radius: 16px;
 
     overflow: hidden;
@@ -74,26 +72,29 @@ body {
 }
 
 .title {
+    color: #37352F;
+
     font-size: 26px;
     font-weight: 600;
 
-    letter-spacing: -0.45px;
-
     line-height: 1.2;
 
-    color: #37352f;
+    letter-spacing: -0.45px;
 }
+
+
+/* TODAY PILL */
 
 .today-badge {
     flex-shrink: 0;
 
     padding: 5px 10px;
 
+    background: #ECEAE5;
+
     border-radius: 20px;
 
-    background: #dcd7ca;
-
-    color: #6f6a61;
+    color: #77746E;
 
     font-size: 10px;
     font-weight: 600;
@@ -103,28 +104,31 @@ body {
     text-transform: uppercase;
 }
 
+
+/* DATE */
+
 .date {
     margin-top: 6px;
 
-    color: #7f7a71;
+    color: #8F8D88;
 
     font-size: 13px;
 }
 
 
 /* =====================================================
-   EVENTS
+   EVENT LIST
 ===================================================== */
 
 .events {
     width: 100%;
 
-    border-top: 1px solid #d8d3c7;
+    border-top: 1px solid #E8E6E1;
 }
 
 
 /* =====================================================
-   EVENT ROW
+   EVENT
 ===================================================== */
 
 .event {
@@ -143,7 +147,7 @@ body {
 
     padding: 11px 24px;
 
-    border-bottom: 1px solid #d8d3c7;
+    border-bottom: 1px solid #E8E6E1;
 
     transition:
         background-color 0.15s ease;
@@ -154,7 +158,7 @@ body {
 }
 
 .event:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.55);
 }
 
 
@@ -163,15 +167,15 @@ body {
 ===================================================== */
 
 .time-column {
+    color: #85827D;
+
     font-size: 12px;
 
     line-height: 1.4;
-
-    color: #777269;
 }
 
 .start-time {
-    color: #45423d;
+    color: #45433F;
 
     font-weight: 600;
 }
@@ -179,18 +183,18 @@ body {
 .end-time {
     margin-top: 1px;
 
-    color: #928d84;
+    color: #A09D97;
 }
 
 .all-day {
-    color: #6f6a61;
+    color: #77746E;
 
     font-weight: 500;
 }
 
 
 /* =====================================================
-   CALENDAR COLOR DOT
+   CALENDAR COLOR
 ===================================================== */
 
 .dot-column {
@@ -217,6 +221,9 @@ body {
     min-width: 0;
 }
 
+
+/* TITLE */
+
 .event-title {
     display: flex;
 
@@ -224,10 +231,9 @@ body {
 
     min-width: 0;
 
-    color: #37352f;
+    color: #37352F;
 
     font-size: 14px;
-
     font-weight: 550;
 
     line-height: 1.35;
@@ -243,16 +249,19 @@ body {
     text-overflow: ellipsis;
 }
 
-.event-meta {
-    margin-top: 4px;
 
+/* CALENDAR NAME */
+
+.event-meta {
     display: flex;
 
     align-items: center;
 
     min-width: 0;
 
-    color: #7f7a71;
+    margin-top: 4px;
+
+    color: #8F8D88;
 
     font-size: 11px;
 }
@@ -271,8 +280,11 @@ body {
 ===================================================== */
 
 .event.current {
-    background: rgba(255, 255, 255, 0.34);
+    background: rgba(255, 255, 255, 0.62);
 }
+
+
+/* LEFT RED INDICATOR */
 
 .event.current::before {
     content: "";
@@ -280,16 +292,18 @@ body {
     position: absolute;
 
     left: 0;
-
     top: 12px;
     bottom: 12px;
 
     width: 3px;
 
-    border-radius: 0 3px 3px 0;
+    background: #EB5757;
 
-    background: #eb5757;
+    border-radius: 0 3px 3px 0;
 }
+
+
+/* NOW */
 
 .now {
     display: inline-flex;
@@ -300,10 +314,9 @@ body {
 
     margin-left: 9px;
 
-    color: #eb5757;
+    color: #EB5757;
 
     font-size: 9px;
-
     font-weight: 700;
 
     letter-spacing: 0.5px;
@@ -315,22 +328,22 @@ body {
 
     margin-right: 4px;
 
-    border-radius: 50%;
+    background: #EB5757;
 
-    background: #eb5757;
+    border-radius: 50%;
 }
 
 
 /* =====================================================
-   LOADING / EMPTY / ERROR
+   LOADING / EMPTY
 ===================================================== */
 
 .status {
     padding: 42px 20px;
 
-    border-top: 1px solid #d8d3c7;
+    border-top: 1px solid #E8E6E1;
 
-    color: #7f7a71;
+    color: #8F8D88;
 
     font-size: 13px;
 
@@ -340,18 +353,18 @@ body {
 .empty-icon {
     margin-bottom: 8px;
 
-    color: #9d988e;
+    color: #AAA7A1;
 
     font-size: 20px;
 }
 
 .error {
-    color: #eb5757;
+    color: #EB5757;
 }
 
 
 /* =====================================================
-   RESPONSIVE
+   MOBILE
 ===================================================== */
 
 @media (max-width: 500px) {
@@ -394,7 +407,9 @@ body {
 <div class="widget-container">
 
 
-    <!-- HEADER -->
+    <!-- =================================================
+         HEADER
+    ================================================== -->
 
     <div class="header">
 
@@ -420,7 +435,9 @@ body {
 
 
 
-    <!-- STATUS -->
+    <!-- =================================================
+         LOADING / EMPTY MESSAGE
+    ================================================== -->
 
     <div
         id="status"
@@ -431,7 +448,9 @@ body {
 
 
 
-    <!-- EVENTS -->
+    <!-- =================================================
+         EVENTS
+    ================================================== -->
 
     <div
         id="events"
@@ -447,15 +466,16 @@ body {
 <script>
 
 /* =====================================================
-   BACKEND
+   CLOUDFLARE BACKEND
 ===================================================== */
 
 const API_URL =
     "https://notion-calendar-api.nourmohsen12223.workers.dev/events";
 
 
+
 /* =====================================================
-   DATE
+   TODAY'S DATE
 ===================================================== */
 
 const today =
@@ -477,11 +497,13 @@ document.getElementById(
     );
 
 
+
 /* =====================================================
-   LOAD EVENTS
+   LOAD TODAY'S EVENTS
 ===================================================== */
 
 async function loadToday() {
+
 
     const status =
         document.getElementById(
@@ -567,7 +589,9 @@ async function loadToday() {
             data.events || [];
 
 
-        /* NO EVENTS */
+        /* =================================================
+           NO EVENTS
+        ================================================= */
 
         if (
             events.length === 0
@@ -596,7 +620,9 @@ async function loadToday() {
         }
 
 
-        /* EVENTS FOUND */
+        /* =================================================
+           EVENTS FOUND
+        ================================================= */
 
         status.style.display =
             "none";
@@ -642,6 +668,7 @@ async function loadToday() {
 }
 
 
+
 /* =====================================================
    RENDER EVENTS
 ===================================================== */
@@ -665,7 +692,9 @@ function renderEvents(
         event => {
 
 
-            /* EVENT ROW */
+            /* =================================================
+               EVENT ROW
+            ================================================= */
 
             const card =
                 document.createElement(
@@ -682,7 +711,9 @@ function renderEvents(
 
 
 
-            /* CHECK CURRENT EVENT */
+            /* =================================================
+               CURRENT EVENT CHECK
+            ================================================= */
 
             if (
                 event.start?.dateTime &&
@@ -727,7 +758,9 @@ function renderEvents(
 
 
 
-            /* TIME COLUMN */
+            /* =================================================
+               TIME
+            ================================================= */
 
             const timeColumn =
                 document.createElement(
@@ -846,7 +879,9 @@ function renderEvents(
 
 
 
-            /* CALENDAR COLOR DOT */
+            /* =================================================
+               CALENDAR COLOR DOT
+            ================================================= */
 
             const dotColumn =
                 document.createElement(
@@ -870,7 +905,7 @@ function renderEvents(
 
             dot.style.backgroundColor =
                 event.calendarColor ||
-                "#8d887e";
+                "#8F8D88";
 
 
             dotColumn.appendChild(
@@ -879,7 +914,9 @@ function renderEvents(
 
 
 
-            /* CONTENT */
+            /* =================================================
+               EVENT CONTENT
+            ================================================= */
 
             const content =
                 document.createElement(
@@ -892,7 +929,9 @@ function renderEvents(
 
 
 
-            /* TITLE */
+            /* =================================================
+               TITLE
+            ================================================= */
 
             const title =
                 document.createElement(
@@ -925,7 +964,9 @@ function renderEvents(
 
 
 
-            /* NOW INDICATOR */
+            /* =================================================
+               NOW INDICATOR
+            ================================================= */
 
             if (
                 isCurrent
@@ -973,7 +1014,9 @@ function renderEvents(
 
 
 
-            /* CALENDAR NAME */
+            /* =================================================
+               CALENDAR NAME
+            ================================================= */
 
             const meta =
                 document.createElement(
@@ -1013,7 +1056,9 @@ function renderEvents(
 
 
 
-            /* BUILD CONTENT */
+            /* =================================================
+               BUILD CONTENT
+            ================================================= */
 
             content.appendChild(
                 title
@@ -1034,7 +1079,9 @@ function renderEvents(
 
 
 
-            /* BUILD EVENT */
+            /* =================================================
+               BUILD EVENT
+            ================================================= */
 
             card.appendChild(
                 timeColumn
@@ -1062,6 +1109,7 @@ function renderEvents(
 }
 
 
+
 /* =====================================================
    FORMAT TIME
 ===================================================== */
@@ -1081,6 +1129,7 @@ function formatTime(
 
 
 }
+
 
 
 /* =====================================================
