@@ -5,54 +5,45 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Nour's Anghami</title>
 <style>
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100%;
-    background: transparent;
-  }
-  body {
-    padding: 4px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-  }
-
-  .anghami-rounded {
-    width: 100%;
-    max-width: 600px;
-    height: 450px;
-
-    /* Gray like the reference, visible through Anghami's transparent theme */
-    background: #363636;
-
-    border-radius: 28px;
-    overflow: hidden;
-
-    /* Helps iPad/Safari clip iframe corners cleanly */
-    transform: translateZ(0);
-    -webkit-mask-image: -webkit-radial-gradient(white, black);
-  }
-
-  .anghami-rounded iframe {
-    display: block;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    border: 0;
-    background: transparent;
-  }
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+  background:transparent;
+}
+body{padding:4px}
+.anghami-rounded{
+  width:100%;
+  max-width:600px;
+  height:450px;
+  border-radius:28px;
+  overflow:hidden;
+  background:#222;
+  transform:translateZ(0);
+  -webkit-mask-image:-webkit-radial-gradient(white,black);
+}
+.anghami-rounded iframe{
+  display:block;
+  width:100%;
+  height:100%;
+  margin:0;
+  border:0;
+}
 </style>
 </head>
 <body>
-  <div class="anghami-rounded">
-    <iframe
-      src="https://widget.anghami.com/profile/62680320/?theme=fulltrans&layout=list&lang=en"
-      scrolling="no"
-      frameborder="0"
-      allow="autoplay; encrypted-media"
-      title="Nour Mohsen on Anghami">
-    </iframe>
-  </div>
+<div class="anghami-rounded">
+  <iframe
+    src="https://widget.anghami.com/profile/62680320/?theme=fulldark&layout=list&lang=en"
+    scrolling="no"
+    frameborder="0"
+    width="600"
+    height="450"
+    allow="autoplay; encrypted-media"
+    title="Nour Mohsen on Anghami">
+  </iframe>
+</div>
 </body>
 </html>
