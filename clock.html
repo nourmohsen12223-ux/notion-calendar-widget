@@ -7,6 +7,11 @@
 
 <title>Flip Clock</title>
 
+<!-- Condensed font for the small labels -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&display=swap" rel="stylesheet">
+
 <style>
 
 * {
@@ -17,18 +22,7 @@ html,
 body {
     margin: 0;
     padding: 0;
-
-    width: 100%;
-
     background: transparent;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Helvetica,
-        Arial,
-        sans-serif;
 }
 
 body {
@@ -70,12 +64,12 @@ body {
     border-radius: 22px;
 
     box-shadow:
-        0 2px 10px rgba(55, 53, 47, 0.04);
+        0 2px 10px rgba(55, 53, 47, 0.035);
 }
 
 
 /* =====================================================
-   NUMBER
+   LARGE NUMBER
 ===================================================== */
 
 .number {
@@ -87,33 +81,27 @@ body {
     align-items: center;
     justify-content: center;
 
-    padding-bottom: 15px;
+    padding-bottom: 12px;
 
-    color: #98938F;
+    color: #96918D;
 
-    font-family:
-        "Arial Narrow",
-        "Helvetica Neue",
-        Arial,
-        sans-serif;
+    font-family: "Anton", sans-serif;
 
-    font-size: clamp(110px, 28vw, 205px);
-    font-weight: 800;
+    font-size: clamp(115px, 27vw, 190px);
+    font-weight: 400;
 
     line-height: 1;
 
-    letter-spacing: -10px;
-
-    font-stretch: condensed;
-
-    transform-origin: center center;
+    letter-spacing: -5px;
 
     user-select: none;
+
+    transform-origin: center;
 }
 
 
 /* =====================================================
-   CENTER FLIP LINE
+   MIDDLE FLIP LINE
 ===================================================== */
 
 .flip-line {
@@ -127,48 +115,55 @@ body {
 
     height: 1px;
 
-    background: rgba(255,255,255,0.42);
+    background: rgba(255, 255, 255, 0.52);
 
     box-shadow:
-        0 1px 1px rgba(120,115,110,0.08);
+        0 1px 1px rgba(100, 95, 90, 0.08);
 
     pointer-events: none;
 }
 
 
 /* =====================================================
-   BOTTOM LABELS
+   SMALL LABELS
+   Matches the narrow reference typography
 ===================================================== */
 
 .bottom-label {
     position: absolute;
 
-    bottom: 16px;
+    bottom: 14px;
 
     z-index: 6;
 
-    color: #77736F;
+    color: #6F6B67;
 
-    font-family:
-        "Arial Narrow",
-        "Helvetica Neue",
-        Arial,
-        sans-serif;
+    font-family: "Bebas Neue", sans-serif;
 
-    font-size: 17px;
-    font-weight: 800;
+    font-size: 22px;
+    font-weight: 400;
 
-    letter-spacing: -0.5px;
+    line-height: 1;
+
+    letter-spacing: -0.4px;
 
     text-transform: uppercase;
+
+    user-select: none;
 }
+
+
+/* AM / PM */
 
 .period {
-    left: 14px;
+    left: 13px;
 }
 
+
+/* WEEKDAY */
+
 .weekday {
-    right: 14px;
+    right: 13px;
 }
 
 
@@ -181,6 +176,7 @@ body {
         flipNumber 0.48s
         cubic-bezier(.45,.05,.55,.95);
 }
+
 
 @keyframes flipNumber {
 
@@ -240,23 +236,23 @@ body {
     }
 
     .number {
-        font-size: clamp(90px, 34vw, 150px);
+        font-size: clamp(90px, 33vw, 145px);
 
-        letter-spacing: -7px;
+        letter-spacing: -4px;
     }
 
     .bottom-label {
-        bottom: 12px;
+        bottom: 11px;
 
-        font-size: 13px;
+        font-size: 18px;
     }
 
     .period {
-        left: 11px;
+        left: 10px;
     }
 
     .weekday {
-        right: 11px;
+        right: 10px;
     }
 
 }
@@ -269,11 +265,11 @@ body {
     }
 
     .number {
-        font-size: 95px;
+        font-size: 92px;
     }
 
     .bottom-label {
-        font-size: 11px;
+        font-size: 16px;
     }
 
 }
@@ -357,77 +353,46 @@ body {
 ===================================================== */
 
 const hoursElement =
-    document.getElementById(
-        "hours"
-    );
-
+    document.getElementById("hours");
 
 const minutesElement =
-    document.getElementById(
-        "minutes"
-    );
-
+    document.getElementById("minutes");
 
 const periodElement =
-    document.getElementById(
-        "period"
-    );
-
+    document.getElementById("period");
 
 const weekdayElement =
-    document.getElementById(
-        "weekday"
-    );
-
+    document.getElementById("weekday");
 
 const hourCard =
-    document.getElementById(
-        "hourCard"
-    );
-
+    document.getElementById("hourCard");
 
 const minuteCard =
-    document.getElementById(
-        "minuteCard"
-    );
+    document.getElementById("minuteCard");
 
-
-
-/* =====================================================
-   PREVIOUS VALUES
-===================================================== */
 
 let previousHour = null;
-
 let previousMinute = null;
 
 
 
 /* =====================================================
-   FLIP
+   FLIP ANIMATION
 ===================================================== */
 
 function triggerFlip(card) {
 
-    card.classList.remove(
-        "flipping"
-    );
-
+    card.classList.remove("flipping");
 
     void card.offsetWidth;
 
-
-    card.classList.add(
-        "flipping"
-    );
+    card.classList.add("flipping");
 
 
     setTimeout(
         () => {
 
-            card.classList.remove(
-                "flipping"
-            );
+            card.classList.remove("flipping");
 
         },
         500
@@ -461,15 +426,13 @@ function updateClock() {
             : "AM";
 
 
-    /* 12 HOUR FORMAT */
+    /* 12-HOUR CLOCK */
 
     hours =
         hours % 12;
 
 
-    if (
-        hours === 0
-    ) {
+    if (hours === 0) {
 
         hours = 12;
 
@@ -477,18 +440,14 @@ function updateClock() {
 
 
     const hourText =
-        String(
-            hours
-        ).padStart(
+        String(hours).padStart(
             2,
             "0"
         );
 
 
     const minuteText =
-        String(
-            minutes
-        ).padStart(
+        String(minutes).padStart(
             2,
             "0"
         );
@@ -505,30 +464,26 @@ function updateClock() {
         ).toUpperCase();
 
 
-    /* HOURS */
+    /* FLIP HOUR */
 
     if (
         previousHour !== null &&
         previousHour !== hourText
     ) {
 
-        triggerFlip(
-            hourCard
-        );
+        triggerFlip(hourCard);
 
     }
 
 
-    /* MINUTES */
+    /* FLIP MINUTE */
 
     if (
         previousMinute !== null &&
         previousMinute !== minuteText
     ) {
 
-        triggerFlip(
-            minuteCard
-        );
+        triggerFlip(minuteCard);
 
     }
 
@@ -566,11 +521,6 @@ function updateClock() {
 
 updateClock();
 
-
-/*
-Update every second so the minute
-changes immediately when needed.
-*/
 
 setInterval(
     updateClock,
