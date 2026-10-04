@@ -9,10 +9,6 @@
 
 <style>
 
-/* =====================================================
-   BASE
-===================================================== */
-
 * {
     box-sizing: border-box;
 }
@@ -21,7 +17,6 @@ html,
 body {
     margin: 0;
     padding: 0;
-
     background: #ffffff;
     color: #37352f;
 
@@ -47,7 +42,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     min-height: 46px;
     margin-bottom: 14px;
 }
@@ -55,9 +49,7 @@ body {
 .month-title {
     font-size: 32px;
     font-weight: 600;
-
     color: #37352f;
-
     letter-spacing: -0.4px;
     line-height: 1.2;
 }
@@ -71,7 +63,6 @@ body {
 .control-button {
     height: 34px;
     min-width: 34px;
-
     padding: 0 8px;
 
     display: flex;
@@ -80,11 +71,9 @@ body {
 
     border: none;
     border-radius: 5px;
-
     background: transparent;
 
     color: #787774;
-
     font-size: 19px;
 
     cursor: pointer;
@@ -96,10 +85,8 @@ body {
 
 .today-button {
     color: #37352f;
-
     font-size: 13px;
     font-weight: 500;
-
     padding: 0 11px;
 }
 
@@ -110,9 +97,7 @@ body {
 
 .weekdays {
     display: grid;
-
-    grid-template-columns:
-        repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .weekday {
@@ -130,14 +115,12 @@ body {
 
 
 /* =====================================================
-   CALENDAR GRID
+   CALENDAR
 ===================================================== */
 
 .calendar {
     display: grid;
-
-    grid-template-columns:
-        repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(0, 1fr));
 
     border-top: 1px solid #e9e9e7;
     border-left: 1px solid #e9e9e7;
@@ -145,7 +128,7 @@ body {
 
 
 /* =====================================================
-   DAY CELLS
+   DAY
 ===================================================== */
 
 .day {
@@ -179,7 +162,6 @@ body {
     align-items: center;
 
     min-height: 29px;
-
     margin-bottom: 4px;
 }
 
@@ -198,17 +180,11 @@ body {
     color: #37352f;
 
     font-size: 14px;
-    font-weight: 400;
 }
 
 .other-month .day-number {
     color: #b4b4b1;
 }
-
-
-/* =====================================================
-   TODAY
-===================================================== */
 
 .current-day .day-number {
     width: 28px;
@@ -241,7 +217,9 @@ body {
     padding: 3px 6px;
     margin-bottom: 3px;
 
-    border-radius: 3px;
+    border-radius: 4px;
+
+    color: #4b4945;
 
     font-size: 12px;
     line-height: 15px;
@@ -292,7 +270,7 @@ body {
 
 
 /* =====================================================
-   EVENT DETAILS OVERLAY
+   EVENT POPUP
 ===================================================== */
 
 .event-overlay {
@@ -318,16 +296,10 @@ body {
     display: flex;
 }
 
-
-/* =====================================================
-   EVENT DETAILS CARD
-===================================================== */
-
 .event-details {
     position: relative;
 
     width: min(420px, 100%);
-
     max-height: 80vh;
 
     overflow-y: auto;
@@ -342,9 +314,6 @@ body {
     box-shadow:
         0 12px 35px rgba(55, 53, 47, 0.12);
 }
-
-
-/* CLOSE */
 
 .close-button {
     position: absolute;
@@ -369,21 +338,14 @@ body {
     color: #8f8d88;
 
     font-size: 22px;
-    font-weight: 300;
-
-    line-height: 1;
 
     cursor: pointer;
 }
 
 .close-button:hover {
     background: #ebe9e4;
-
     color: #37352f;
 }
-
-
-/* COLOR DOT */
 
 .detail-calendar-row {
     display: flex;
@@ -392,7 +354,6 @@ body {
     gap: 8px;
 
     margin-bottom: 11px;
-
     padding-right: 35px;
 }
 
@@ -410,12 +371,7 @@ body {
 
     font-size: 11px;
     font-weight: 500;
-
-    letter-spacing: 0.2px;
 }
-
-
-/* TITLE */
 
 .detail-title {
     padding-right: 28px;
@@ -426,12 +382,7 @@ body {
     font-weight: 600;
 
     line-height: 1.3;
-
-    letter-spacing: -0.25px;
 }
-
-
-/* DATE & TIME */
 
 .detail-time {
     margin-top: 10px;
@@ -442,9 +393,6 @@ body {
 
     line-height: 1.5;
 }
-
-
-/* EXTRA INFORMATION */
 
 .detail-section {
     margin-top: 20px;
@@ -479,7 +427,7 @@ body {
 
 
 /* =====================================================
-   LOADING / ERROR
+   STATUS
 ===================================================== */
 
 .status {
@@ -539,14 +487,12 @@ body {
 
     .event-details {
         padding: 23px 21px 24px;
-
         border-radius: 14px;
     }
 
     .detail-title {
         font-size: 19px;
     }
-
 }
 
 </style>
@@ -629,9 +575,7 @@ body {
 
 
 
-<!-- =====================================================
-     EVENT DETAILS
-===================================================== -->
+<!-- EVENT DETAILS -->
 
 <div
     id="eventOverlay"
@@ -739,6 +683,52 @@ let displayedDate =
 
 
 /* =====================================================
+   NEUTRAL CALENDAR COLORS
+===================================================== */
+
+const neutralColors = [
+    "#E8E4DE",
+    "#DDDCD7",
+    "#DED7D1",
+    "#E2E3E1",
+    "#E7E1DC",
+    "#DCD9D3"
+];
+
+
+function getNeutralColor(calendarName) {
+
+    const key =
+        calendarName ||
+        "Calendar";
+
+
+    let hash = 0;
+
+
+    for (
+        let i = 0;
+        i < key.length;
+        i++
+    ) {
+
+        hash =
+            key.charCodeAt(i) +
+            ((hash << 5) - hash);
+
+    }
+
+
+    return neutralColors[
+        Math.abs(hash) %
+        neutralColors.length
+    ];
+
+}
+
+
+
+/* =====================================================
    LOAD MONTH
 ===================================================== */
 
@@ -787,17 +777,17 @@ async function loadMonth() {
         );
 
 
-    /* First visible Sunday */
-
     const start =
         new Date(
             firstOfMonth
         );
 
+
     start.setDate(
         start.getDate() -
         start.getDay()
     );
+
 
     start.setHours(
         0,
@@ -807,18 +797,18 @@ async function loadMonth() {
     );
 
 
-    /* Day after final visible Saturday */
-
     const end =
         new Date(
             lastOfMonth
         );
+
 
     end.setDate(
         end.getDate() +
         (6 - end.getDay()) +
         1
     );
+
 
     end.setHours(
         0,
@@ -934,8 +924,6 @@ function renderCalendar(events) {
         "";
 
 
-    /* First visible Sunday */
-
     const first =
         new Date(
             year,
@@ -953,8 +941,6 @@ function renderCalendar(events) {
         first.getDay()
     );
 
-
-    /* Last visible Saturday */
 
     const last =
         new Date(
@@ -1141,14 +1127,16 @@ function renderCalendar(events) {
                         "event";
 
 
+                    /* NEUTRAL COLOR */
+
                     eventDiv.style.backgroundColor =
-                        event.calendarColor ||
-                        "#e9e9e7";
+                        getNeutralColor(
+                            event.calendarName
+                        );
 
 
                     eventDiv.style.color =
-                        event.calendarTextColor ||
-                        "#37352f";
+                        "#4B4945";
 
 
                     eventDiv.setAttribute(
@@ -1224,28 +1212,32 @@ function renderCalendar(events) {
                     );
 
 
-                    /* OPEN DETAILS ON TAP */
+                    /* CLICK / TAP */
 
                     eventDiv.addEventListener(
                         "click",
                         () => {
-                            openEventDetails(event);
+
+                            openEventDetails(
+                                event
+                            );
+
                         }
                     );
 
 
-                    /* KEYBOARD SUPPORT */
+                    /* KEYBOARD */
 
                     eventDiv.addEventListener(
                         "keydown",
-                        eventKey => {
+                        keyEvent => {
 
                             if (
-                                eventKey.key === "Enter" ||
-                                eventKey.key === " "
+                                keyEvent.key === "Enter" ||
+                                keyEvent.key === " "
                             ) {
 
-                                eventKey.preventDefault();
+                                keyEvent.preventDefault();
 
                                 openEventDetails(
                                     event
@@ -1323,7 +1315,7 @@ function renderCalendar(events) {
 
 
 /* =====================================================
-   OPEN EVENT DETAILS
+   EVENT DETAILS
 ===================================================== */
 
 function openEventDetails(event) {
@@ -1334,29 +1326,41 @@ function openEventDetails(event) {
         );
 
 
-    const color =
-        document.getElementById(
-            "detailColor"
+    const neutralColor =
+        getNeutralColor(
+            event.calendarName
         );
 
 
-    const calendar =
-        document.getElementById(
-            "detailCalendar"
+    document.getElementById(
+        "detailColor"
+    ).style.backgroundColor =
+        neutralColor;
+
+
+    document.getElementById(
+        "detailCalendar"
+    ).textContent =
+        event.calendarName ||
+        "Calendar";
+
+
+    document.getElementById(
+        "detailTitle"
+    ).textContent =
+        event.summary ||
+        "Event";
+
+
+    document.getElementById(
+        "detailTime"
+    ).textContent =
+        formatEventDateTime(
+            event
         );
 
 
-    const title =
-        document.getElementById(
-            "detailTitle"
-        );
-
-
-    const time =
-        document.getElementById(
-            "detailTime"
-        );
-
+    /* LOCATION */
 
     const locationSection =
         document.getElementById(
@@ -1370,6 +1374,34 @@ function openEventDetails(event) {
         );
 
 
+    if (
+        event.location &&
+        event.location.trim()
+    ) {
+
+        location.textContent =
+            event.location;
+
+
+        locationSection.style.display =
+            "block";
+
+    }
+
+    else {
+
+        location.textContent =
+            "";
+
+
+        locationSection.style.display =
+            "none";
+
+    }
+
+
+    /* DESCRIPTION */
+
     const descriptionSection =
         document.getElementById(
             "descriptionSection"
@@ -1382,61 +1414,6 @@ function openEventDetails(event) {
         );
 
 
-    /* CALENDAR */
-
-    color.style.backgroundColor =
-        event.calendarColor ||
-        "#9b9a97";
-
-
-    calendar.textContent =
-        event.calendarName ||
-        "Calendar";
-
-
-    /* TITLE */
-
-    title.textContent =
-        event.summary ||
-        "Event";
-
-
-    /* DATE & TIME */
-
-    time.textContent =
-        formatEventDateTime(
-            event
-        );
-
-
-    /* LOCATION */
-
-    if (
-        event.location &&
-        event.location.trim()
-    ) {
-
-        location.textContent =
-            event.location;
-
-        locationSection.style.display =
-            "block";
-
-    }
-
-    else {
-
-        location.textContent =
-            "";
-
-        locationSection.style.display =
-            "none";
-
-    }
-
-
-    /* DESCRIPTION */
-
     if (
         event.description &&
         event.description.trim()
@@ -1444,6 +1421,7 @@ function openEventDetails(event) {
 
         description.textContent =
             event.description;
+
 
         descriptionSection.style.display =
             "block";
@@ -1454,6 +1432,7 @@ function openEventDetails(event) {
 
         description.textContent =
             "";
+
 
         descriptionSection.style.display =
             "none";
@@ -1481,12 +1460,12 @@ function openEventDetails(event) {
 
 
 /* =====================================================
-   FORMAT EVENT DATE & TIME
+   FORMAT EVENT DATE
 ===================================================== */
 
 function formatEventDateTime(event) {
 
-    /* ALL-DAY */
+    /* ALL DAY */
 
     if (
         event.start?.date
@@ -1516,14 +1495,16 @@ function formatEventDateTime(event) {
                     year: "numeric"
                 }
             )
+
             +
+
             " · All day"
         );
 
     }
 
 
-    /* TIMED EVENT */
+    /* TIMED */
 
     if (
         event.start?.dateTime
@@ -1604,7 +1585,7 @@ function formatEventDateTime(event) {
 
 
 /* =====================================================
-   CLOSE EVENT DETAILS
+   CLOSE POPUP
 ===================================================== */
 
 function closeEventDetails() {
@@ -1628,9 +1609,6 @@ function closeEventDetails() {
 }
 
 
-
-/* CLOSE BUTTON */
-
 document.getElementById(
     "closeEvent"
 ).addEventListener(
@@ -1638,9 +1616,6 @@ document.getElementById(
     closeEventDetails
 );
 
-
-
-/* CLICK OUTSIDE CARD */
 
 document.getElementById(
     "eventOverlay"
@@ -1660,9 +1635,6 @@ document.getElementById(
     }
 );
 
-
-
-/* ESC KEY */
 
 document.addEventListener(
     "keydown",
@@ -1690,7 +1662,7 @@ function eventOccursOnDate(
     date
 ) {
 
-    /* ALL-DAY EVENT */
+    /* ALL DAY */
 
     if (
         event.start?.date
@@ -1722,7 +1694,7 @@ function eventOccursOnDate(
     }
 
 
-    /* TIMED EVENT */
+    /* TIMED */
 
     if (
         event.start?.dateTime
@@ -1825,7 +1797,7 @@ function goToday() {
 
 
 /* =====================================================
-   START AUTOMATICALLY
+   START
 ===================================================== */
 
 loadMonth();
