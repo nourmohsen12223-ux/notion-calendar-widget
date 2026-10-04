@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Today's Schedule </title>
+<title>Today's Schedule</title>
 
 <style>
 
@@ -15,10 +15,8 @@
 html, body {
     margin: 0;
     padding: 0;
-
     background: transparent;
-
-    color: #faf0e6;
+    color: #37352f;
 
     font-family:
         -apple-system,
@@ -41,9 +39,9 @@ body {
 .widget-container {
     width: 100%;
 
-    background: #fbf8f2;
+    background: #F5EBDD;
 
-    border: 1px solid #e8e2d8;
+    border: 1px solid #E7D8C5;
     border-radius: 16px;
 
     overflow: hidden;
@@ -78,13 +76,13 @@ body {
 .today-badge {
     flex-shrink: 0;
 
-    padding: 5px 9px;
+    padding: 5px 10px;
 
     border-radius: 20px;
 
-    background: #f3ede4;
+    background: #EADBC8;
 
-    color: #78716c;
+    color: #756A5E;
 
     font-size: 10px;
     font-weight: 600;
@@ -96,7 +94,7 @@ body {
 .date {
     margin-top: 6px;
 
-    color: #9b958e;
+    color: #8E8377;
 
     font-size: 13px;
 }
@@ -109,7 +107,7 @@ body {
 .events {
     width: 100%;
 
-    border-top: 1px solid #e8e2d8;
+    border-top: 1px solid #E7D8C5;
 }
 
 
@@ -133,10 +131,9 @@ body {
 
     padding: 11px 24px;
 
-    border-bottom: 1px solid #ebe5dc;
+    border-bottom: 1px solid #E7D8C5;
 
-    transition:
-        background-color 0.15s ease;
+    transition: background-color 0.15s ease;
 }
 
 .event:last-child {
@@ -144,7 +141,7 @@ body {
 }
 
 .event:hover {
-    background: rgba(255, 255, 255, 0.42);
+    background: rgba(255, 255, 255, 0.28);
 }
 
 
@@ -156,11 +153,11 @@ body {
     font-size: 12px;
     line-height: 1.4;
 
-    color: #8b857e;
+    color: #81766A;
 }
 
 .start-time {
-    color: #4a4742;
+    color: #4B453F;
 
     font-weight: 600;
 }
@@ -168,11 +165,11 @@ body {
 .end-time {
     margin-top: 1px;
 
-    color: #aaa39b;
+    color: #9D9185;
 }
 
 .all-day {
-    color: #78716c;
+    color: #756A5E;
 
     font-weight: 500;
 }
@@ -235,7 +232,7 @@ body {
 
     min-width: 0;
 
-    color: #9b958e;
+    color: #8E8377;
 
     font-size: 11px;
 }
@@ -252,7 +249,7 @@ body {
 ===================================================== */
 
 .event.current {
-    background: rgba(255, 255, 255, 0.58);
+    background: rgba(255, 255, 255, 0.38);
 }
 
 .event.current::before {
@@ -268,7 +265,7 @@ body {
 
     border-radius: 0 3px 3px 0;
 
-    background: #eb5757;
+    background: #EB5757;
 }
 
 .now {
@@ -279,7 +276,7 @@ body {
 
     margin-left: 9px;
 
-    color: #eb5757;
+    color: #EB5757;
 
     font-size: 9px;
     font-weight: 700;
@@ -295,20 +292,20 @@ body {
 
     border-radius: 50%;
 
-    background: #eb5757;
+    background: #EB5757;
 }
 
 
 /* =====================================================
-   LOADING / EMPTY / ERROR
+   STATUS
 ===================================================== */
 
 .status {
     padding: 42px 20px;
 
-    border-top: 1px solid #e8e2d8;
+    border-top: 1px solid #E7D8C5;
 
-    color: #9b958e;
+    color: #8E8377;
 
     font-size: 13px;
 
@@ -318,13 +315,13 @@ body {
 .empty-icon {
     margin-bottom: 8px;
 
-    color: #bbb3aa;
+    color: #B5A695;
 
     font-size: 20px;
 }
 
 .error {
-    color: #eb5757;
+    color: #EB5757;
 }
 
 
@@ -377,7 +374,7 @@ body {
         <div class="header-top">
 
             <div class="title">
-                Today's Events
+                Today's Schedule
             </div>
 
             <div class="today-badge">
@@ -402,7 +399,7 @@ body {
         id="status"
         class="status"
     >
-        Loading today's events…
+        Loading today's schedule…
     </div>
 
 
@@ -572,7 +569,7 @@ async function loadToday() {
             "status error";
 
         status.textContent =
-            "Unable to load today's events.";
+            "Unable to load today's schedule.";
 
     }
 
@@ -596,8 +593,6 @@ function renderEvents(events) {
 
     events.forEach(event => {
 
-
-        /* EVENT */
 
         const card =
             document.createElement(
@@ -659,9 +654,7 @@ function renderEvents(events) {
             "time-column";
 
 
-        if (
-            event.start?.dateTime
-        ) {
+        if (event.start?.dateTime) {
 
             const startTime =
                 new Date(
@@ -762,7 +755,7 @@ function renderEvents(events) {
 
         dot.style.backgroundColor =
             event.calendarColor ||
-            "#9b9a97";
+            "#9B8B78";
 
 
         dotColumn.appendChild(
@@ -780,8 +773,6 @@ function renderEvents(events) {
         content.className =
             "event-content";
 
-
-        /* TITLE */
 
         const title =
             document.createElement(
@@ -861,9 +852,7 @@ function renderEvents(events) {
             "event-meta";
 
 
-        if (
-            event.calendarName
-        ) {
+        if (event.calendarName) {
 
             const calendarName =
                 document.createElement(
@@ -889,9 +878,7 @@ function renderEvents(events) {
         );
 
 
-        if (
-            event.calendarName
-        ) {
+        if (event.calendarName) {
 
             content.appendChild(
                 meta
