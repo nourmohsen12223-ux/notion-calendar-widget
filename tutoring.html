@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Lessons</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --background: #F7F5F1;
+  --card: #FFFFFF;
+  --text: #37352F;
+  --muted: #8F8D88;
+  --line: #E8E5E0;
+
+  --burgundy: #7A0026;
+
+  --neutral-1: #E9E5DF;
+  --neutral-2: #E5E3DF;
+  --neutral-3: #DDD7D0;
+  --neutral-4: #EEEAE4;
+  --neutral-5: #E8E8E5;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+
+  background: transparent;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: var(--text);
+}
+
+body {
+  padding: 8px;
+}
+
+
+/* =====================================
+   MAIN LAYOUT
+===================================== */
+
+.dashboard {
+  width: 96%;
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 2.5fr)
+    minmax(260px, 0.9fr);
+
+  gap: 22px;
+
+  align-items: start;
+}
+
+
+/* =====================================
+   CARDS
+===================================== */
+
+.panel {
+  background: var(--card);
+
+  border: 1px solid var(--line);
+
+  border-radius: 20px;
+
+  overflow: hidden;
+}
+
+
+/* =====================================
+   CALENDAR PANEL
+===================================== */
+
+.calendar-panel {
+  padding: 24px;
+}
+
+
+/* =====================================
+   TOP BAR
+===================================== */
+
+.calendar-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 24px;
+}
+
+
+.title {
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 25px;
+  font-weight: 600;
+
+  margin: 0;
+
+  color: #292724;
+}
+
+
+.calendar-controls {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.control-button {
+  height: 34px;
+
+  min-width: 34px;
+
+  padding: 0 11px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--line);
+
+  border-radius: 8px;
+
+  background: #FFFFFF;
+
+  color: #55514C;
+
+  font-size: 11px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border 0.15s ease;
+}
+
+
+.control-button:hover {
+  background: #F7F5F1;
+}
+
+
+.arrow {
+  width: 34px;
+  padding: 0;
+
+  font-size: 18px;
+
+  border: none;
+
+  background: transparent;
+}
+
+
+.month-label {
+  margin-left: 8px;
+
+  min-width: 120px;
+
+  text-align: right;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #45423E;
+}
+
+
+/* =====================================
+   WEEK HEADER
+===================================== */
+
+.week-header {
+  display: grid;
+
+  grid-template-columns:
+    52px repeat(7, minmax(0, 1fr));
+
+  border:
+    1px solid var(--line);
+
+  border-bottom: none;
+
+  border-radius: 12px 12px 0 0;
+
+  overflow: hidden;
+}
+
+
+.time-header {
+  background: #FBFAF8;
+
+  border-right:
+    1px solid var(--line);
+}
+
+
+.day-header {
+  min-width: 0;
+
+  padding: 10px 4px;
+
+  text-align: center;
+
+  background: #FBFAF8;
+
+  border-right:
+    1px solid var(--line);
+}
+
+
+.day-header:last-child {
+  border-right: none;
+}
+
+
+.day-name {
+  font-size: 9px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.6px;
+
+  color: #77736E;
+}
+
+
+.day-number {
+  margin-top: 3px;
+
+  font-size: 15px;
+
+  font-weight: 500;
+
+  color: #494641;
+}
+
+
+.day-header.today {
+  background: #F7F2F3;
+}
+
+
+.day-header.today .day-number {
+  width: 27px;
+  height: 27px;
+
+  margin:
+    3px auto 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--burgundy);
+
+  color: white;
+}
+
+
+/* =====================================
+   CALENDAR BODY
+===================================== */
+
+.calendar-scroll {
+  width: 100%;
+
+  overflow-x: auto;
+
+  border:
+    1px solid var(--line);
+
+  border-radius: 0 0 12px 12px;
+}
+
+
+.calendar-grid {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns:
+    52px repeat(7, minmax(100px, 1fr));
+
+  min-width: 760px;
+}
+
+
+/* =====================================
+   TIME COLUMN
+===================================== */
+
+.time-column {
+  position: relative;
+
+  height: 780px;
+
+  background: #FFFFFF;
+
+  border-right:
+    1px solid var(--line);
+}
+
+
+.time-label {
+  position: absolute;
+
+  right: 8px;
+
+  transform:
+    translateY(-50%);
+
+  color: #918D87;
+
+  font-size: 9px;
+
+  white-space: nowrap;
+}
+
+
+/* =====================================
+   DAY COLUMNS
+===================================== */
+
+.day-column {
+  position: relative;
+
+  height: 780px;
+
+  border-right:
+    1px solid var(--line);
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 59px,
+      #EEECE8 60px
+    );
+}
+
+
+.day-column:last-child {
+  border-right: none;
+}
+
+
+.day-column.today {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #FCFAFA 0,
+      #FCFAFA 59px,
+      #EEECE8 60px
+    );
+}
+
+
+/* =====================================
+   LESSON CARD
+===================================== */
+
+.lesson {
+  position: absolute;
+
+  left: 6px;
+  right: 6px;
+
+  min-height: 44px;
+
+  padding: 7px 8px;
+
+  border-radius: 7px;
+
+  border-left:
+    3px solid rgba(90, 82, 74, 0.25);
+
+  overflow: hidden;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+
+.lesson:hover {
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 3px 10px
+    rgba(55, 53, 47, 0.08);
+}
+
+
+.lesson-name {
+  font-size: 10.5px;
+
+  font-weight: 650;
+
+  color: #37332F;
+
+  line-height: 1.25;
+}
+
+
+.lesson-time {
+  margin-top: 2px;
+
+  font-size: 8.5px;
+
+  color: #716C66;
+
+  line-height: 1.25;
+}
+
+
+.lesson-subject {
+  margin-top: 3px;
+
+  font-size: 8.5px;
+
+  color: #5E5954;
+
+  line-height: 1.25;
+}
+
+
+/* =====================================
+   RIGHT COLUMN
+===================================== */
+
+.sidebar {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+
+/* =====================================
+   NEW LESSON BUTTON
+===================================== */
+
+.new-lesson {
+  width: 100%;
+
+  padding: 16px 20px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: var(--burgundy);
+
+  color: #FFFFFF;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+
+.new-lesson:hover {
+  opacity: 0.92;
+
+  transform:
+    translateY(-1px);
+}
+
+
+/* =====================================
+   SIDEBAR PANELS
+===================================== */
+
+.sidebar-panel {
+  padding: 18px;
+}
+
+
+.sidebar-heading {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+}
+
+
+.sidebar-title {
+  margin: 0;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 17px;
+
+  font-weight: 600;
+
+  color: #302D29;
+}
+
+
+.view-all {
+  color: #99958F;
+
+  font-size: 9px;
+}
+
+
+/* =====================================
+   UPCOMING LIST
+===================================== */
+
+.upcoming-item,
+.deadline-item {
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 11px 0;
+
+  border-bottom:
+    1px solid #F0EEEA;
+}
+
+
+.upcoming-item:last-child,
+.deadline-item:last-child {
+  border-bottom: none;
+}
+
+
+.mini-date {
+  flex: 0 0 42px;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  background: #F3F0EC;
+}
+
+
+.mini-month {
+  color: var(--burgundy);
+
+  font-size: 7px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.5px;
+}
+
+
+.mini-day {
+  margin-top: 1px;
+
+  color: #4A4641;
+
+  font-size: 15px;
+
+  font-weight: 600;
+}
+
+
+.mini-content {
+  min-width: 0;
+
+  flex: 1;
+}
+
+
+.mini-title {
+  color: #393632;
+
+  font-size: 10.5px;
+
+  font-weight: 600;
+
+  line-height: 1.35;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+.mini-meta {
+  margin-top: 3px;
+
+  color: #96918B;
+
+  font-size: 8.5px;
+
+  line-height: 1.35;
+}
+
+
+.chevron {
+  color: #AAA69F;
+
+  font-size: 15px;
+}
+
+
+/* =====================================
+   EMPTY
+===================================== */
+
+.empty {
+  padding: 28px 10px;
+
+  text-align: center;
+
+  color: #AAA69F;
+
+  font-size: 10px;
+}
+
+
+/* =====================================
+   LOADING
+===================================== */
+
+.loading {
+  padding: 30px;
+
+  text-align: center;
+
+  color: #AAA69F;
+
+  font-size: 10px;
+}
+
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 850px) {
+
+  .dashboard {
+    width: 96%;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      230px;
+
+    gap: 14px;
+  }
+
+
+  .calendar-panel {
+    padding: 16px;
+  }
+
+
+  .calendar-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 12px;
+  }
+
+
+  .calendar-controls {
+    width: 100%;
+
+    justify-content: flex-end;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+
+  .sidebar {
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+
+  .new-lesson {
+    grid-column:
+      1 / -1;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .sidebar {
+    grid-template-columns: 1fr;
+  }
+
+
+  .title {
+    font-size: 22px;
+  }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<div class="dashboard">
+
+
+<!-- =================================
+     MY LESSONS
+================================== -->
+
+<section class="panel calendar-panel">
+
+
+  <div class="calendar-header">
+
+
+    <h1 class="title">
+      My Lessons
+    </h1>
+
+
+    <div class="calendar-controls">
+
+
+      <button
+        class="control-button arrow"
+        id="previousWeek"
+        aria-label="Previous week"
+      >
+        ‹
+      </button>
+
+
+      <button
+        class="control-button"
+        id="todayButton"
+      >
+        Today
+      </button>
+
+
+      <button
+        class="control-button arrow"
+        id="nextWeek"
+        aria-label="Next week"
+      >
+        ›
+      </button>
+
+
+      <div
+        class="month-label"
+        id="monthLabel"
+      >
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div
+    class="week-header"
+    id="weekHeader"
+  >
+  </div>
+
+
+  <div class="calendar-scroll">
+
+
+    <div
+      class="calendar-grid"
+      id="calendarGrid"
+    >
+
+
+      <div
+        class="time-column"
+        id="timeColumn"
+      >
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+</section>
+
+
+
+<!-- =================================
+     RIGHT SIDEBAR
+================================== -->
+
+<aside class="sidebar">
+
+
+  <button
+    class="new-lesson"
+    id="newLessonButton"
+  >
+    ＋ New Lesson
+  </button>
+
+
+
+  <!-- UPCOMING LESSONS -->
+
+  <section class="panel sidebar-panel">
+
+
+    <div class="sidebar-heading">
+
+
+      <h2 class="sidebar-title">
+        Upcoming Lessons
+      </h2>
+
+
+      <span class="view-all">
+        Next 4
+      </span>
+
+
+    </div>
+
+
+    <div
+      id="upcomingLessons"
+      class="loading"
+    >
+      Loading…
+    </div>
+
+
+  </section>
+
+
+
+  <!-- DEADLINES -->
+
+  <section class="panel sidebar-panel">
+
+
+    <div class="sidebar-heading">
+
+
+      <h2 class="sidebar-title">
+        Deadlines
+      </h2>
+
+
+      <span class="view-all">
+        Upcoming
+      </span>
+
+
+    </div>
+
+
+    <div id="deadlines">
+
+
+      <div class="empty">
+        No upcoming deadlines
+      </div>
+
+
+    </div>
+
+
+  </section>
+
+
+</aside>
+
+
+</div>
+
+
+<script>
+
+/* =====================================
+   SETTINGS
+===================================== */
+
+const API_URL =
+  "https://notion-calendar-api.nourmohsen12223.workers.dev/upcoming-data";
+
+
+const START_HOUR = 8;
+
+const END_HOUR = 21;
+
+const HOUR_HEIGHT = 60;
+
+const CALENDAR_HEIGHT =
+  (END_HOUR - START_HOUR) *
+  HOUR_HEIGHT;
+
+
+/* =====================================
+   STATE
+===================================== */
+
+let currentWeekStart =
+  getMonday(new Date());
+
+let tutoringLessons = [];
+
+let deadlines = [];
+
+
+/* =====================================
+   NEUTRAL STUDENT COLORS
+===================================== */
+
+const NEUTRAL_COLORS = [
+  "#E9E5DF",
+  "#E5E3DF",
+  "#DDD7D0",
+  "#EEEAE4",
+  "#E8E8E5"
+];
+
+
+const studentColorMap =
+  new Map();
+
+
+function colorForStudent(name) {
+
+  const key =
+    String(name || "Student");
+
+  if (
+    studentColorMap.has(key)
+  ) {
+
+    return studentColorMap.get(key);
+  }
+
+
+  const color =
+    NEUTRAL_COLORS[
+      studentColorMap.size %
+      NEUTRAL_COLORS.length
+    ];
+
+
+  studentColorMap.set(
+    key,
+    color
+  );
+
+
+  return color;
+}
+
+
+/* =====================================
+   DATE HELPERS
+===================================== */
+
+function getMonday(date) {
+
+  const copy =
+    new Date(date);
+
+  copy.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+
+  const day =
+    copy.getDay();
+
+
+  const difference =
+    day === 0
+      ? -6
+      : 1 - day;
+
+
+  copy.setDate(
+    copy.getDate() +
+    difference
+  );
+
+
+  return copy;
+}
+
+
+function addDays(
+  date,
+  amount
+) {
+
+  const result =
+    new Date(date);
+
+  result.setDate(
+    result.getDate() +
+    amount
+  );
+
+  return result;
+}
+
+
+function sameDay(
+  a,
+  b
+) {
+
+  return (
+    a.getFullYear() ===
+      b.getFullYear() &&
+
+    a.getMonth() ===
+      b.getMonth() &&
+
+    a.getDate() ===
+      b.getDate()
+  );
+}
+
+
+function monthName(date) {
+
+  return date
+    .toLocaleDateString(
+      "en-US",
+      {
+        month: "long",
+        year: "numeric"
+      }
+    );
+}
+
+
+function shortMonth(date) {
+
+  return date
+    .toLocaleDateString(
+      "en-US",
+      {
+        month: "short"
+      }
+    )
+    .toUpperCase();
+}
+
+
+function dayNumber(date) {
+
+  return date
+    .toLocaleDateString(
+      "en-US",
+      {
+        day: "numeric"
+      }
+    );
+}
+
+
+function dayName(date) {
+
+  return date
+    .toLocaleDateString(
+      "en-US",
+      {
+        weekday: "short"
+      }
+    )
+    .toUpperCase();
+}
+
+
+function formatTime(date) {
+
+  return date
+    .toLocaleTimeString(
+      "en-US",
+      {
+        hour: "numeric",
+        minute: "2-digit"
+      }
+    );
+}
+
+
+/* =====================================
+   SAFE HTML
+===================================== */
+
+function escapeHTML(value) {
+
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+}
+
+
+/* =====================================
+   CLEAN SOLOMON TITLE
+===================================== */
+
+function parseTutoringLesson(item) {
+
+  /*
+    Future server-side sanitized
+    format support
+  */
+
+  if (
+    item.student ||
+    item.subject ||
+    item.grade
+  ) {
+
+    return {
+
+      student:
+        item.student ||
+        item.title ||
+        "Student",
+
+      subject:
+        item.subject || "",
+
+      grade:
+        item.grade || ""
+
+    };
+  }
+
+
+  /*
+    Current raw Google Calendar
+    format
+  */
+
+  const original =
+    String(
+      item.title || ""
+    );
+
+
+  const firstLine =
+    original
+      .split(/\r?\n/)[0]
+      .trim();
+
+
+  const nameMatch =
+    firstLine.match(
+      /^([^,]+),\s*([^(]+)/
+    );
+
+
+  let student =
+    firstLine;
+
+
+  if (nameMatch) {
+
+    const lastName =
+      nameMatch[1].trim();
+
+    const firstName =
+      nameMatch[2].trim();
+
+
+    student =
+      firstName +
+      " " +
+      lastName;
+
+  } else {
+
+    student =
+      student
+        .replace(
+          /\s*\(Private Lesson\).*$/i,
+          ""
+        )
+        .trim();
+  }
+
+
+  const subjectMatch =
+    original.match(
+      /Subject:\s*([^\r\n]+)/i
+    );
+
+
+  const gradeMatch =
+    original.match(
+      /Grade:\s*([^\r\n]+)/i
+    );
+
+
+  return {
+
+    student:
+      student ||
+      "Student",
+
+    subject:
+      subjectMatch
+        ? subjectMatch[1].trim()
+        : "",
+
+    grade:
+      gradeMatch
+        ? gradeMatch[1].trim()
+        : ""
+
+  };
+}
+
+
+/* =====================================
+   TIME COLUMN
+===================================== */
+
+function renderTimeColumn() {
+
+  const column =
+    document.getElementById(
+      "timeColumn"
+    );
+
+
+  column.style.height =
+    CALENDAR_HEIGHT +
+    "px";
+
+
+  column.innerHTML = "";
+
+
+  for (
+    let hour = START_HOUR;
+    hour <= END_HOUR;
+    hour++
+  ) {
+
+    const label =
+      document.createElement(
+        "div"
+      );
+
+
+    label.className =
+      "time-label";
+
+
+    label.style.top =
+      (
+        (hour - START_HOUR) *
+        HOUR_HEIGHT
+      ) +
+      "px";
+
+
+    const date =
+      new Date();
+
+    date.setHours(
+      hour,
+      0,
+      0,
+      0
+    );
+
+
+    label.textContent =
+      date.toLocaleTimeString(
+        "en-US",
+        {
+          hour: "numeric"
+        }
+      );
+
+
+    column.appendChild(
+      label
+    );
+  }
+}
+
+
+/* =====================================
+   WEEK HEADER
+===================================== */
+
+function renderWeekHeader() {
+
+  const header =
+    document.getElementById(
+      "weekHeader"
+    );
+
+
+  header.innerHTML =
+    `
+      <div class="time-header"></div>
+    `;
+
+
+  const today =
+    new Date();
+
+
+  for (
+    let index = 0;
+    index < 7;
+    index++
+  ) {
+
+    const date =
+      addDays(
+        currentWeekStart,
+        index
+      );
+
+
+    const day =
+      document.createElement(
+        "div"
+      );
+
+
+    day.className =
+      "day-header";
+
+
+    if (
+      sameDay(
+        date,
+        today
+      )
+    ) {
+
+      day.classList.add(
+        "today"
+      );
+    }
+
+
+    day.innerHTML =
+      `
+        <div class="day-name">
+          ${escapeHTML(
+            dayName(date)
+          )}
+        </div>
+
+        <div class="day-number">
+          ${escapeHTML(
+            dayNumber(date)
+          )}
+        </div>
+      `;
+
+
+    header.appendChild(
+      day
+    );
+  }
+
+
+  const middleOfWeek =
+    addDays(
+      currentWeekStart,
+      3
+    );
+
+
+  document
+    .getElementById(
+      "monthLabel"
+    )
+    .textContent =
+      monthName(
+        middleOfWeek
+      );
+}
+
+
+/* =====================================
+   CALENDAR DAYS
+===================================== */
+
+function renderCalendarDays() {
+
+  const grid =
+    document.getElementById(
+      "calendarGrid"
+    );
+
+
+  grid
+    .querySelectorAll(
+      ".day-column"
+    )
+    .forEach(
+      element =>
+        element.remove()
+    );
+
+
+  const today =
+    new Date();
+
+
+  for (
+    let index = 0;
+    index < 7;
+    index++
+  ) {
+
+    const date =
+      addDays(
+        currentWeekStart,
+        index
+      );
+
+
+    const column =
+      document.createElement(
+        "div"
+      );
+
+
+    column.className =
+      "day-column";
+
+
+    column.style.height =
+      CALENDAR_HEIGHT +
+      "px";
+
+
+    column.dataset.day =
+      index;
+
+
+    if (
+      sameDay(
+        date,
+        today
+      )
+    ) {
+
+      column.classList.add(
+        "today"
+      );
+    }
+
+
+    grid.appendChild(
+      column
+    );
+  }
+}
+
+
+/* =====================================
+   RENDER LESSONS
+===================================== */
+
+function renderLessons() {
+
+  const columns =
+    document.querySelectorAll(
+      ".day-column"
+    );
+
+
+  columns.forEach(
+    column => {
+
+      column
+        .querySelectorAll(
+          ".lesson"
+        )
+        .forEach(
+          lesson =>
+            lesson.remove()
+        );
+    }
+  );
+
+
+  tutoringLessons.forEach(
+    item => {
+
+      if (!item.start) {
+        return;
+      }
+
+
+      const start =
+        new Date(
+          item.start
+        );
+
+
+      if (
+        Number.isNaN(
+          start.getTime()
+        )
+      ) {
+        return;
+      }
+
+
+      const end =
+        item.end
+          ? new Date(item.end)
+          : new Date(
+              start.getTime() +
+              60 * 60 * 1000
+            );
+
+
+      let dayIndex = -1;
+
+
+      for (
+        let index = 0;
+        index < 7;
+        index++
+      ) {
+
+        const date =
+          addDays(
+            currentWeekStart,
+            index
+          );
+
+
+        if (
+          sameDay(
+            date,
+            start
+          )
+        ) {
+
+          dayIndex =
+            index;
+
+          break;
+        }
+      }
+
+
+      if (
+        dayIndex < 0
+      ) {
+        return;
+      }
+
+
+      const decimalStart =
+        start.getHours() +
+        start.getMinutes() / 60;
+
+
+      const decimalEnd =
+        end.getHours() +
+        end.getMinutes() / 60;
+
+
+      if (
+        decimalEnd <=
+          START_HOUR ||
+
+        decimalStart >=
+          END_HOUR
+      ) {
+
+        return;
+      }
+
+
+      const visibleStart =
+        Math.max(
+          decimalStart,
+          START_HOUR
+        );
+
+
+      const visibleEnd =
+        Math.min(
+          decimalEnd,
+          END_HOUR
+        );
+
+
+      const top =
+        (
+          visibleStart -
+          START_HOUR
+        ) *
+        HOUR_HEIGHT;
+
+
+      const height =
+        Math.max(
+          44,
+
+          (
+            visibleEnd -
+            visibleStart
+          ) *
+          HOUR_HEIGHT -
+          4
+        );
+
+
+      const info =
+        parseTutoringLesson(
+          item
+        );
+
+
+      const lesson =
+        document.createElement(
+          "div"
+        );
+
+
+      lesson.className =
+        "lesson";
+
+
+      lesson.style.top =
+        top +
+        "px";
+
+
+      lesson.style.height =
+        height +
+        "px";
+
+
+      lesson.style.background =
+        colorForStudent(
+          info.student
+        );
+
+
+      lesson.innerHTML =
+        `
+          <div class="lesson-name">
+            ${escapeHTML(
+              info.student
+            )}
+          </div>
+
+          <div class="lesson-time">
+            ${escapeHTML(
+              formatTime(start)
+            )}
+            –
+            ${escapeHTML(
+              formatTime(end)
+            )}
+          </div>
+
+          ${
+            info.subject
+              ? `
+                <div class="lesson-subject">
+                  ${escapeHTML(
+                    info.subject
+                  )}
+                </div>
+              `
+              : ""
+          }
+        `;
+
+
+      columns[
+        dayIndex
+      ]
+        .appendChild(
+          lesson
+        );
+    }
+  );
+}
+
+
+/* =====================================
+   UPCOMING LESSONS
+===================================== */
+
+function renderUpcoming() {
+
+  const container =
+    document.getElementById(
+      "upcomingLessons"
+    );
+
+
+  const now =
+    new Date();
+
+
+  const upcoming =
+    tutoringLessons
+
+      .filter(
+        item => {
+
+          if (!item.start) {
+            return false;
+          }
+
+
+          const start =
+            new Date(
+              item.start
+            );
+
+
+          return (
+            !Number.isNaN(
+              start.getTime()
+            ) &&
+            start >= now
+          );
+        }
+      )
+
+      .sort(
+        (a, b) =>
+          new Date(a.start) -
+          new Date(b.start)
+      )
+
+      .slice(
+        0,
+        4
+      );
+
+
+  if (
+    !upcoming.length
+  ) {
+
+    container.className =
+      "empty";
+
+    container.textContent =
+      "No upcoming lessons";
+
+    return;
+  }
+
+
+  container.className = "";
+
+
+  container.innerHTML =
+    upcoming
+      .map(
+        item => {
+
+          const start =
+            new Date(
+              item.start
+            );
+
+
+          const info =
+            parseTutoringLesson(
+              item
+            );
+
+
+          return `
+            <div class="upcoming-item">
+
+              <div class="mini-date">
+
+                <div class="mini-month">
+                  ${escapeHTML(
+                    shortMonth(start)
+                  )}
+                </div>
+
+                <div class="mini-day">
+                  ${escapeHTML(
+                    dayNumber(start)
+                  )}
+                </div>
+
+              </div>
+
+
+              <div class="mini-content">
+
+                <div class="mini-title">
+                  ${escapeHTML(
+                    info.student
+                  )}
+                </div>
+
+                <div class="mini-meta">
+
+                  ${escapeHTML(
+                    formatTime(start)
+                  )}
+
+                  ${
+                    info.subject
+                      ? " · " +
+                        escapeHTML(
+                          info.subject
+                        )
+                      : ""
+                  }
+
+                </div>
+
+              </div>
+
+
+              <div class="chevron">
+                ›
+              </div>
+
+            </div>
+          `;
+        }
+      )
+      .join("");
+}
+
+
+/* =====================================
+   DEADLINES
+===================================== */
+
+function renderDeadlines() {
+
+  const container =
+    document.getElementById(
+      "deadlines"
+    );
+
+
+  const now =
+    new Date();
+
+
+  const future =
+    deadlines
+
+      .filter(
+        item => {
+
+          const value =
+            item.due ||
+            item.date ||
+            item.start;
+
+
+          if (!value) {
+            return false;
+          }
+
+
+          const date =
+            new Date(value);
+
+
+          return (
+            !Number.isNaN(
+              date.getTime()
+            ) &&
+            date >= now
+          );
+        }
+      )
+
+      .sort(
+        (a, b) => {
+
+          const aDate =
+            new Date(
+              a.due ||
+              a.date ||
+              a.start
+            );
+
+
+          const bDate =
+            new Date(
+              b.due ||
+              b.date ||
+              b.start
+            );
+
+
+          return (
+            aDate -
+            bDate
+          );
+        }
+      )
+
+      .slice(
+        0,
+        4
+      );
+
+
+  if (
+    !future.length
+  ) {
+
+    container.innerHTML =
+      `
+        <div class="empty">
+          No upcoming deadlines
+        </div>
+      `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    future
+      .map(
+        item => {
+
+          const date =
+            new Date(
+              item.due ||
+              item.date ||
+              item.start
+            );
+
+
+          const title =
+            item.title ||
+            item.name ||
+            "Deadline";
+
+
+          return `
+            <div class="deadline-item">
+
+              <div class="mini-date">
+
+                <div class="mini-month">
+                  ${escapeHTML(
+                    shortMonth(date)
+                  )}
+                </div>
+
+                <div class="mini-day">
+                  ${escapeHTML(
+                    dayNumber(date)
+                  )}
+                </div>
+
+              </div>
+
+
+              <div class="mini-content">
+
+                <div class="mini-title">
+                  ${escapeHTML(
+                    title
+                  )}
+                </div>
+
+                <div class="mini-meta">
+                  Upcoming deadline
+                </div>
+
+              </div>
+
+
+              <div class="chevron">
+                ›
+              </div>
+
+            </div>
+          `;
+        }
+      )
+      .join("");
+}
+
+
+/* =====================================
+   COMPLETE RENDER
+===================================== */
+
+function renderCalendar() {
+
+  renderWeekHeader();
+
+  renderTimeColumn();
+
+  renderCalendarDays();
+
+  renderLessons();
+}
+
+
+/* =====================================
+   FETCH
+===================================== */
+
+async function loadData() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          cache:
+            "no-store"
+        }
+      );
+
+
+    if (
+      !response.ok
+    ) {
+
+      throw new Error(
+        "Unable to load tutoring data."
+      );
+    }
+
+
+    const data =
+      await response.json();
+
+
+    tutoringLessons =
+      Array.isArray(
+        data.tutoring
+      )
+        ? data.tutoring
+        : [];
+
+
+    deadlines =
+      Array.isArray(
+        data.deadlines
+      )
+        ? data.deadlines
+        : [];
+
+
+    renderCalendar();
+
+    renderUpcoming();
+
+    renderDeadlines();
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    document
+      .getElementById(
+        "upcomingLessons"
+      )
+      .innerHTML =
+        `
+          <div class="empty">
+            Unable to load lessons
+          </div>
+        `;
+  }
+}
+
+
+/* =====================================
+   NAVIGATION
+===================================== */
+
+document
+  .getElementById(
+    "previousWeek"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      currentWeekStart =
+        addDays(
+          currentWeekStart,
+          -7
+        );
+
+
+      renderCalendar();
+    }
+  );
+
+
+document
+  .getElementById(
+    "nextWeek"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      currentWeekStart =
+        addDays(
+          currentWeekStart,
+          7
+        );
+
+
+      renderCalendar();
+    }
+  );
+
+
+document
+  .getElementById(
+    "todayButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      currentWeekStart =
+        getMonday(
+          new Date()
+        );
+
+
+      renderCalendar();
+    }
+  );
+
+
+/* =====================================
+   NEW LESSON
+===================================== */
+
+document
+  .getElementById(
+    "newLessonButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      /*
+        We will connect this to
+        your Notion Lessons database
+        in the next stage.
+      */
+
+      alert(
+        "We’ll connect this button to your Notion Lessons database next."
+      );
+    }
+  );
+
+
+/* =====================================
+   START
+===================================== */
+
+renderCalendar();
+
+loadData();
+
+
+/* Refresh every 5 minutes */
+
+setInterval(
+  loadData,
+  5 * 60 * 1000
+);
+
+</script>
+
+</body>
+</html>
