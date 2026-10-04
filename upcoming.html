@@ -9,7 +9,7 @@
   content="width=device-width, initial-scale=1.0"
 >
 
-<title>Upcoming</title>
+<title>Dashboard</title>
 
 <style>
 
@@ -21,6 +21,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+
   background: transparent;
 
   font-family:
@@ -33,106 +34,77 @@ body {
 }
 
 body {
-  padding: 4px;
+  padding: 2px;
 }
 
+
 /* =========================
-   MAIN GRID
+   GRID
 ========================= */
 
-.upcoming-grid {
+.grid {
   width: 100%;
-  max-width: 1000px;
-
-  margin: 0 auto;
 
   display: grid;
 
   grid-template-columns:
     repeat(2, minmax(0, 1fr));
 
-  gap: 14px;
+  column-gap: 42px;
+
+  row-gap: 34px;
 }
 
+
 /* =========================
-   CARDS
+   SECTION
 ========================= */
 
-.card {
+.section {
   min-width: 0;
-  min-height: 245px;
-
-  background: #FFFFFF;
-
-  border:
-    1px solid #E8E6E1;
-
-  border-radius: 16px;
-
-  padding: 20px 21px 18px;
-
-  overflow: hidden;
 }
 
-/* =========================
-   HEADER
-========================= */
-
-.card-header {
+.section-header {
   display: flex;
 
   align-items: center;
 
-  justify-content:
-    space-between;
+  gap: 10px;
 
-  gap: 12px;
-
-  margin-bottom: 13px;
+  margin-bottom: 5px;
 }
 
-.card-title {
+.section-title {
   margin: 0;
 
-  color: #37352F;
+  color: #57544F;
 
-  font-size: 12px;
+  font-size: 11px;
 
   font-weight: 650;
 
-  letter-spacing: 0.65px;
+  letter-spacing: 0.7px;
 
   text-transform: uppercase;
+
+  white-space: nowrap;
 }
 
-.card-count {
-  flex: 0 0 auto;
+.section-line {
+  flex: 1;
 
-  min-width: 23px;
+  height: 1px;
 
-  padding: 3px 7px;
-
-  background: #F5F4F1;
-
-  border-radius: 999px;
-
-  color: #8F8D88;
-
-  font-size: 9.5px;
-
-  font-weight: 600;
-
-  text-align: center;
+  background: #E8E6E1;
 }
+
 
 /* =========================
-   ITEMS
+   LIST
 ========================= */
 
 .items {
-  display: flex;
-
-  flex-direction: column;
+  width: 100%;
 }
 
 .item {
@@ -140,9 +112,9 @@ body {
 
   align-items: flex-start;
 
-  gap: 13px;
+  gap: 14px;
 
-  padding: 12px 0;
+  padding: 13px 0;
 
   border-bottom:
     1px solid #F0EFEC;
@@ -152,16 +124,15 @@ body {
   border-bottom: 0;
 }
 
+
 /* =========================
    DATE
 ========================= */
 
-.date-block {
+.date {
   flex: 0 0 43px;
 
   padding-top: 1px;
-
-  text-align: center;
 }
 
 .month {
@@ -169,7 +140,7 @@ body {
 
   color: #7A0026;
 
-  font-size: 9px;
+  font-size: 8.5px;
 
   font-weight: 700;
 
@@ -185,41 +156,42 @@ body {
 
   color: #37352F;
 
-  font-size: 19px;
+  font-size: 18px;
 
-  font-weight: 650;
+  font-weight: 600;
 
-  line-height: 1.05;
+  line-height: 1.1;
 }
 
+
 /* =========================
-   ITEM CONTENT
+   CONTENT
 ========================= */
 
-.item-content {
+.content {
   flex: 1;
 
   min-width: 0;
 }
 
-.item-title {
+.title {
   overflow: hidden;
 
   color: #45423E;
 
   font-size: 12.5px;
 
-  font-weight: 600;
+  font-weight: 550;
 
-  line-height: 1.35;
+  line-height: 1.4;
 
   text-overflow: ellipsis;
 
   white-space: nowrap;
 }
 
-.item-meta {
-  margin-top: 4px;
+.meta {
+  margin-top: 3px;
 
   overflow: hidden;
 
@@ -236,108 +208,100 @@ body {
   white-space: nowrap;
 }
 
+
 /* =========================
-   EMPTY STATE
+   EMPTY
 ========================= */
 
 .empty {
-  min-height: 155px;
+  min-height: 92px;
 
   display: flex;
 
   align-items: center;
 
-  justify-content: center;
-
-  padding: 20px;
+  padding: 17px 0;
 
   color: #AAA7A2;
 
-  font-size: 11.5px;
+  font-size: 11px;
 
-  text-align: center;
+  font-style: italic;
 }
+
 
 /* =========================
    LOADING
 ========================= */
 
 .loading {
-  min-height: 155px;
+  min-height: 92px;
 
   display: flex;
 
   align-items: center;
 
-  justify-content: center;
+  padding: 17px 0;
 
   color: #AAA7A2;
 
   font-size: 11px;
 }
 
+
 /* =========================
    ERROR
 ========================= */
 
 .error {
-  min-height: 155px;
+  min-height: 92px;
 
   display: flex;
 
   align-items: center;
 
-  justify-content: center;
-
-  padding: 20px;
+  padding: 17px 0;
 
   color: #7A0026;
 
   font-size: 11px;
-
-  line-height: 1.5;
-
-  text-align: center;
 }
 
+
 /* =========================
-   RESPONSIVE
+   MOBILE
 ========================= */
 
 @media (max-width: 560px) {
 
-  .upcoming-grid {
+  .grid {
     grid-template-columns: 1fr;
+
+    row-gap: 28px;
   }
 
-  .card {
-    min-height: 220px;
-  }
 }
 
 </style>
 </head>
 
+
 <body>
 
-<div class="upcoming-grid">
+<div class="grid">
+
 
   <!-- EVENTS -->
 
-  <section class="card">
+  <section class="section">
 
-    <div class="card-header">
+    <div class="section-header">
 
-      <h2 class="card-title">
-        Upcoming Events
+      <h2 class="section-title">
+        Events
       </h2>
 
-      <span
-        class="card-count"
-        id="events-count"
-      >
-        —
-      </span>
+      <div class="section-line"></div>
 
     </div>
 
@@ -355,20 +319,15 @@ body {
 
   <!-- TUTORING -->
 
-  <section class="card">
+  <section class="section">
 
-    <div class="card-header">
+    <div class="section-header">
 
-      <h2 class="card-title">
+      <h2 class="section-title">
         Tutoring
       </h2>
 
-      <span
-        class="card-count"
-        id="tutoring-count"
-      >
-        —
-      </span>
+      <div class="section-line"></div>
 
     </div>
 
@@ -386,20 +345,15 @@ body {
 
   <!-- EXPENSES -->
 
-  <section class="card">
+  <section class="section">
 
-    <div class="card-header">
+    <div class="section-header">
 
-      <h2 class="card-title">
-        Upcoming Expenses
+      <h2 class="section-title">
+        Expenses
       </h2>
 
-      <span
-        class="card-count"
-        id="expenses-count"
-      >
-        —
-      </span>
+      <div class="section-line"></div>
 
     </div>
 
@@ -417,20 +371,15 @@ body {
 
   <!-- DEADLINES -->
 
-  <section class="card">
+  <section class="section">
 
-    <div class="card-header">
+    <div class="section-header">
 
-      <h2 class="card-title">
-        Upcoming Deadlines
+      <h2 class="section-title">
+        Deadlines
       </h2>
 
-      <span
-        class="card-count"
-        id="deadlines-count"
-      >
-        —
-      </span>
+      <div class="section-line"></div>
 
     </div>
 
@@ -444,6 +393,7 @@ body {
     </div>
 
   </section>
+
 
 </div>
 
@@ -461,7 +411,7 @@ const MAX_ITEMS = 4;
 
 
 /* =========================
-   DATE HELPERS
+   BASIC HELPERS
 ========================= */
 
 function getStart(item) {
@@ -547,7 +497,7 @@ function timeText(date) {
 
 
 /* =========================
-   ESCAPE HTML
+   HTML SAFETY
 ========================= */
 
 function escapeHTML(value) {
@@ -579,7 +529,7 @@ function escapeHTML(value) {
 
 
 /* =========================
-   DEDUPLICATE EVENTS
+   REMOVE DUPLICATE EVENTS
 ========================= */
 
 function deduplicateEvents(items) {
@@ -588,14 +538,6 @@ function deduplicateEvents(items) {
 
   return items.filter(
     function(item) {
-
-      /*
-       * Same Google event can appear
-       * in both Personal and DEPH.
-       *
-       * We intentionally do not use
-       * calendar name in this key.
-       */
 
       const key = [
         item.id || "",
@@ -617,7 +559,7 @@ function deduplicateEvents(items) {
 
 
 /* =========================
-   CLEAN TUTORING TITLE
+   CLEAN SOLOMON TITLES
 ========================= */
 
 function cleanTutoring(item) {
@@ -632,20 +574,16 @@ function cleanTutoring(item) {
       .split(/\r?\n/)[0]
       .trim();
 
-  /*
-   * TutorBird format:
-   *
-   * Darby, Gabriella (Private Lesson)
-   * Subject: Biology
-   * Grade: 12
-   */
 
   const nameMatch =
     firstLine.match(
       /^([^,]+),\s*([^(]+)/
     );
 
-  let name = firstLine;
+
+  let name =
+    firstLine;
+
 
   if (nameMatch) {
 
@@ -662,12 +600,13 @@ function cleanTutoring(item) {
 
   } else {
 
-    name = name
-      .replace(
-        /\s*\(Private Lesson\).*$/i,
-        ""
-      )
-      .trim();
+    name =
+      name
+        .replace(
+          /\s*\(Private Lesson\).*$/i,
+          ""
+        )
+        .trim();
   }
 
 
@@ -675,6 +614,7 @@ function cleanTutoring(item) {
     original.match(
       /Subject:\s*([^\r\n]+)/i
     );
+
 
   const gradeMatch =
     original.match(
@@ -697,6 +637,7 @@ function cleanTutoring(item) {
       gradeMatch
         ? gradeMatch[1].trim()
         : ""
+
   };
 }
 
@@ -716,6 +657,7 @@ function eventMeta(item) {
     return "";
   }
 
+
   if (item.allDay) {
 
     return [
@@ -726,10 +668,35 @@ function eventMeta(item) {
       .join(" · ");
   }
 
+
+  let calendarName =
+    item.calendar || "";
+
+
+  if (
+    calendarName ===
+    "DEPH Training"
+  ) {
+
+    calendarName =
+      "DEPH";
+  }
+
+
+  if (
+    calendarName ===
+    "Personal"
+  ) {
+
+    calendarName =
+      "Personal";
+  }
+
+
   return [
     weekdayText(start),
     timeText(start),
-    item.calendar || ""
+    calendarName
   ]
     .filter(Boolean)
     .join(" · ");
@@ -750,13 +717,17 @@ function tutoringMeta(
       item.start
     );
 
+
   const details = [];
 
+
   if (cleaned.subject) {
+
     details.push(
       cleaned.subject
     );
   }
+
 
   if (cleaned.grade) {
 
@@ -766,6 +737,7 @@ function tutoringMeta(
     );
   }
 
+
   if (start) {
 
     details.push(
@@ -774,6 +746,7 @@ function tutoringMeta(
       timeText(start)
     );
   }
+
 
   return details.join(" · ");
 }
@@ -793,7 +766,8 @@ function expenseMeta(item) {
 
     const currency =
       item.currency
-        ? " " + item.currency
+        ? " " +
+          item.currency
         : "";
 
     return (
@@ -801,6 +775,7 @@ function expenseMeta(item) {
       currency
     );
   }
+
 
   return (
     item.meta ||
@@ -810,7 +785,7 @@ function expenseMeta(item) {
 
 
 /* =========================
-   DEADLINE COUNTDOWN
+   DEADLINE META
 ========================= */
 
 function deadlineMeta(item) {
@@ -820,6 +795,7 @@ function deadlineMeta(item) {
       getStart(item)
     );
 
+
   if (!date) {
 
     return (
@@ -828,8 +804,10 @@ function deadlineMeta(item) {
     );
   }
 
+
   const now =
     new Date();
+
 
   const today =
     new Date(
@@ -838,12 +816,14 @@ function deadlineMeta(item) {
       now.getDate()
     );
 
+
   const due =
     new Date(
       date.getFullYear(),
       date.getMonth(),
       date.getDate()
     );
+
 
   const difference =
     Math.round(
@@ -854,13 +834,18 @@ function deadlineMeta(item) {
       86400000
     );
 
+
   if (difference === 0) {
+
     return "Due today";
   }
 
+
   if (difference === 1) {
+
     return "Due tomorrow";
   }
+
 
   if (difference > 1) {
 
@@ -871,12 +856,13 @@ function deadlineMeta(item) {
     );
   }
 
+
   return "";
 }
 
 
 /* =========================
-   CREATE ITEM
+   CREATE ROW
 ========================= */
 
 function createItem(
@@ -889,6 +875,7 @@ function createItem(
       getStart(item)
     );
 
+
   if (!date) {
     return "";
   }
@@ -898,6 +885,7 @@ function createItem(
     item.title ||
     item.name ||
     "Untitled";
+
 
   let meta = "";
 
@@ -942,7 +930,7 @@ function createItem(
   return `
     <div class="item">
 
-      <div class="date-block">
+      <div class="date">
 
         <span class="month">
           ${escapeHTML(
@@ -958,16 +946,17 @@ function createItem(
 
       </div>
 
-      <div class="item-content">
 
-        <div class="item-title">
+      <div class="content">
+
+        <div class="title">
           ${escapeHTML(title)}
         </div>
 
         ${
           meta
             ? `
-              <div class="item-meta">
+              <div class="meta">
                 ${escapeHTML(meta)}
               </div>
             `
@@ -996,22 +985,27 @@ function sortByDate(items) {
             getStart(a)
           );
 
+
         const bDate =
           parseDate(
             getStart(b)
           );
 
+
         if (!aDate && !bDate) {
           return 0;
         }
+
 
         if (!aDate) {
           return 1;
         }
 
+
         if (!bDate) {
           return -1;
         }
+
 
         return (
           aDate.getTime() -
@@ -1023,7 +1017,7 @@ function sortByDate(items) {
 
 
 /* =========================
-   REMOVE PAST ITEMS
+   REMOVE PAST
 ========================= */
 
 function futureOnly(items) {
@@ -1031,68 +1025,69 @@ function futureOnly(items) {
   const now =
     new Date();
 
+
   return items.filter(
     function(item) {
 
-      const date =
+      const start =
         parseDate(
           getStart(item)
         );
 
-      if (!date) {
+
+      if (!start) {
         return false;
       }
 
-      /*
-       * All-day items should remain
-       * throughout their date.
-       */
 
       if (item.allDay) {
 
         const endOfDay =
           new Date(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDate(),
+            start.getFullYear(),
+            start.getMonth(),
+            start.getDate(),
             23,
             59,
             59,
             999
           );
 
+
         return (
           endOfDay >= now
         );
       }
 
-      /*
-       * If an end time exists,
-       * keep the event until it ends.
-       */
 
       const end =
         parseDate(
           item.end
         );
 
+
       if (end) {
-        return end >= now;
+
+        return (
+          end >= now
+        );
       }
 
-      return date >= now;
+
+      return (
+        start >= now
+      );
     }
   );
 }
 
 
 /* =========================
-   RENDER SECTION
+   RENDER
 ========================= */
 
 function renderSection(
-  elementId,
-  countId,
+  id,
   items,
   type,
   emptyText
@@ -1100,12 +1095,7 @@ function renderSection(
 
   const container =
     document.getElementById(
-      elementId
-    );
-
-  const count =
-    document.getElementById(
-      countId
+      id
     );
 
 
@@ -1124,10 +1114,6 @@ function renderSection(
         processed
       );
   }
-
-
-  count.textContent =
-    processed.length;
 
 
   if (!processed.length) {
@@ -1170,36 +1156,30 @@ function renderSection(
 
 function showError() {
 
-  const sections = [
+  [
     "events",
     "tutoring",
     "expenses",
     "deadlines"
-  ];
+  ]
+    .forEach(
+      function(id) {
 
-  sections.forEach(
-    function(id) {
-
-      document.getElementById(
-        id
-      ).innerHTML =
-        `
-          <div class="error">
-            Unable to load upcoming items.
-          </div>
-        `;
-
-      document.getElementById(
-        id + "-count"
-      ).textContent =
-        "—";
-    }
-  );
+        document
+          .getElementById(id)
+          .innerHTML =
+          `
+            <div class="error">
+              Unable to load
+            </div>
+          `;
+      }
+    );
 }
 
 
 /* =========================
-   LOAD DATA
+   LOAD
 ========================= */
 
 async function loadUpcoming() {
@@ -1219,7 +1199,7 @@ async function loadUpcoming() {
     if (!response.ok) {
 
       throw new Error(
-        "Upcoming API request failed."
+        "Request failed"
       );
     }
 
@@ -1230,7 +1210,6 @@ async function loadUpcoming() {
 
     renderSection(
       "events",
-      "events-count",
       data.events || [],
       "event",
       "No upcoming events"
@@ -1239,7 +1218,6 @@ async function loadUpcoming() {
 
     renderSection(
       "tutoring",
-      "tutoring-count",
       data.tutoring || [],
       "tutoring",
       "No upcoming tutoring sessions"
@@ -1248,7 +1226,6 @@ async function loadUpcoming() {
 
     renderSection(
       "expenses",
-      "expenses-count",
       data.expenses || [],
       "expense",
       "No upcoming expenses"
@@ -1257,7 +1234,6 @@ async function loadUpcoming() {
 
     renderSection(
       "deadlines",
-      "deadlines-count",
       data.deadlines || [],
       "deadline",
       "No upcoming deadlines"
@@ -1267,7 +1243,6 @@ async function loadUpcoming() {
   } catch (error) {
 
     console.error(
-      "Upcoming widget:",
       error
     );
 
@@ -1282,11 +1257,6 @@ async function loadUpcoming() {
 
 loadUpcoming();
 
-/*
- * Refresh every five minutes.
- * Past items will disappear
- * automatically.
- */
 
 setInterval(
   loadUpcoming,
