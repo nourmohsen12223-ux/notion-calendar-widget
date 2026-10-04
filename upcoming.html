@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>Upcoming</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: #37352F;
+}
+
+body {
+  padding: 4px;
+}
+
+/* =========================
+   MAIN GRID
+========================= */
+
+.upcoming-grid {
+  width: 100%;
+  max-width: 1000px;
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 14px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+  min-width: 0;
+  min-height: 245px;
+
+  background: #FFFFFF;
+
+  border:
+    1px solid #E8E6E1;
+
+  border-radius: 16px;
+
+  padding: 20px 21px 18px;
+
+  overflow: hidden;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.card-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content:
+    space-between;
+
+  gap: 12px;
+
+  margin-bottom: 13px;
+}
+
+.card-title {
+  margin: 0;
+
+  color: #37352F;
+
+  font-size: 12px;
+
+  font-weight: 650;
+
+  letter-spacing: 0.65px;
+
+  text-transform: uppercase;
+}
+
+.card-count {
+  flex: 0 0 auto;
+
+  min-width: 23px;
+
+  padding: 3px 7px;
+
+  background: #F5F4F1;
+
+  border-radius: 999px;
+
+  color: #8F8D88;
+
+  font-size: 9.5px;
+
+  font-weight: 600;
+
+  text-align: center;
+}
+
+/* =========================
+   ITEMS
+========================= */
+
+.items {
+  display: flex;
+
+  flex-direction: column;
+}
+
+.item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 13px;
+
+  padding: 12px 0;
+
+  border-bottom:
+    1px solid #F0EFEC;
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+/* =========================
+   DATE
+========================= */
+
+.date-block {
+  flex: 0 0 43px;
+
+  padding-top: 1px;
+
+  text-align: center;
+}
+
+.month {
+  display: block;
+
+  color: #7A0026;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.7px;
+
+  text-transform: uppercase;
+}
+
+.day {
+  display: block;
+
+  margin-top: 1px;
+
+  color: #37352F;
+
+  font-size: 19px;
+
+  font-weight: 650;
+
+  line-height: 1.05;
+}
+
+/* =========================
+   ITEM CONTENT
+========================= */
+
+.item-content {
+  flex: 1;
+
+  min-width: 0;
+}
+
+.item-title {
+  overflow: hidden;
+
+  color: #45423E;
+
+  font-size: 12.5px;
+
+  font-weight: 600;
+
+  line-height: 1.35;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.item-meta {
+  margin-top: 4px;
+
+  overflow: hidden;
+
+  color: #96938E;
+
+  font-size: 10.5px;
+
+  font-weight: 400;
+
+  line-height: 1.4;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty {
+  min-height: 155px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+
+  color: #AAA7A2;
+
+  font-size: 11.5px;
+
+  text-align: center;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading {
+  min-height: 155px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: #AAA7A2;
+
+  font-size: 11px;
+}
+
+/* =========================
+   ERROR
+========================= */
+
+.error {
+  min-height: 155px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+
+  color: #7A0026;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+
+  text-align: center;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 560px) {
+
+  .upcoming-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    min-height: 220px;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="upcoming-grid">
+
+  <!-- EVENTS -->
+
+  <section class="card">
+
+    <div class="card-header">
+
+      <h2 class="card-title">
+        Upcoming Events
+      </h2>
+
+      <span
+        class="card-count"
+        id="events-count"
+      >
+        —
+      </span>
+
+    </div>
+
+    <div
+      class="items"
+      id="events"
+    >
+      <div class="loading">
+        Loading…
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- TUTORING -->
+
+  <section class="card">
+
+    <div class="card-header">
+
+      <h2 class="card-title">
+        Tutoring
+      </h2>
+
+      <span
+        class="card-count"
+        id="tutoring-count"
+      >
+        —
+      </span>
+
+    </div>
+
+    <div
+      class="items"
+      id="tutoring"
+    >
+      <div class="loading">
+        Loading…
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- EXPENSES -->
+
+  <section class="card">
+
+    <div class="card-header">
+
+      <h2 class="card-title">
+        Upcoming Expenses
+      </h2>
+
+      <span
+        class="card-count"
+        id="expenses-count"
+      >
+        —
+      </span>
+
+    </div>
+
+    <div
+      class="items"
+      id="expenses"
+    >
+      <div class="loading">
+        Loading…
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- DEADLINES -->
+
+  <section class="card">
+
+    <div class="card-header">
+
+      <h2 class="card-title">
+        Upcoming Deadlines
+      </h2>
+
+      <span
+        class="card-count"
+        id="deadlines-count"
+      >
+        —
+      </span>
+
+    </div>
+
+    <div
+      class="items"
+      id="deadlines"
+    >
+      <div class="loading">
+        Loading…
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+
+<script>
+
+/* =========================
+   SETTINGS
+========================= */
+
+const API_URL =
+  "https://notion-calendar-api.nourmohsen12223.workers.dev/upcoming-data";
+
+const MAX_ITEMS = 4;
+
+
+/* =========================
+   DATE HELPERS
+========================= */
+
+function getStart(item) {
+
+  return (
+    item.start ||
+    item.date ||
+    item.due ||
+    ""
+  );
+}
+
+
+function parseDate(value) {
+
+  if (!value) {
+    return null;
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return null;
+  }
+
+  return date;
+}
+
+
+function monthText(date) {
+
+  return date
+    .toLocaleDateString(
+      "en-US",
+      {
+        month: "short"
+      }
+    )
+    .toUpperCase();
+}
+
+
+function dayText(date) {
+
+  return date
+    .toLocaleDateString(
+      "en-US",
+      {
+        day: "2-digit"
+      }
+    );
+}
+
+
+function weekdayText(date) {
+
+  return date
+    .toLocaleDateString(
+      "en-US",
+      {
+        weekday: "short"
+      }
+    );
+}
+
+
+function timeText(date) {
+
+  return date
+    .toLocaleTimeString(
+      "en-US",
+      {
+        hour: "numeric",
+        minute: "2-digit"
+      }
+    );
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHTML(value) {
+
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+}
+
+
+/* =========================
+   DEDUPLICATE EVENTS
+========================= */
+
+function deduplicateEvents(items) {
+
+  const seen = new Set();
+
+  return items.filter(
+    function(item) {
+
+      /*
+       * Same Google event can appear
+       * in both Personal and DEPH.
+       *
+       * We intentionally do not use
+       * calendar name in this key.
+       */
+
+      const key = [
+        item.id || "",
+        item.title || "",
+        item.start || "",
+        item.end || ""
+      ].join("|");
+
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+
+      return true;
+    }
+  );
+}
+
+
+/* =========================
+   CLEAN TUTORING TITLE
+========================= */
+
+function cleanTutoring(item) {
+
+  const original =
+    String(
+      item.title || ""
+    );
+
+  const firstLine =
+    original
+      .split(/\r?\n/)[0]
+      .trim();
+
+  /*
+   * TutorBird format:
+   *
+   * Darby, Gabriella (Private Lesson)
+   * Subject: Biology
+   * Grade: 12
+   */
+
+  const nameMatch =
+    firstLine.match(
+      /^([^,]+),\s*([^(]+)/
+    );
+
+  let name = firstLine;
+
+  if (nameMatch) {
+
+    const lastName =
+      nameMatch[1].trim();
+
+    const firstName =
+      nameMatch[2].trim();
+
+    name =
+      firstName +
+      " " +
+      lastName;
+
+  } else {
+
+    name = name
+      .replace(
+        /\s*\(Private Lesson\).*$/i,
+        ""
+      )
+      .trim();
+  }
+
+
+  const subjectMatch =
+    original.match(
+      /Subject:\s*([^\r\n]+)/i
+    );
+
+  const gradeMatch =
+    original.match(
+      /Grade:\s*([^\r\n]+)/i
+    );
+
+
+  return {
+
+    title:
+      name ||
+      "Tutoring Session",
+
+    subject:
+      subjectMatch
+        ? subjectMatch[1].trim()
+        : "",
+
+    grade:
+      gradeMatch
+        ? gradeMatch[1].trim()
+        : ""
+  };
+}
+
+
+/* =========================
+   EVENT META
+========================= */
+
+function eventMeta(item) {
+
+  const start =
+    parseDate(
+      item.start
+    );
+
+  if (!start) {
+    return "";
+  }
+
+  if (item.allDay) {
+
+    return [
+      weekdayText(start),
+      item.calendar || ""
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }
+
+  return [
+    weekdayText(start),
+    timeText(start),
+    item.calendar || ""
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+
+/* =========================
+   TUTORING META
+========================= */
+
+function tutoringMeta(
+  item,
+  cleaned
+) {
+
+  const start =
+    parseDate(
+      item.start
+    );
+
+  const details = [];
+
+  if (cleaned.subject) {
+    details.push(
+      cleaned.subject
+    );
+  }
+
+  if (cleaned.grade) {
+
+    details.push(
+      "Grade " +
+      cleaned.grade
+    );
+  }
+
+  if (start) {
+
+    details.push(
+      weekdayText(start) +
+      " · " +
+      timeText(start)
+    );
+  }
+
+  return details.join(" · ");
+}
+
+
+/* =========================
+   EXPENSE META
+========================= */
+
+function expenseMeta(item) {
+
+  if (
+    item.amount !== undefined &&
+    item.amount !== null &&
+    item.amount !== ""
+  ) {
+
+    const currency =
+      item.currency
+        ? " " + item.currency
+        : "";
+
+    return (
+      item.amount +
+      currency
+    );
+  }
+
+  return (
+    item.meta ||
+    ""
+  );
+}
+
+
+/* =========================
+   DEADLINE COUNTDOWN
+========================= */
+
+function deadlineMeta(item) {
+
+  const date =
+    parseDate(
+      getStart(item)
+    );
+
+  if (!date) {
+
+    return (
+      item.meta ||
+      ""
+    );
+  }
+
+  const now =
+    new Date();
+
+  const today =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
+  const due =
+    new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+
+  const difference =
+    Math.round(
+      (
+        due.getTime() -
+        today.getTime()
+      ) /
+      86400000
+    );
+
+  if (difference === 0) {
+    return "Due today";
+  }
+
+  if (difference === 1) {
+    return "Due tomorrow";
+  }
+
+  if (difference > 1) {
+
+    return (
+      "In " +
+      difference +
+      " days"
+    );
+  }
+
+  return "";
+}
+
+
+/* =========================
+   CREATE ITEM
+========================= */
+
+function createItem(
+  item,
+  type
+) {
+
+  const date =
+    parseDate(
+      getStart(item)
+    );
+
+  if (!date) {
+    return "";
+  }
+
+
+  let title =
+    item.title ||
+    item.name ||
+    "Untitled";
+
+  let meta = "";
+
+
+  if (type === "event") {
+
+    meta =
+      eventMeta(item);
+  }
+
+
+  if (type === "tutoring") {
+
+    const cleaned =
+      cleanTutoring(item);
+
+    title =
+      cleaned.title;
+
+    meta =
+      tutoringMeta(
+        item,
+        cleaned
+      );
+  }
+
+
+  if (type === "expense") {
+
+    meta =
+      expenseMeta(item);
+  }
+
+
+  if (type === "deadline") {
+
+    meta =
+      deadlineMeta(item);
+  }
+
+
+  return `
+    <div class="item">
+
+      <div class="date-block">
+
+        <span class="month">
+          ${escapeHTML(
+            monthText(date)
+          )}
+        </span>
+
+        <span class="day">
+          ${escapeHTML(
+            dayText(date)
+          )}
+        </span>
+
+      </div>
+
+      <div class="item-content">
+
+        <div class="item-title">
+          ${escapeHTML(title)}
+        </div>
+
+        ${
+          meta
+            ? `
+              <div class="item-meta">
+                ${escapeHTML(meta)}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+    </div>
+  `;
+}
+
+
+/* =========================
+   SORT
+========================= */
+
+function sortByDate(items) {
+
+  return [...items]
+    .sort(
+      function(a, b) {
+
+        const aDate =
+          parseDate(
+            getStart(a)
+          );
+
+        const bDate =
+          parseDate(
+            getStart(b)
+          );
+
+        if (!aDate && !bDate) {
+          return 0;
+        }
+
+        if (!aDate) {
+          return 1;
+        }
+
+        if (!bDate) {
+          return -1;
+        }
+
+        return (
+          aDate.getTime() -
+          bDate.getTime()
+        );
+      }
+    );
+}
+
+
+/* =========================
+   REMOVE PAST ITEMS
+========================= */
+
+function futureOnly(items) {
+
+  const now =
+    new Date();
+
+  return items.filter(
+    function(item) {
+
+      const date =
+        parseDate(
+          getStart(item)
+        );
+
+      if (!date) {
+        return false;
+      }
+
+      /*
+       * All-day items should remain
+       * throughout their date.
+       */
+
+      if (item.allDay) {
+
+        const endOfDay =
+          new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate(),
+            23,
+            59,
+            59,
+            999
+          );
+
+        return (
+          endOfDay >= now
+        );
+      }
+
+      /*
+       * If an end time exists,
+       * keep the event until it ends.
+       */
+
+      const end =
+        parseDate(
+          item.end
+        );
+
+      if (end) {
+        return end >= now;
+      }
+
+      return date >= now;
+    }
+  );
+}
+
+
+/* =========================
+   RENDER SECTION
+========================= */
+
+function renderSection(
+  elementId,
+  countId,
+  items,
+  type,
+  emptyText
+) {
+
+  const container =
+    document.getElementById(
+      elementId
+    );
+
+  const count =
+    document.getElementById(
+      countId
+    );
+
+
+  let processed =
+    futureOnly(
+      sortByDate(
+        items || []
+      )
+    );
+
+
+  if (type === "event") {
+
+    processed =
+      deduplicateEvents(
+        processed
+      );
+  }
+
+
+  count.textContent =
+    processed.length;
+
+
+  if (!processed.length) {
+
+    container.innerHTML =
+      `
+        <div class="empty">
+          ${escapeHTML(
+            emptyText
+          )}
+        </div>
+      `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    processed
+      .slice(
+        0,
+        MAX_ITEMS
+      )
+      .map(
+        function(item) {
+
+          return createItem(
+            item,
+            type
+          );
+        }
+      )
+      .join("");
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+function showError() {
+
+  const sections = [
+    "events",
+    "tutoring",
+    "expenses",
+    "deadlines"
+  ];
+
+  sections.forEach(
+    function(id) {
+
+      document.getElementById(
+        id
+      ).innerHTML =
+        `
+          <div class="error">
+            Unable to load upcoming items.
+          </div>
+        `;
+
+      document.getElementById(
+        id + "-count"
+      ).textContent =
+        "—";
+    }
+  );
+}
+
+
+/* =========================
+   LOAD DATA
+========================= */
+
+async function loadUpcoming() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          cache:
+            "no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Upcoming API request failed."
+      );
+    }
+
+
+    const data =
+      await response.json();
+
+
+    renderSection(
+      "events",
+      "events-count",
+      data.events || [],
+      "event",
+      "No upcoming events"
+    );
+
+
+    renderSection(
+      "tutoring",
+      "tutoring-count",
+      data.tutoring || [],
+      "tutoring",
+      "No upcoming tutoring sessions"
+    );
+
+
+    renderSection(
+      "expenses",
+      "expenses-count",
+      data.expenses || [],
+      "expense",
+      "No upcoming expenses"
+    );
+
+
+    renderSection(
+      "deadlines",
+      "deadlines-count",
+      data.deadlines || [],
+      "deadline",
+      "No upcoming deadlines"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Upcoming widget:",
+      error
+    );
+
+    showError();
+  }
+}
+
+
+/* =========================
+   START
+========================= */
+
+loadUpcoming();
+
+/*
+ * Refresh every five minutes.
+ * Past items will disappear
+ * automatically.
+ */
+
+setInterval(
+  loadUpcoming,
+  5 * 60 * 1000
+);
+
+</script>
+
+</body>
+</html>
