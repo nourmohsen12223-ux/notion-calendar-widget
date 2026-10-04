@@ -63,14 +63,6 @@ body {
     padding: 22px 24px 19px;
 }
 
-.header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 15px;
-}
-
 .title {
     color: #37352F;
 
@@ -78,34 +70,8 @@ body {
     font-weight: 600;
 
     line-height: 1.2;
-
     letter-spacing: -0.45px;
 }
-
-
-/* TODAY PILL */
-
-.today-badge {
-    flex-shrink: 0;
-
-    padding: 5px 10px;
-
-    background: #ECEAE5;
-
-    border-radius: 20px;
-
-    color: #77746E;
-
-    font-size: 10px;
-    font-weight: 600;
-
-    letter-spacing: 0.5px;
-
-    text-transform: uppercase;
-}
-
-
-/* DATE */
 
 .date {
     margin-top: 6px;
@@ -149,8 +115,7 @@ body {
 
     border-bottom: 1px solid #E8E6E1;
 
-    transition:
-        background-color 0.15s ease;
+    transition: background-color 0.15s ease;
 }
 
 .event:last-child {
@@ -170,7 +135,6 @@ body {
     color: #85827D;
 
     font-size: 12px;
-
     line-height: 1.4;
 }
 
@@ -199,7 +163,6 @@ body {
 
 .dot-column {
     display: flex;
-
     align-items: center;
 }
 
@@ -221,12 +184,8 @@ body {
     min-width: 0;
 }
 
-
-/* TITLE */
-
 .event-title {
     display: flex;
-
     align-items: center;
 
     min-width: 0;
@@ -243,18 +202,12 @@ body {
     min-width: 0;
 
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
 }
 
-
-/* CALENDAR NAME */
-
 .event-meta {
     display: flex;
-
     align-items: center;
 
     min-width: 0;
@@ -268,9 +221,7 @@ body {
 
 .calendar-name {
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
 }
 
@@ -282,9 +233,6 @@ body {
 .event.current {
     background: rgba(255, 255, 255, 0.62);
 }
-
-
-/* LEFT RED INDICATOR */
 
 .event.current::before {
     content: "";
@@ -302,12 +250,8 @@ body {
     border-radius: 0 3px 3px 0;
 }
 
-
-/* NOW */
-
 .now {
     display: inline-flex;
-
     align-items: center;
 
     flex-shrink: 0;
@@ -335,7 +279,7 @@ body {
 
 
 /* =====================================================
-   LOADING / EMPTY
+   LOADING / EMPTY / ERROR
 ===================================================== */
 
 .status {
@@ -407,24 +351,13 @@ body {
 <div class="widget-container">
 
 
-    <!-- =================================================
-         HEADER
-    ================================================== -->
+    <!-- HEADER -->
 
     <div class="header">
 
-        <div class="header-top">
-
-            <div class="title">
-                Today's Schedule
-            </div>
-
-            <div class="today-badge">
-                Today
-            </div>
-
+        <div class="title">
+            Today
         </div>
-
 
         <div
             id="todayDate"
@@ -435,22 +368,18 @@ body {
 
 
 
-    <!-- =================================================
-         LOADING / EMPTY MESSAGE
-    ================================================== -->
+    <!-- LOADING / EMPTY MESSAGE -->
 
     <div
         id="status"
         class="status"
     >
-        Loading today's schedule…
+        Loading today's events…
     </div>
 
 
 
-    <!-- =================================================
-         EVENTS
-    ================================================== -->
+    <!-- EVENTS -->
 
     <div
         id="events"
@@ -589,9 +518,7 @@ async function loadToday() {
             data.events || [];
 
 
-        /* =================================================
-           NO EVENTS
-        ================================================= */
+        /* NO EVENTS */
 
         if (
             events.length === 0
@@ -620,9 +547,7 @@ async function loadToday() {
         }
 
 
-        /* =================================================
-           EVENTS FOUND
-        ================================================= */
+        /* EVENTS FOUND */
 
         status.style.display =
             "none";
@@ -660,7 +585,7 @@ async function loadToday() {
 
 
         status.textContent =
-            "Unable to load today's schedule.";
+            "Unable to load today's events.";
 
 
     }
@@ -692,9 +617,7 @@ function renderEvents(
         event => {
 
 
-            /* =================================================
-               EVENT ROW
-            ================================================= */
+            /* EVENT ROW */
 
             const card =
                 document.createElement(
@@ -711,9 +634,7 @@ function renderEvents(
 
 
 
-            /* =================================================
-               CURRENT EVENT CHECK
-            ================================================= */
+            /* CHECK IF EVENT IS HAPPENING NOW */
 
             if (
                 event.start?.dateTime &&
@@ -758,9 +679,7 @@ function renderEvents(
 
 
 
-            /* =================================================
-               TIME
-            ================================================= */
+            /* TIME COLUMN */
 
             const timeColumn =
                 document.createElement(
@@ -879,9 +798,7 @@ function renderEvents(
 
 
 
-            /* =================================================
-               CALENDAR COLOR DOT
-            ================================================= */
+            /* CALENDAR COLOR DOT */
 
             const dotColumn =
                 document.createElement(
@@ -914,9 +831,7 @@ function renderEvents(
 
 
 
-            /* =================================================
-               EVENT CONTENT
-            ================================================= */
+            /* EVENT CONTENT */
 
             const content =
                 document.createElement(
@@ -929,9 +844,7 @@ function renderEvents(
 
 
 
-            /* =================================================
-               TITLE
-            ================================================= */
+            /* EVENT TITLE */
 
             const title =
                 document.createElement(
@@ -964,9 +877,7 @@ function renderEvents(
 
 
 
-            /* =================================================
-               NOW INDICATOR
-            ================================================= */
+            /* NOW INDICATOR */
 
             if (
                 isCurrent
@@ -1014,9 +925,7 @@ function renderEvents(
 
 
 
-            /* =================================================
-               CALENDAR NAME
-            ================================================= */
+            /* CALENDAR NAME */
 
             const meta =
                 document.createElement(
@@ -1056,9 +965,7 @@ function renderEvents(
 
 
 
-            /* =================================================
-               BUILD CONTENT
-            ================================================= */
+            /* BUILD EVENT CONTENT */
 
             content.appendChild(
                 title
@@ -1079,9 +986,7 @@ function renderEvents(
 
 
 
-            /* =================================================
-               BUILD EVENT
-            ================================================= */
+            /* ADD EVERYTHING TO EVENT ROW */
 
             card.appendChild(
                 timeColumn
