@@ -394,15 +394,18 @@ body {
    SETTINGS
 ===================================================== */
 
-const STORAGE_KEY =
-    "noury-daily-todo";
+const STORAGE_KEY = "noury-daily-todo";
+const DATE_KEY = "noury-daily-todo-date";
+const TOTAL_ITEMS = 6;
 
-const DATE_KEY =
-    "noury-daily-todo-date";
+const SYNC_URL =
+    "https://notion-calendar-api.nourmohsen12223.workers.dev/todo-data";
 
-const TOTAL_ITEMS =
-    6;
+const SYNC_INTERVAL_MS = 3000;
 
+let lastCloudSignature = "";
+let saveTimer = null;
+let cloudBusy = false;
 
 
 /* =====================================================
@@ -411,145 +414,33 @@ const TOTAL_ITEMS =
 
 function getTodayKey() {
 
-    const now =
-        new Date();
+    const now = new Date();
 
+    const year = now.getFullYear();
 
-    const year =
-        now.getFullYear();
+    const month = String(
+        now.getMonth() + 1
+    ).padStart(2, "0");
 
+    const day = String(
+        now.getDate()
+    ).padStart(2, "0");
 
-    const month =
-        String(
-            now.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const day =
-        String(
-            now.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    return (
-        year +
-        "-" +
-        month +
-        "-" +
-        day
-    );
-
+    return year + "-" + month + "-" + day;
 }
 
 
-
 /* =====================================================
-   CLEAR OLD DAY
+   TODO DATA
 ===================================================== */
 
-function checkForNewDay() {
+function getTodosFromPage() {
 
-    const today =
-        getTodayKey();
+    const todos = [];
 
-
-    const savedDate =
-        localStorage.getItem(
-            DATE_KEY
-        );
-
-
-    if (
-        savedDate !== today
-    ) {
-
-        localStorage.removeItem(
-            STORAGE_KEY
-        );
-
-
-        localStorage.setItem(
-            DATE_KEY,
-            today
-        );
-
-
-        clearTodos();
-
-    }
-
-}
-
-
-
-/* =====================================================
-   CLEAR TODOS
-===================================================== */
-
-function clearTodos() {
-
-    for (
-        let i = 1;
-        i <= TOTAL_ITEMS;
-        i++
-    ) {
-
-        const task =
-            document.getElementById(
-                "task" + i
-            );
-
-
-        const checkbox =
-            document.getElementById(
-                "check" + i
-            );
-
-
-        task.value =
-            "";
-
-
-        checkbox.checked =
-            false;
-
-
-        checkbox
-            .closest(".todo-row")
-            .classList.remove(
-                "completed"
-            );
-
-    }
-
-}
-
-
-
-/* =====================================================
-   SAVE
-===================================================== */
-
-function saveTodos() {
-
-    const todos =
-        [];
-
-
-    for (
-        let i = 1;
-        i <= TOTAL_ITEMS;
-        i++
-    ) {
+    for (let i = 1; i <= TOTAL_ITEMS; i++) {
 
         todos.push({
-
             text:
                 document.getElementById(
                     "task" + i
@@ -559,96 +450,239 @@ function saveTodos() {
                 document.getElementById(
                     "check" + i
                 ).checked
-
         });
-
     }
 
+    return todos;
+}
+
+
+function normalizeTodos(todos) {
+
+    const result = [];
+
+    for (let i = 0; i < TOTAL_ITEMS; i++) {
+
+        const todo =
+            Array.isArray(todos) && todos[i]
+                ? todos[i]
+                : {};
+
+        result.push({
+            text:
+                typeof todo.text === "string"
+                    ? todo.text
+                    : "",
+
+            checked:
+                Boolean(todo.checked)
+        });
+    }
+
+    return result;
+}
+
+
+function applyTodos(todos) {
+
+    const normalized =
+        normalizeTodos(todos);
+
+    normalized.forEach(
+        (todo, index) => {
+
+            const number =
+                index + 1;
+
+            const task =
+                document.getElementById(
+                    "task" + number
+                );
+
+            const checkbox =
+                document.getElementById(
+                    "check" + number
+                );
+
+            task.value =
+                todo.text;
+
+            checkbox.checked =
+                todo.checked;
+
+            updateCompletedState(
+                checkbox
+            );
+        }
+    );
+}
+
+
+/* =====================================================
+   CLEAR TODOS
+===================================================== */
+
+function clearTodos() {
+
+    applyTodos([]);
+}
+
+
+/* =====================================================
+   LOCAL SAVE
+===================================================== */
+
+function saveLocalTodos() {
+
+    const todos =
+        getTodosFromPage();
 
     localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify(todos)
     );
 
-
     localStorage.setItem(
         DATE_KEY,
         getTodayKey()
     );
-
 }
 
 
-
 /* =====================================================
-   LOAD
+   CLOUD SAVE
 ===================================================== */
 
-function loadTodos() {
+function makeSignature(data) {
 
-    checkForNewDay();
+    return JSON.stringify({
+        date: data.date || "",
+        todos: normalizeTodos(data.todos)
+    });
+}
 
+
+async function saveToCloud() {
+
+    const payload = {
+        date: getTodayKey(),
+        todos: getTodosFromPage(),
+        updatedAt: Date.now()
+    };
+
+    try {
+
+        const response =
+            await fetch(
+                SYNC_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        ),
+
+                    cache: "no-store"
+                }
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Cloud save failed"
+            );
+        }
+
+        lastCloudSignature =
+            makeSignature(payload);
+    }
+
+    catch (error) {
+
+        console.warn(
+            "To-do cloud save failed:",
+            error
+        );
+    }
+}
+
+
+function queueCloudSave() {
+
+    clearTimeout(saveTimer);
+
+    saveTimer =
+        setTimeout(
+            saveToCloud,
+            350
+        );
+}
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+function saveTodos() {
+
+    saveLocalTodos();
+    queueCloudSave();
+}
+
+
+/* =====================================================
+   LOCAL LOAD
+===================================================== */
+
+function loadLocalTodos() {
+
+    const today =
+        getTodayKey();
+
+    const savedDate =
+        localStorage.getItem(
+            DATE_KEY
+        );
+
+    if (savedDate !== today) {
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+        localStorage.setItem(
+            DATE_KEY,
+            today
+        );
+
+        clearTodos();
+
+        return false;
+    }
 
     const saved =
         localStorage.getItem(
             STORAGE_KEY
         );
 
-
     if (!saved) {
-        return;
+        clearTodos();
+        return false;
     }
-
 
     try {
 
         const todos =
             JSON.parse(saved);
 
+        applyTodos(todos);
 
-        todos.forEach(
-            (todo, index) => {
-
-                const number =
-                    index + 1;
-
-
-                if (
-                    number > TOTAL_ITEMS
-                ) {
-                    return;
-                }
-
-
-                const task =
-                    document.getElementById(
-                        "task" + number
-                    );
-
-
-                const checkbox =
-                    document.getElementById(
-                        "check" + number
-                    );
-
-
-                task.value =
-                    todo.text || "";
-
-
-                checkbox.checked =
-                    Boolean(
-                        todo.checked
-                    );
-
-
-                updateCompletedState(
-                    checkbox
-                );
-
-            }
-        );
-
+        return true;
     }
 
     catch (error) {
@@ -657,10 +691,141 @@ function loadTodos() {
             STORAGE_KEY
         );
 
-    }
+        clearTodos();
 
+        return false;
+    }
 }
 
+
+/* =====================================================
+   CLOUD LOAD / SYNC
+===================================================== */
+
+async function loadFromCloud(
+    firstLoad = false
+) {
+
+    if (cloudBusy) {
+        return;
+    }
+
+    cloudBusy = true;
+
+    try {
+
+        const response =
+            await fetch(
+                SYNC_URL +
+                "?t=" +
+                Date.now(),
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Cloud load failed"
+            );
+        }
+
+        const data =
+            await response.json();
+
+        const today =
+            getTodayKey();
+
+        /*
+         * If the cloud contains today's list,
+         * it is the shared source of truth.
+         */
+        if (
+            data &&
+            data.date === today &&
+            Array.isArray(data.todos)
+        ) {
+
+            const signature =
+                makeSignature(data);
+
+            const localSignature =
+                makeSignature({
+                    date: today,
+                    todos:
+                        getTodosFromPage()
+                });
+
+            if (
+                signature !==
+                localSignature
+            ) {
+
+                applyTodos(
+                    data.todos
+                );
+
+                saveLocalTodos();
+            }
+
+            lastCloudSignature =
+                signature;
+
+            return;
+        }
+
+        /*
+         * Cloud has no data for today.
+         * On first setup, preserve today's
+         * existing local to-do list by
+         * uploading it rather than deleting it.
+         */
+        if (firstLoad) {
+
+            const savedDate =
+                localStorage.getItem(
+                    DATE_KEY
+                );
+
+            const saved =
+                localStorage.getItem(
+                    STORAGE_KEY
+                );
+
+            if (
+                savedDate === today &&
+                saved
+            ) {
+
+                await saveToCloud();
+                return;
+            }
+        }
+
+        /*
+         * A new day has started.
+         * Clear the shared daily list and
+         * publish the empty list.
+         */
+        clearTodos();
+        saveLocalTodos();
+        await saveToCloud();
+    }
+
+    catch (error) {
+
+        console.warn(
+            "To-do cloud sync failed:",
+            error
+        );
+    }
+
+    finally {
+
+        cloudBusy = false;
+    }
+}
 
 
 /* =====================================================
@@ -676,15 +841,11 @@ function updateCompletedState(
             ".todo-row"
         );
 
-
-    if (
-        checkbox.checked
-    ) {
+    if (checkbox.checked) {
 
         row.classList.add(
             "completed"
         );
-
     }
 
     else {
@@ -692,11 +853,8 @@ function updateCompletedState(
         row.classList.remove(
             "completed"
         );
-
     }
-
 }
-
 
 
 /* =====================================================
@@ -714,18 +872,15 @@ for (
             "task" + i
         );
 
-
     const checkbox =
         document.getElementById(
             "check" + i
         );
 
-
     task.addEventListener(
         "input",
         saveTodos
     );
-
 
     checkbox.addEventListener(
         "change",
@@ -735,39 +890,90 @@ for (
                 checkbox
             );
 
-
             saveTodos();
-
         }
     );
-
 }
 
 
-
 /* =====================================================
-   MIDNIGHT CHECK
+   NEW DAY CHECK
 ===================================================== */
 
-/*
-Checks every minute.
+async function checkForNewDay() {
 
-If the date has changed,
-the list automatically resets.
-*/
+    const today =
+        getTodayKey();
 
-setInterval(
-    checkForNewDay,
-    60000
-);
+    const savedDate =
+        localStorage.getItem(
+            DATE_KEY
+        );
 
+    if (savedDate !== today) {
+
+        clearTodos();
+        saveLocalTodos();
+
+        /*
+         * Check cloud immediately so that
+         * another device's today's list is
+         * not accidentally overwritten.
+         */
+        await loadFromCloud(false);
+    }
+}
 
 
 /* =====================================================
    START
 ===================================================== */
 
-loadTodos();
+async function startTodoWidget() {
+
+    loadLocalTodos();
+
+    await loadFromCloud(true);
+
+    setInterval(
+        () => {
+            if (
+                document.visibilityState ===
+                "visible"
+            ) {
+                loadFromCloud(false);
+            }
+        },
+        SYNC_INTERVAL_MS
+    );
+
+    setInterval(
+        checkForNewDay,
+        60000
+    );
+
+    document.addEventListener(
+        "visibilitychange",
+        () => {
+
+            if (
+                document.visibilityState ===
+                "visible"
+            ) {
+                loadFromCloud(false);
+            }
+        }
+    );
+
+    window.addEventListener(
+        "focus",
+        () => {
+            loadFromCloud(false);
+        }
+    );
+}
+
+startTodoWidget();
 
 </script>
 
