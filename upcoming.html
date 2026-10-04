@@ -21,7 +21,6 @@ html,
 body {
   margin: 0;
   padding: 0;
-
   background: transparent;
 
   font-family:
@@ -52,7 +51,11 @@ body {
   grid-template-columns:
     repeat(2, minmax(0, 1fr));
 
-  gap: 14px;
+  /* More space in the middle */
+  column-gap: 28px;
+
+  /* Space between top and bottom */
+  row-gap: 18px;
 
   align-items: stretch;
 }
@@ -273,7 +276,7 @@ body {
 
 
 /* =========================
-   PHONE ONLY
+   PHONE
 ========================= */
 
 @media (max-width: 520px) {
@@ -282,6 +285,8 @@ body {
     width: 94%;
 
     grid-template-columns: 1fr;
+
+    row-gap: 18px;
   }
 
   .card {
@@ -384,10 +389,6 @@ body {
 
 <script>
 
-/* =========================
-   SETTINGS
-========================= */
-
 const API_URL =
   "https://notion-calendar-api.nourmohsen12223.workers.dev/upcoming-data";
 
@@ -395,7 +396,7 @@ const MAX_ITEMS = 4;
 
 
 /* =========================
-   HELPERS
+   DATE HELPERS
 ========================= */
 
 function getStart(item) {
@@ -415,14 +416,9 @@ function parseDate(value) {
     return null;
   }
 
-  const date =
-    new Date(value);
+  const date = new Date(value);
 
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
+  if (Number.isNaN(date.getTime())) {
     return null;
   }
 
@@ -486,29 +482,12 @@ function timeText(date) {
 
 function escapeHTML(value) {
 
-  return String(
-    value ?? ""
-  )
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 
@@ -547,9 +526,7 @@ function deduplicateEvents(items) {
 function cleanTutoring(item) {
 
   const original =
-    String(
-      item.title || ""
-    );
+    String(item.title || "");
 
 
   const firstLine =
@@ -564,8 +541,7 @@ function cleanTutoring(item) {
     );
 
 
-  let name =
-    firstLine;
+  let name = firstLine;
 
 
   if (nameMatch) {
@@ -632,9 +608,7 @@ function cleanTutoring(item) {
 function eventMeta(item) {
 
   const start =
-    parseDate(
-      item.start
-    );
+    parseDate(item.start);
 
 
   if (!start) {
@@ -646,13 +620,8 @@ function eventMeta(item) {
     item.calendar || "";
 
 
-  if (
-    source ===
-    "DEPH Training"
-  ) {
-
-    source =
-      "DEPH";
+  if (source === "DEPH Training") {
+    source = "DEPH";
   }
 
 
@@ -687,19 +656,14 @@ function tutoringMeta(
 ) {
 
   const start =
-    parseDate(
-      item.start
-    );
+    parseDate(item.start);
 
 
   const details = [];
 
 
   if (cleaned.subject) {
-
-    details.push(
-      cleaned.subject
-    );
+    details.push(cleaned.subject);
   }
 
 
@@ -739,7 +703,6 @@ function expenseMeta(item) {
   ) {
 
     if (item.amountDisplay) {
-
       return item.amountDisplay;
     }
 
@@ -753,15 +716,12 @@ function expenseMeta(item) {
   }
 
 
-  return (
-    item.meta ||
-    ""
-  );
+  return item.meta || "";
 }
 
 
 /* =========================
-   DEADLINE COUNTDOWN
+   DEADLINE DETAILS
 ========================= */
 
 function deadlineMeta(item) {
@@ -773,11 +733,7 @@ function deadlineMeta(item) {
 
 
   if (!date) {
-
-    return (
-      item.meta ||
-      ""
-    );
+    return item.meta || "";
   }
 
 
@@ -812,13 +768,11 @@ function deadlineMeta(item) {
 
 
   if (difference === 0) {
-
     return "Due today";
   }
 
 
   if (difference === 1) {
-
     return "Due tomorrow";
   }
 
@@ -993,7 +947,7 @@ function sortByDate(items) {
 
 
 /* =========================
-   REMOVE PAST ITEMS
+   REMOVE PAST
 ========================= */
 
 function futureOnly(items) {
@@ -1030,36 +984,27 @@ function futureOnly(items) {
           );
 
 
-        return (
-          endOfDay >= now
-        );
+        return endOfDay >= now;
       }
 
 
       const end =
-        parseDate(
-          item.end
-        );
+        parseDate(item.end);
 
 
       if (end) {
-
-        return (
-          end >= now
-        );
+        return end >= now;
       }
 
 
-      return (
-        start >= now
-      );
+      return start >= now;
     }
   );
 }
 
 
 /* =========================
-   RENDER SECTION
+   RENDER
 ========================= */
 
 function renderSection(
@@ -1070,9 +1015,7 @@ function renderSection(
 ) {
 
   const container =
-    document.getElementById(
-      id
-    );
+    document.getElementById(id);
 
 
   let processed =
@@ -1097,9 +1040,7 @@ function renderSection(
     container.innerHTML =
       `
         <div class="empty">
-          ${escapeHTML(
-            emptyText
-          )}
+          ${escapeHTML(emptyText)}
         </div>
       `;
 
@@ -1155,7 +1096,7 @@ function showError() {
 
 
 /* =========================
-   FETCH DATA
+   LOAD DATA
 ========================= */
 
 async function loadUpcoming() {
@@ -1166,17 +1107,13 @@ async function loadUpcoming() {
       await fetch(
         API_URL,
         {
-          cache:
-            "no-store"
+          cache: "no-store"
         }
       );
 
 
     if (!response.ok) {
-
-      throw new Error(
-        "Request failed"
-      );
+      throw new Error("Request failed");
     }
 
 
@@ -1234,8 +1171,6 @@ async function loadUpcoming() {
 
 loadUpcoming();
 
-
-/* Refresh every 5 minutes */
 
 setInterval(
   loadUpcoming,
