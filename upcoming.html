@@ -21,6 +21,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+
   background: transparent;
 
   font-family:
@@ -50,6 +51,8 @@ body {
     repeat(2, minmax(0, 1fr));
 
   gap: 14px;
+
+  align-items: stretch;
 }
 
 
@@ -60,18 +63,20 @@ body {
 .card {
   min-width: 0;
 
-  height: 245px;
-
-  padding: 19px 21px 17px;
-
-  background: #F8F7F5;
+  background: #FFFFFF;
 
   border:
     1px solid #E8E6E1;
 
   border-radius: 18px;
 
-  overflow: hidden;
+  padding: 20px 22px;
+
+  height: auto;
+
+  min-height: 290px;
+
+  overflow: visible;
 }
 
 
@@ -80,7 +85,7 @@ body {
 ========================= */
 
 .card-title {
-  margin: 0 0 9px 0;
+  margin: 0 0 10px 0;
 
   color: #57544F;
 
@@ -107,12 +112,12 @@ body {
 
   align-items: flex-start;
 
-  gap: 13px;
+  gap: 14px;
 
-  padding: 10px 0;
+  padding: 13px 0;
 
   border-bottom:
-    1px solid #EDEBE7;
+    1px solid #F0EFEC;
 }
 
 .item:last-child {
@@ -125,7 +130,7 @@ body {
 ========================= */
 
 .date {
-  flex: 0 0 43px;
+  flex: 0 0 44px;
 
   padding-top: 1px;
 }
@@ -147,11 +152,11 @@ body {
 .day {
   display: block;
 
-  margin-top: 1px;
+  margin-top: 2px;
 
   color: #37352F;
 
-  font-size: 18px;
+  font-size: 19px;
 
   font-weight: 600;
 
@@ -170,25 +175,21 @@ body {
 }
 
 .item-title {
-  overflow: hidden;
-
   color: #45423E;
 
   font-size: 12.5px;
 
   font-weight: 550;
 
-  line-height: 1.35;
+  line-height: 1.4;
 
-  text-overflow: ellipsis;
+  white-space: normal;
 
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .meta {
-  margin-top: 3px;
-
-  overflow: hidden;
+  margin-top: 4px;
 
   color: #96938E;
 
@@ -196,26 +197,28 @@ body {
 
   font-weight: 400;
 
-  line-height: 1.35;
+  line-height: 1.4;
 
-  text-overflow: ellipsis;
+  white-space: normal;
 
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 
 /* =========================
-   EMPTY BOX
+   EMPTY
 ========================= */
 
 .empty {
-  height: 175px;
+  min-height: 215px;
 
   display: flex;
 
   align-items: center;
 
   justify-content: center;
+
+  padding: 20px;
 
   color: #A7A49F;
 
@@ -230,7 +233,7 @@ body {
 ========================= */
 
 .loading {
-  height: 175px;
+  min-height: 215px;
 
   display: flex;
 
@@ -249,13 +252,15 @@ body {
 ========================= */
 
 .error {
-  height: 175px;
+  min-height: 215px;
 
   display: flex;
 
   align-items: center;
 
   justify-content: center;
+
+  padding: 20px;
 
   color: #7A0026;
 
@@ -276,8 +281,7 @@ body {
   }
 
   .card {
-    height: auto;
-    min-height: 220px;
+    min-height: 260px;
   }
 
 }
@@ -1227,7 +1231,7 @@ async function loadUpcoming() {
 loadUpcoming();
 
 
-/* Refresh every 5 minutes */
+/* Refresh automatically every 5 minutes */
 
 setInterval(
   loadUpcoming,
@@ -1237,5 +1241,4 @@ setInterval(
 </script>
 
 </body>
-
 </html>
