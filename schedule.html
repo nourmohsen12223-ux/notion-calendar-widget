@@ -287,6 +287,9 @@ body {
 
 .drag-handle {
     color: #96938E;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
 
     font-size: 15px;
 
@@ -498,6 +501,17 @@ let tasks = [];
 let draggedTaskId = null;
 
 let draggedScheduleHour = null;
+
+/* Drag state */
+let pointerDrag = null;
+let pointerGhost = null;
+let pointerDropTarget = null;
+let suppressClickUntil = 0;
+
+/* Dedicated Notion iPad/iPhone touch drag state */
+let touchDrag = null;
+let touchGhost = null;
+let touchDropTarget = null;
 
 
 /* =====================================================
@@ -1024,6 +1038,23 @@ function renderTasks() {
             handle.textContent =
                 "⋮⋮";
 
+            /* NOTION IPAD / IPHONE TOUCH DRAG */
+            handle.addEventListener(
+                "touchstart",
+                event => {
+                    startTouchDrag(
+                        event,
+                        {
+                            type: "task",
+                            taskId: task.id,
+                            text: task.text,
+                            sourceElement: item
+                        }
+                    );
+                },
+                { passive: false }
+            );
+
 
             /* TASK TEXT */
 
@@ -1505,6 +1536,177 @@ taskList.addEventListener(
 
     }
 );
+
+
+/* =====================================================
+   NOTION IPAD / IPHONE — DEDICATED TOUCH DRAG
+===================================================== */
+
+function startTouchDrag(event, data) {
+    if (touchDrag || !event.touches || event.touches.length !== 1) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const t = event.touches[0];
+
+    touchDrag = {
+        ...data,
+        identifier: t.identifier
+    };
+
+    data.sourceElement.classList.add("dragging");
+    createTouchGhost(data.text, t.clientX, t.clientY);
+    updateTouchDropTarget(t.clientX, t.clientY);
+
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleTouchEnd, { passive: false });
+    document.addEventListener("touchcancel", handleTouchCancel, { passive: false });
+}
+
+function trackedTouch(list) {
+    if (!touchDrag) return null;
+
+    for (let i = 0; i < list.length; i++) {
+        if (list[i].identifier === touchDrag.identifier) return list[i];
+    }
+
+    return null;
+}
+
+function handleTouchMove(event) {
+    if (!touchDrag) return;
+
+    const t = trackedTouch(event.touches);
+    if (!t) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    moveTouchGhost(t.clientX, t.clientY);
+    updateTouchDropTarget(t.clientX, t.clientY);
+}
+
+function handleTouchEnd(event) {
+    if (!touchDrag) return;
+
+    const t = trackedTouch(event.changedTouches);
+    if (!t) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    performTouchDrop(t.clientX, t.clientY);
+    finishTouchDrag();
+}
+
+function handleTouchCancel(event) {
+    if (!touchDrag) return;
+    event.preventDefault();
+    finishTouchDrag();
+}
+
+function createTouchGhost(text, x, y) {
+    touchGhost = document.createElement("div");
+    touchGhost.textContent = text;
+
+    Object.assign(touchGhost.style, {
+        position: "fixed",
+        left: "0",
+        top: "0",
+        zIndex: "2147483647",
+        maxWidth: "260px",
+        padding: "9px 12px",
+        borderRadius: "10px",
+        background: "#E8E4DE",
+        border: "1px solid rgba(55,53,47,0.12)",
+        color: "#4B4945",
+        fontFamily: "inherit",
+        fontSize: "13px",
+        fontWeight: "500",
+        boxShadow: "0 8px 24px rgba(55,53,47,0.18)",
+        pointerEvents: "none",
+        opacity: "0.96"
+    });
+
+    document.body.appendChild(touchGhost);
+    moveTouchGhost(x, y);
+}
+
+function moveTouchGhost(x, y) {
+    if (!touchGhost) return;
+    touchGhost.style.transform = `translate(${x + 16}px, ${y + 16}px)`;
+}
+
+function getTouchDropTarget(x, y) {
+    if (touchGhost) touchGhost.style.display = "none";
+
+    const el = document.elementFromPoint(x, y);
+
+    if (touchGhost) touchGhost.style.display = "";
+    if (!el) return null;
+
+    return el.closest(".activity-cell") || el.closest("#taskList");
+}
+
+function updateTouchDropTarget(x, y) {
+    const target = getTouchDropTarget(x, y);
+
+    if (target === touchDropTarget) return;
+
+    if (touchDropTarget) touchDropTarget.classList.remove("drag-over");
+
+    touchDropTarget = target;
+
+    if (touchDropTarget) touchDropTarget.classList.add("drag-over");
+}
+
+function performTouchDrop(x, y) {
+    const target = getTouchDropTarget(x, y);
+
+    if (!target || !touchDrag) return;
+
+    if (target.classList.contains("activity-cell")) {
+        const hour = Number(target.dataset.hour);
+
+        if (touchDrag.type === "task") {
+            draggedTaskId = touchDrag.taskId;
+            draggedScheduleHour = null;
+            handleDropOnSchedule(hour);
+            return;
+        }
+
+        if (touchDrag.type === "schedule") {
+            draggedTaskId = null;
+            draggedScheduleHour = touchDrag.hour;
+            handleDropOnSchedule(hour);
+            return;
+        }
+    }
+
+    if (target.id === "taskList" && touchDrag.type === "schedule") {
+        moveScheduleHourBackToTasks(touchDrag.hour);
+    }
+}
+
+function finishTouchDrag() {
+    if (touchDrag?.sourceElement) {
+        touchDrag.sourceElement.classList.remove("dragging");
+    }
+
+    if (touchDropTarget) touchDropTarget.classList.remove("drag-over");
+    if (touchGhost) touchGhost.remove();
+
+    touchDrag = null;
+    touchGhost = null;
+    touchDropTarget = null;
+
+    resetDragState();
+
+    document.removeEventListener("touchmove", handleTouchMove);
+    document.removeEventListener("touchend", handleTouchEnd);
+    document.removeEventListener("touchcancel", handleTouchCancel);
+}
 
 
 /* =====================================================
@@ -2303,6 +2505,7 @@ function startCloudSync() {
                     document.visibilityState
                     === "visible"
                     && !pointerDrag
+                    && !touchDrag
                     && draggedTaskId === null
                     && draggedScheduleHour === null
                 ) {
