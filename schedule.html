@@ -24,21 +24,21 @@ body {
     padding: 18px 22px;
 }
 
-/* =========================
+/* =====================================================
    MAIN LAYOUT
-========================= */
+===================================================== */
 
 .planner {
     width: 100%;
     display: grid;
-    grid-template-columns: minmax(420px, 1fr) 260px;
+    grid-template-columns: minmax(420px, 1fr) 270px;
     gap: 22px;
     align-items: start;
 }
 
-/* =========================
+/* =====================================================
    SCHEDULE TABLE
-========================= */
+===================================================== */
 
 .schedule {
     width: 100%;
@@ -96,7 +96,6 @@ body {
     background: #fafaf9;
 }
 
-/* A scheduled item can be dragged back */
 .activity-cell.has-task {
     cursor: grab;
 }
@@ -105,9 +104,9 @@ body {
     cursor: grabbing;
 }
 
-/* =========================
+/* =====================================================
    TASKS PANEL
-========================= */
+===================================================== */
 
 .tasks-panel {
     width: 100%;
@@ -122,6 +121,10 @@ body {
     margin-bottom: 16px;
 }
 
+/* =====================================================
+   ADD TASK
+===================================================== */
+
 .add-task {
     display: flex;
     gap: 7px;
@@ -131,12 +134,18 @@ body {
 #newTask {
     flex: 1;
     min-width: 0;
-    height: 35px;
+    height: 36px;
+
     border: 1px solid #dedede;
+    border-radius: 8px;
+
     outline: none;
-    padding: 0 9px;
+
+    padding: 0 10px;
+
     font-family: inherit;
     font-size: 13px;
+
     color: #37352f;
     background: #ffffff;
 }
@@ -150,26 +159,42 @@ body {
 }
 
 .add-button {
-    width: 35px;
-    height: 35px;
+    width: 36px;
+    height: 36px;
+
     border: 1px solid #dedede;
-    background: #ffffff;
+    border-radius: 8px;
+
+    background: #f5f4f1;
+
     color: #37352f;
+
     font-size: 20px;
     line-height: 1;
+
     cursor: pointer;
+
+    transition: background 0.15s ease;
 }
 
 .add-button:hover {
-    background: #f7f6f3;
+    background: #ebe9e4;
 }
 
-/* =========================
+/* =====================================================
    TASK LIST
-========================= */
+===================================================== */
 
 .task-list {
     min-height: 100px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 9px;
+
+    padding: 3px 0;
+
     transition: background 0.15s ease;
 }
 
@@ -177,25 +202,71 @@ body {
     background: #fafaf9;
 }
 
+/* =====================================================
+   EMPTY MESSAGE
+===================================================== */
+
 .empty-message {
     color: #aaa8a4;
+
     font-size: 12px;
     line-height: 1.5;
+
     padding: 8px 2px;
 }
 
+/* =====================================================
+   TASK CARDS
+===================================================== */
+
 .task {
-    min-height: 38px;
+    min-height: 42px;
+
     display: flex;
     align-items: center;
-    gap: 8px;
-    border-bottom: 1px solid #e7e6e3;
+
+    gap: 9px;
+
+    padding: 7px 11px;
+
+    border-radius: 10px;
+
+    border: 1px solid rgba(55, 53, 47, 0.07);
+
     cursor: grab;
+
     user-select: none;
+
+    transition:
+        transform 0.12s ease,
+        opacity 0.12s ease,
+        background 0.12s ease;
 }
 
-.task:first-child {
-    border-top: 1px solid #e7e6e3;
+/* Neutral shades */
+
+.task:nth-child(6n + 1) {
+    background: #E8E4DE;
+}
+
+.task:nth-child(6n + 2) {
+    background: #DDDCD7;
+}
+
+.task:nth-child(6n + 3) {
+    background: #E5E0DA;
+}
+
+.task:nth-child(6n + 4) {
+    background: #E2E3E1;
+}
+
+.task:nth-child(6n + 5) {
+    background: #E7E1DC;
+}
+
+.task:nth-child(6n + 6) {
+    background: #DCD9D3;
 }
 
 .task:active {
@@ -204,43 +275,83 @@ body {
 
 .task.dragging {
     opacity: 0.45;
+    transform: scale(0.98);
 }
 
+/* =====================================================
+   DRAG HANDLE
+===================================================== */
+
 .drag-handle {
-    color: #aaa8a4;
+    color: #96938E;
+
     font-size: 15px;
+
     letter-spacing: -2px;
+
     flex-shrink: 0;
 }
+
+/* =====================================================
+   TASK TEXT
+===================================================== */
 
 .task-text {
     flex: 1;
+
     min-width: 0;
+
     font-size: 13px;
+    font-weight: 500;
+
     line-height: 1.35;
+
+    color: #4B4945;
+
     overflow-wrap: anywhere;
-    padding: 8px 0;
+
+    padding: 4px 0;
 }
+
+/* =====================================================
+   DELETE BUTTON
+===================================================== */
 
 .delete-task {
     flex-shrink: 0;
+
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     border: 0;
+    border-radius: 50%;
+
     background: transparent;
-    color: #aaa8a4;
+
+    color: #96938E;
+
     cursor: pointer;
-    font-size: 17px;
-    padding: 4px 2px 4px 7px;
+
+    font-size: 16px;
+
+    padding: 0;
 }
 
 .delete-task:hover {
-    color: #37352f;
+    background: rgba(55, 53, 47, 0.07);
+    color: #37352F;
 }
 
-/* =========================
+/* =====================================================
    MOBILE
-========================= */
+===================================================== */
 
 @media (max-width: 700px) {
+
     body {
         padding: 10px;
     }
@@ -272,27 +383,36 @@ body {
 
 <div class="planner">
 
-    <!-- =====================
+    <!-- =================================================
          SCHEDULE
-    ====================== -->
+    ================================================== -->
 
     <div class="schedule-wrapper">
+
         <table class="schedule">
+
             <thead>
                 <tr>
-                    <th style="width:105px;">Time</th>
-                    <th>Activity</th>
+                    <th style="width:105px;">
+                        Time
+                    </th>
+
+                    <th>
+                        Activity
+                    </th>
                 </tr>
             </thead>
 
             <tbody id="scheduleBody"></tbody>
+
         </table>
+
     </div>
 
 
-    <!-- =====================
+    <!-- =================================================
          TASKS
-    ====================== -->
+    ================================================== -->
 
     <aside class="tasks-panel">
 
@@ -300,7 +420,9 @@ body {
             Tasks
         </div>
 
+
         <div class="add-task">
+
             <input
                 id="newTask"
                 type="text"
@@ -316,7 +438,9 @@ body {
             >
                 +
             </button>
+
         </div>
+
 
         <div
             id="taskList"
@@ -341,6 +465,7 @@ const HOURS = [
     0, 1, 2, 3, 4, 5, 6
 ];
 
+
 const SCHEDULE_KEY =
     "noury-daily-schedule";
 
@@ -354,6 +479,7 @@ const DATE_KEY =
 let tasks = [];
 
 let draggedTaskId = null;
+
 let draggedScheduleHour = null;
 
 
@@ -363,20 +489,39 @@ let draggedScheduleHour = null;
 
 function getTodayKey() {
 
-    const now = new Date();
+    const now =
+        new Date();
+
 
     const year =
         now.getFullYear();
 
+
     const month =
-        String(now.getMonth() + 1)
-        .padStart(2, "0");
+        String(
+            now.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     const day =
-        String(now.getDate())
-        .padStart(2, "0");
+        String(
+            now.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
 
-    return `${year}-${month}-${day}`;
+
+    return (
+        year +
+        "-" +
+        month +
+        "-" +
+        day
+    );
 }
 
 
@@ -387,177 +532,257 @@ function getTodayKey() {
 function formatTime(hour) {
 
     const period =
-        hour >= 12 ? "pm" : "am";
+        hour >= 12
+            ? "pm"
+            : "am";
+
 
     let displayHour =
         hour % 12;
 
-    if (displayHour === 0) {
-        displayHour = 12;
+
+    if (
+        displayHour === 0
+    ) {
+
+        displayHour =
+            12;
     }
 
-    return `${displayHour}:00 ${period}`;
+
+    return (
+        displayHour +
+        ":00 " +
+        period
+    );
 }
 
 
 /* =====================================================
-   CREATE SCHEDULE
+   BUILD SCHEDULE
 ===================================================== */
 
 function buildSchedule() {
 
     const body =
-        document.getElementById("scheduleBody");
-
-    body.innerHTML = "";
-
-    HOURS.forEach(hour => {
-
-        const row =
-            document.createElement("tr");
-
-
-        /* TIME */
-
-        const timeCell =
-            document.createElement("td");
-
-        timeCell.className =
-            "time-cell";
-
-        timeCell.textContent =
-            formatTime(hour);
-
-
-        /* ACTIVITY */
-
-        const activityCell =
-            document.createElement("td");
-
-        activityCell.className =
-            "activity-cell";
-
-        activityCell.dataset.hour =
-            hour;
-
-
-        const input =
-            document.createElement("input");
-
-        input.type =
-            "text";
-
-        input.className =
-            "activity-input";
-
-        input.dataset.hour =
-            hour;
-
-        input.autocomplete =
-            "off";
-
-
-        input.addEventListener(
-            "input",
-            () => {
-
-                updateCellState(activityCell);
-
-                saveSchedule();
-            }
+        document.getElementById(
+            "scheduleBody"
         );
 
 
-        /* ---------------------
-           DRAG FROM SCHEDULE
-        --------------------- */
-
-        activityCell.draggable =
-            false;
+    body.innerHTML =
+        "";
 
 
-        activityCell.addEventListener(
-            "dragstart",
-            event => {
+    HOURS.forEach(
+        hour => {
 
-                if (!input.value.trim()) {
-                    event.preventDefault();
-                    return;
-                }
-
-                draggedScheduleHour =
-                    hour;
-
-                draggedTaskId =
-                    null;
-
-                event.dataTransfer.effectAllowed =
-                    "move";
-
-                event.dataTransfer.setData(
-                    "text/plain",
-                    input.value
-                );
-            }
-        );
-
-
-        /* ---------------------
-           DROP TASK INTO HOUR
-        --------------------- */
-
-        activityCell.addEventListener(
-            "dragover",
-            event => {
-
-                event.preventDefault();
-
-                event.dataTransfer.dropEffect =
-                    "move";
-
-                activityCell.classList.add(
-                    "drag-over"
-                );
-            }
-        );
-
-
-        activityCell.addEventListener(
-            "dragleave",
-            () => {
-
-                activityCell.classList.remove(
-                    "drag-over"
-                );
-            }
-        );
-
-
-        activityCell.addEventListener(
-            "drop",
-            event => {
-
-                event.preventDefault();
-
-                activityCell.classList.remove(
-                    "drag-over"
+            const row =
+                document.createElement(
+                    "tr"
                 );
 
-                handleDropOnSchedule(
+
+            /* TIME */
+
+            const timeCell =
+                document.createElement(
+                    "td"
+                );
+
+
+            timeCell.className =
+                "time-cell";
+
+
+            timeCell.textContent =
+                formatTime(
                     hour
                 );
-            }
-        );
 
 
-        activityCell.appendChild(input);
+            /* ACTIVITY CELL */
 
-        row.appendChild(timeCell);
-        row.appendChild(activityCell);
+            const activityCell =
+                document.createElement(
+                    "td"
+                );
 
-        body.appendChild(row);
 
-    });
+            activityCell.className =
+                "activity-cell";
+
+
+            activityCell.dataset.hour =
+                hour;
+
+
+            /* INPUT */
+
+            const input =
+                document.createElement(
+                    "input"
+                );
+
+
+            input.type =
+                "text";
+
+
+            input.className =
+                "activity-input";
+
+
+            input.dataset.hour =
+                hour;
+
+
+            input.autocomplete =
+                "off";
+
+
+            /* DIRECT TYPING */
+
+            input.addEventListener(
+                "input",
+                () => {
+
+                    updateCellState(
+                        activityCell
+                    );
+
+
+                    saveSchedule();
+
+                }
+            );
+
+
+            /* =========================================
+               DRAG FROM SCHEDULE
+            ========================================== */
+
+            activityCell.draggable =
+                false;
+
+
+            activityCell.addEventListener(
+                "dragstart",
+                event => {
+
+                    const text =
+                        input.value.trim();
+
+
+                    if (!text) {
+
+                        event.preventDefault();
+
+                        return;
+                    }
+
+
+                    draggedScheduleHour =
+                        hour;
+
+
+                    draggedTaskId =
+                        null;
+
+
+                    event.dataTransfer.effectAllowed =
+                        "move";
+
+
+                    event.dataTransfer.setData(
+                        "text/plain",
+                        text
+                    );
+
+                }
+            );
+
+
+            /* =========================================
+               DRAG OVER SCHEDULE
+            ========================================== */
+
+            activityCell.addEventListener(
+                "dragover",
+                event => {
+
+                    event.preventDefault();
+
+
+                    event.dataTransfer.dropEffect =
+                        "move";
+
+
+                    activityCell.classList.add(
+                        "drag-over"
+                    );
+
+                }
+            );
+
+
+            activityCell.addEventListener(
+                "dragleave",
+                () => {
+
+                    activityCell.classList.remove(
+                        "drag-over"
+                    );
+
+                }
+            );
+
+
+            /* =========================================
+               DROP ON SCHEDULE
+            ========================================== */
+
+            activityCell.addEventListener(
+                "drop",
+                event => {
+
+                    event.preventDefault();
+
+
+                    activityCell.classList.remove(
+                        "drag-over"
+                    );
+
+
+                    handleDropOnSchedule(
+                        hour
+                    );
+
+                }
+            );
+
+
+            activityCell.appendChild(
+                input
+            );
+
+
+            row.appendChild(
+                timeCell
+            );
+
+
+            row.appendChild(
+                activityCell
+            );
+
+
+            body.appendChild(
+                row
+            );
+
+        }
+    );
 }
 
 
@@ -565,20 +790,25 @@ function buildSchedule() {
    CELL STATE
 ===================================================== */
 
-function updateCellState(cell) {
+function updateCellState(
+    cell
+) {
 
     const input =
         cell.querySelector(
             ".activity-input"
         );
 
+
     const hasText =
         input.value.trim() !== "";
+
 
     cell.classList.toggle(
         "has-task",
         hasText
     );
+
 
     cell.draggable =
         hasText;
@@ -596,12 +826,16 @@ function addTask() {
             "newTask"
         );
 
+
     const text =
         input.value.trim();
 
+
     if (!text) {
+
         return;
     }
+
 
     const task = {
 
@@ -609,18 +843,29 @@ function addTask() {
             Date.now().toString()
             +
             Math.random()
-            .toString(16)
-            .slice(2),
+                .toString(16)
+                .slice(2),
 
-        text: text
+        text:
+            text
+
     };
 
-    tasks.push(task);
 
-    input.value = "";
+    tasks.push(
+        task
+    );
+
+
+    input.value =
+        "";
+
 
     saveTasks();
+
+
     renderTasks();
+
 
     input.focus();
 }
@@ -630,7 +875,9 @@ function addTask() {
    DELETE TASK
 ===================================================== */
 
-function deleteTask(id) {
+function deleteTask(
+    id
+) {
 
     tasks =
         tasks.filter(
@@ -638,13 +885,16 @@ function deleteTask(id) {
                 task.id !== id
         );
 
+
     saveTasks();
+
+
     renderTasks();
 }
 
 
 /* =====================================================
-   RENDER TASKS
+   RENDER TASK CARDS
 ===================================================== */
 
 function renderTasks() {
@@ -654,158 +904,211 @@ function renderTasks() {
             "taskList"
         );
 
-    list.innerHTML = "";
+
+    list.innerHTML =
+        "";
 
 
-    if (tasks.length === 0) {
+    /* EMPTY */
+
+    if (
+        tasks.length === 0
+    ) {
 
         const empty =
             document.createElement(
                 "div"
             );
 
+
         empty.className =
             "empty-message";
+
 
         empty.textContent =
             "Add tasks here, then drag them into your schedule.";
 
-        list.appendChild(empty);
+
+        list.appendChild(
+            empty
+        );
+
 
         return;
     }
 
 
-    tasks.forEach(task => {
+    /* TASKS */
 
-        const item =
-            document.createElement(
-                "div"
-            );
+    tasks.forEach(
+        task => {
 
-        item.className =
-            "task";
-
-        item.draggable =
-            true;
-
-        item.dataset.id =
-            task.id;
-
-
-        /* HANDLE */
-
-        const handle =
-            document.createElement(
-                "span"
-            );
-
-        handle.className =
-            "drag-handle";
-
-        handle.textContent =
-            "⋮⋮";
-
-
-        /* TEXT */
-
-        const text =
-            document.createElement(
-                "div"
-            );
-
-        text.className =
-            "task-text";
-
-        text.textContent =
-            task.text;
-
-
-        /* DELETE */
-
-        const remove =
-            document.createElement(
-                "button"
-            );
-
-        remove.type =
-            "button";
-
-        remove.className =
-            "delete-task";
-
-        remove.textContent =
-            "×";
-
-        remove.setAttribute(
-            "aria-label",
-            "Delete task"
-        );
-
-
-        remove.addEventListener(
-            "click",
-            event => {
-
-                event.stopPropagation();
-
-                deleteTask(
-                    task.id
-                );
-            }
-        );
-
-
-        /* DRAG START */
-
-        item.addEventListener(
-            "dragstart",
-            event => {
-
-                draggedTaskId =
-                    task.id;
-
-                draggedScheduleHour =
-                    null;
-
-                item.classList.add(
-                    "dragging"
+            const item =
+                document.createElement(
+                    "div"
                 );
 
-                event.dataTransfer.effectAllowed =
-                    "move";
 
-                event.dataTransfer.setData(
-                    "text/plain",
-                    task.text
+            item.className =
+                "task";
+
+
+            item.draggable =
+                true;
+
+
+            item.dataset.id =
+                task.id;
+
+
+            /* DRAG HANDLE */
+
+            const handle =
+                document.createElement(
+                    "span"
                 );
-            }
-        );
 
 
-        item.addEventListener(
-            "dragend",
-            () => {
+            handle.className =
+                "drag-handle";
 
-                item.classList.remove(
-                    "dragging"
+
+            handle.textContent =
+                "⋮⋮";
+
+
+            /* TASK TEXT */
+
+            const text =
+                document.createElement(
+                    "div"
                 );
-            }
-        );
 
 
-        item.appendChild(handle);
-        item.appendChild(text);
-        item.appendChild(remove);
+            text.className =
+                "task-text";
 
-        list.appendChild(item);
 
-    });
+            text.textContent =
+                task.text;
+
+
+            /* DELETE */
+
+            const remove =
+                document.createElement(
+                    "button"
+                );
+
+
+            remove.type =
+                "button";
+
+
+            remove.className =
+                "delete-task";
+
+
+            remove.textContent =
+                "×";
+
+
+            remove.setAttribute(
+                "aria-label",
+                "Delete task"
+            );
+
+
+            remove.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+
+                    deleteTask(
+                        task.id
+                    );
+
+                }
+            );
+
+
+            /* DRAG START */
+
+            item.addEventListener(
+                "dragstart",
+                event => {
+
+                    draggedTaskId =
+                        task.id;
+
+
+                    draggedScheduleHour =
+                        null;
+
+
+                    item.classList.add(
+                        "dragging"
+                    );
+
+
+                    event.dataTransfer.effectAllowed =
+                        "move";
+
+
+                    event.dataTransfer.setData(
+                        "text/plain",
+                        task.text
+                    );
+
+                }
+            );
+
+
+            /* DRAG END */
+
+            item.addEventListener(
+                "dragend",
+                () => {
+
+                    item.classList.remove(
+                        "dragging"
+                    );
+
+
+                    resetDragState();
+
+                }
+            );
+
+
+            item.appendChild(
+                handle
+            );
+
+
+            item.appendChild(
+                text
+            );
+
+
+            item.appendChild(
+                remove
+            );
+
+
+            list.appendChild(
+                item
+            );
+
+        }
+    );
 }
 
 
 /* =====================================================
-   DROP TASK ON SCHEDULE
+   DROP TASK INTO SCHEDULE
 ===================================================== */
 
 function handleDropOnSchedule(
@@ -817,16 +1120,22 @@ function handleDropOnSchedule(
             `.activity-input[data-hour="${hour}"]`
         );
 
+
     if (!targetInput) {
+
+        resetDragState();
+
         return;
     }
 
 
-    /* ---------------------
-       TASK LIST -> SCHEDULE
-    --------------------- */
+    /* =================================================
+       TASK PANEL -> SCHEDULE
+    ================================================= */
 
-    if (draggedTaskId) {
+    if (
+        draggedTaskId
+    ) {
 
         const task =
             tasks.find(
@@ -835,16 +1144,16 @@ function handleDropOnSchedule(
                     draggedTaskId
             );
 
+
         if (!task) {
+
             resetDragState();
+
             return;
         }
 
 
-        /*
-        If the hour already has text,
-        keep it and add the task beneath it.
-        */
+        /* Existing activity */
 
         if (
             targetInput.value.trim()
@@ -866,6 +1175,8 @@ function handleDropOnSchedule(
         }
 
 
+        /* Remove from Tasks */
+
         tasks =
             tasks.filter(
                 item =>
@@ -874,16 +1185,18 @@ function handleDropOnSchedule(
             );
 
 
-        saveTasks();
-        saveSchedule();
-
-        renderTasks();
-
         updateCellState(
             targetInput.closest(
                 ".activity-cell"
             )
         );
+
+
+        saveTasks();
+
+        saveSchedule();
+
+        renderTasks();
 
         resetDragState();
 
@@ -891,9 +1204,9 @@ function handleDropOnSchedule(
     }
 
 
-    /* ---------------------
-       SCHEDULE -> SCHEDULE
-    --------------------- */
+    /* =================================================
+       SCHEDULE -> DIFFERENT HOUR
+    ================================================= */
 
     if (
         draggedScheduleHour !== null
@@ -906,8 +1219,11 @@ function handleDropOnSchedule(
                 `.activity-input[data-hour="${draggedScheduleHour}"]`
             );
 
+
         if (!sourceInput) {
+
             resetDragState();
+
             return;
         }
 
@@ -917,10 +1233,14 @@ function handleDropOnSchedule(
 
 
         if (!sourceText) {
+
             resetDragState();
+
             return;
         }
 
+
+        /* Existing target activity */
 
         if (
             targetInput.value.trim()
@@ -942,6 +1262,8 @@ function handleDropOnSchedule(
         }
 
 
+        /* Clear old hour */
+
         sourceInput.value =
             "";
 
@@ -951,6 +1273,7 @@ function handleDropOnSchedule(
                 ".activity-cell"
             )
         );
+
 
         updateCellState(
             targetInput.closest(
@@ -968,7 +1291,7 @@ function handleDropOnSchedule(
 
 
 /* =====================================================
-   DRAG SCHEDULE BACK TO TASKS
+   DRAG SCHEDULE BACK INTO TASKS
 ===================================================== */
 
 const taskList =
@@ -981,25 +1304,25 @@ taskList.addEventListener(
     "dragover",
     event => {
 
-        /*
-        Only allow schedule items
-        to be dropped back here.
-        */
-
         if (
             draggedScheduleHour === null
         ) {
+
             return;
         }
 
+
         event.preventDefault();
+
 
         event.dataTransfer.dropEffect =
             "move";
 
+
         taskList.classList.add(
             "drag-over"
         );
+
     }
 );
 
@@ -1017,7 +1340,9 @@ taskList.addEventListener(
             taskList.classList.remove(
                 "drag-over"
             );
+
         }
+
     }
 );
 
@@ -1028,6 +1353,7 @@ taskList.addEventListener(
 
         event.preventDefault();
 
+
         taskList.classList.remove(
             "drag-over"
         );
@@ -1036,6 +1362,7 @@ taskList.addEventListener(
         if (
             draggedScheduleHour === null
         ) {
+
             return;
         }
 
@@ -1047,7 +1374,9 @@ taskList.addEventListener(
 
 
         if (!sourceInput) {
+
             resetDragState();
+
             return;
         }
 
@@ -1057,10 +1386,14 @@ taskList.addEventListener(
 
 
         if (!text) {
+
             resetDragState();
+
             return;
         }
 
+
+        /* CREATE TASK AGAIN */
 
         tasks.push({
 
@@ -1068,13 +1401,16 @@ taskList.addEventListener(
                 Date.now().toString()
                 +
                 Math.random()
-                .toString(16)
-                .slice(2),
+                    .toString(16)
+                    .slice(2),
 
-            text: text
+            text:
+                text
 
         });
 
+
+        /* CLEAR SCHEDULE */
 
         sourceInput.value =
             "";
@@ -1088,10 +1424,13 @@ taskList.addEventListener(
 
 
         saveSchedule();
+
         saveTasks();
+
         renderTasks();
 
         resetDragState();
+
     }
 );
 
@@ -1105,6 +1444,7 @@ function resetDragState() {
     draggedTaskId =
         null;
 
+
     draggedScheduleHour =
         null;
 
@@ -1114,10 +1454,13 @@ function resetDragState() {
             ".drag-over"
         )
         .forEach(
-            element =>
+            element => {
+
                 element.classList.remove(
                     "drag-over"
-                )
+                );
+
+            }
         );
 }
 
@@ -1131,18 +1474,23 @@ function saveSchedule() {
     const schedule =
         {};
 
-    HOURS.forEach(hour => {
 
-        const input =
-            document.querySelector(
-                `.activity-input[data-hour="${hour}"]`
-            );
+    HOURS.forEach(
+        hour => {
 
-        schedule[hour] =
-            input
-            ? input.value
-            : "";
-    });
+            const input =
+                document.querySelector(
+                    `.activity-input[data-hour="${hour}"]`
+                );
+
+
+            schedule[hour] =
+                input
+                    ? input.value
+                    : "";
+
+        }
+    );
 
 
     localStorage.setItem(
@@ -1151,6 +1499,7 @@ function saveSchedule() {
             schedule
         )
     );
+
 
     localStorage.setItem(
         DATE_KEY,
@@ -1172,6 +1521,7 @@ function saveTasks() {
         )
     );
 
+
     localStorage.setItem(
         DATE_KEY,
         getTodayKey()
@@ -1188,14 +1538,19 @@ function loadData() {
     checkForNewDay();
 
 
-    /* LOAD SCHEDULE */
+    /* =================================================
+       LOAD SCHEDULE
+    ================================================= */
 
     const savedSchedule =
         localStorage.getItem(
             SCHEDULE_KEY
         );
 
-    if (savedSchedule) {
+
+    if (
+        savedSchedule
+    ) {
 
         try {
 
@@ -1204,26 +1559,36 @@ function loadData() {
                     savedSchedule
                 );
 
-            HOURS.forEach(hour => {
 
-                const input =
-                    document.querySelector(
-                        `.activity-input[data-hour="${hour}"]`
+            HOURS.forEach(
+                hour => {
+
+                    const input =
+                        document.querySelector(
+                            `.activity-input[data-hour="${hour}"]`
+                        );
+
+
+                    if (!input) {
+
+                        return;
+                    }
+
+
+                    input.value =
+                        schedule[hour]
+                        ||
+                        "";
+
+
+                    updateCellState(
+                        input.closest(
+                            ".activity-cell"
+                        )
                     );
 
-                if (!input) {
-                    return;
                 }
-
-                input.value =
-                    schedule[hour] || "";
-
-                updateCellState(
-                    input.closest(
-                        ".activity-cell"
-                    )
-                );
-            });
+            );
 
         }
 
@@ -1232,18 +1597,24 @@ function loadData() {
             localStorage.removeItem(
                 SCHEDULE_KEY
             );
+
         }
     }
 
 
-    /* LOAD TASKS */
+    /* =================================================
+       LOAD TASKS
+    ================================================= */
 
     const savedTasks =
         localStorage.getItem(
             TASKS_KEY
         );
 
-    if (savedTasks) {
+
+    if (
+        savedTasks
+    ) {
 
         try {
 
@@ -1252,22 +1623,29 @@ function loadData() {
                     savedTasks
                 );
 
+
             tasks =
-                Array.isArray(parsed)
-                ? parsed
-                : [];
+                Array.isArray(
+                    parsed
+                )
+                    ? parsed
+                    : [];
 
         }
 
         catch (error) {
 
-            tasks = [];
+            tasks =
+                [];
+
 
             localStorage.removeItem(
                 TASKS_KEY
             );
+
         }
     }
+
 
     renderTasks();
 }
@@ -1282,6 +1660,7 @@ function checkForNewDay() {
     const today =
         getTodayKey();
 
+
     const savedDate =
         localStorage.getItem(
             DATE_KEY
@@ -1289,20 +1668,28 @@ function checkForNewDay() {
 
 
     if (
-        savedDate &&
+        savedDate
+        &&
         savedDate !== today
     ) {
+
+        /* CLEAR STORAGE */
 
         localStorage.removeItem(
             SCHEDULE_KEY
         );
 
+
         localStorage.removeItem(
             TASKS_KEY
         );
 
-        tasks = [];
 
+        tasks =
+            [];
+
+
+        /* CLEAR SCHEDULE */
 
         document
             .querySelectorAll(
@@ -1311,13 +1698,16 @@ function checkForNewDay() {
             .forEach(
                 input => {
 
-                    input.value = "";
+                    input.value =
+                        "";
+
 
                     updateCellState(
                         input.closest(
                             ".activity-cell"
                         )
                     );
+
                 }
             );
 
@@ -1334,7 +1724,7 @@ function checkForNewDay() {
 
 
 /* =====================================================
-   ADD TASK EVENTS
+   ADD BUTTON
 ===================================================== */
 
 document
@@ -1346,6 +1736,10 @@ document
         addTask
     );
 
+
+/* =====================================================
+   ENTER TO ADD
+===================================================== */
 
 document
     .getElementById(
@@ -1361,14 +1755,17 @@ document
 
                 event.preventDefault();
 
+
                 addTask();
+
             }
+
         }
     );
 
 
 /* =====================================================
-   DAILY CHECK
+   CHECK FOR NEW DAY EVERY MINUTE
 ===================================================== */
 
 setInterval(
