@@ -403,10 +403,134 @@ h2{
   .progress-summary{width:100%}
   .panel{min-height:300px}
 }
+
+.student-callouts{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;
+  margin:0 0 16px 0;
+}
+.student-callout{
+  min-height:66px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 16px;
+  border-radius:11px;
+  background:#F7F6F3;
+  color:var(--ink);
+  min-width:0;
+}
+.student-callout-icon{
+  flex:0 0 auto;
+  font-size:20px;
+  color:#5F5C56;
+}
+.student-callout-content{min-width:0}
+.student-callout-label{
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.01em;
+}
+.student-callout-value{
+  margin-top:3px;
+  font-size:13px;
+  color:#6F6A63;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.chat-actions{display:flex;align-items:center;gap:7px;margin-top:3px;min-width:0}
+.chat-link{
+  color:#6F6A63;
+  text-decoration:none;
+  font-size:13px;
+  white-space:nowrap;
+}
+.chat-link:hover{text-decoration:underline}
+.chat-edit{
+  border:0;
+  background:transparent;
+  padding:0;
+  color:#8F8B84;
+  font:inherit;
+  font-size:11px;
+  cursor:pointer;
+}
+.chat-editor{
+  display:none;
+  gap:6px;
+  margin-top:6px;
+}
+.chat-editor.open{display:flex}
+.chat-editor input{
+  min-width:0;
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:6px 8px;
+  background:#FFFFFF;
+  font:inherit;
+  font-size:12px;
+}
+.chat-editor button{
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:#FFFFFF;
+  padding:6px 8px;
+  font:inherit;
+  font-size:12px;
+  cursor:pointer;
+}
+@media(max-width:800px){
+  .student-callouts{grid-template-columns:1fr 1fr}
+}
+@media(max-width:500px){
+  .student-callouts{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
 <div class="shell">
+  <div class="student-callouts">
+    <div class="student-callout">
+      <div class="student-callout-icon">#</div>
+      <div class="student-callout-content">
+        <div class="student-callout-label">GRADE:</div>
+        <div id="studentGrade" class="student-callout-value">—</div>
+      </div>
+    </div>
+    <div class="student-callout">
+      <div class="student-callout-icon">▣</div>
+      <div class="student-callout-content">
+        <div class="student-callout-label">SUBJECT:</div>
+        <div id="studentSubject" class="student-callout-value">—</div>
+      </div>
+    </div>
+    <div class="student-callout">
+      <div class="student-callout-icon">◌</div>
+      <div class="student-callout-content">
+        <div class="student-callout-label">STATUS:</div>
+        <div id="studentStatus" class="student-callout-value">—</div>
+      </div>
+    </div>
+    <div class="student-callout">
+      <div class="student-callout-icon">↗</div>
+      <div class="student-callout-content">
+        <div class="student-callout-label">Google Chat:</div>
+        <div class="chat-actions">
+          <a id="googleChatLink" class="chat-link" href="#" target="_blank" rel="noopener" style="display:none">Open Chat</a>
+          <span id="googleChatEmpty" class="student-callout-value">Not linked</span>
+          <button id="editGoogleChat" class="chat-edit" type="button" disabled>Edit</button>
+        </div>
+        <div id="googleChatEditor" class="chat-editor">
+          <input id="googleChatInput" type="url" placeholder="Paste Google Chat link">
+          <button id="saveGoogleChat" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="dashboard-tabs" role="tablist" aria-label="Student dashboard sections">
     <button class="dashboard-tab active" type="button" data-tab="studyTab">Study Plan</button>
     <button class="dashboard-tab" type="button" data-tab="progressTab">Progress</button>
@@ -486,7 +610,7 @@ h2{
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
 const qs=new URLSearchParams(location.search);
-let studentId=qs.get("studentId")||"", topics=[], lessons=[], deadlines=[], weekCount=6, drag=null, lastTap={id:null,time:0};
+let studentId=qs.get("studentId")||"", students=[], topics=[], lessons=[], deadlines=[], weekCount=6, drag=null, lastTap={id:null,time:0};
 
 const $=id=>document.getElementById(id);
 async function api(path,opt={}) {
@@ -496,6 +620,25 @@ async function api(path,opt={}) {
   return d;
 }
 function message(t){$("msg").textContent=t||""}
+
+function selectedStudent(){
+  return students.find(s=>s.id===studentId)||null;
+}
+function renderStudentCallouts(){
+  const s=selectedStudent();
+  $("studentGrade").textContent=s?.grade||"—";
+  $("studentSubject").textContent=(s?.subjects||[]).join(", ")||"—";
+  $("studentStatus").textContent=s?.status||"—";
+  $("editGoogleChat").disabled=!s;
+
+  const hasChat=Boolean(s?.googleChat);
+  $("googleChatLink").style.display=hasChat?"inline":"none";
+  $("googleChatEmpty").style.display=hasChat?"none":"inline";
+  if(hasChat) $("googleChatLink").href=s.googleChat;
+  $("googleChatInput").value=s?.googleChat||"";
+  if(!s) $("googleChatEditor").classList.remove("open");
+}
+
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function maxAssignedWeek(){return topics.flatMap(t=>t.weeks||[]).reduce((m,w)=>Math.max(m,Number((w.match(/\d+/)||[0])[0])),0)}
 function render(){
@@ -527,9 +670,10 @@ function render(){
 async function loadStudents(){
   try{
     const d=await api("/study-plan-embed-students");
-    $("student").innerHTML='<option value="">Select student…</option>'+d.students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
-    if(studentId && d.students.some(s=>s.id===studentId)){$("student").value=studentId;await loadPlan()}
-    else message("Select a student to load the study plan.");
+    students=d.students||[];
+    $("student").innerHTML='<option value="">Select student…</option>'+students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
+    if(studentId && students.some(s=>s.id===studentId)){$("student").value=studentId;renderStudentCallouts();await loadPlan();await loadLessons();await loadDeadlines()}
+    else {studentId="";renderStudentCallouts();message("Select a student to load the study plan.");}
   }catch(e){message(e.message)}
 }
 async function loadPlan(){
@@ -578,6 +722,7 @@ function bindTopics(){
 }
 $("student").onchange=async e=>{
   studentId=e.target.value;
+  renderStudentCallouts();
   await loadPlan();
   await loadLessons();
   await loadDeadlines();
@@ -694,6 +839,32 @@ $("changeFocus").addEventListener("click",()=>{
   $("focusTopic").focus();
 });
 $("focusText").addEventListener("input",saveFocus);
+
+$("editGoogleChat").addEventListener("click",()=>{
+  if(!studentId)return;
+  $("googleChatEditor").classList.toggle("open");
+  if($("googleChatEditor").classList.contains("open")) $("googleChatInput").focus();
+});
+$("saveGoogleChat").addEventListener("click",async()=>{
+  if(!studentId)return;
+  const googleChat=$("googleChatInput").value.trim();
+  $("saveGoogleChat").disabled=true;
+  try{
+    const d=await api("/study-plan-embed-students",{
+      method:"PATCH",
+      body:JSON.stringify({studentPageId:studentId,googleChat})
+    });
+    const s=selectedStudent();
+    if(s) s.googleChat=d.googleChat||null;
+    $("googleChatEditor").classList.remove("open");
+    renderStudentCallouts();
+  }catch(e){
+    message(e.message);
+  }finally{
+    $("saveGoogleChat").disabled=false;
+  }
+});
+
 </script>
 </body>
 </html>
