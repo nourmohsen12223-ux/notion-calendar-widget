@@ -104,8 +104,24 @@ function nearestLesson(items){
   const now=Date.now();
   return [...items].filter(x=>x.start).sort((a,b)=>Math.abs(new Date(a.start)-now)-Math.abs(new Date(b.start)-now))[0];
 }
+async function saveTopics(lessonId, topicIds){
+  const status=document.getElementById("status");
+  status.textContent="Saving Topics Covered…";
+  const r=await fetch(API+"/tutoring-lessons",{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({lessonId,topicIds})
+  });
+  const d=await r.json();
+  if(!r.ok||!d.success)throw new Error(d.error||"Could not save Topics Covered");
+  const lesson=lessons.find(x=>x.id===lessonId);
+  if(lesson) lesson.topicsCoveredIds=[...topicIds];
+  status.textContent="Topics Covered saved ✓";
+}
+
 async function loadTopics(studentPageId){
   const box=document.getElementById("topics");
+  const lesson=lessons.find(x=>x.id===document.getElementById("lesson").value);
   if(!studentPageId){
     box.innerHTML='<div class="placeholder">No student is attached to this lesson.</div>';
     return;
@@ -120,11 +136,28 @@ async function loadTopics(studentPageId){
       box.innerHTML='<div class="placeholder">No Study Plan topics have been added for this student yet.</div>';
       return;
     }
+    const saved=new Set((lesson?.topicsCoveredIds||[]).map(String));
     box.innerHTML=topics.map(t=>`
       <label class="topic-row ${t.completed?"topic-done":""}">
-        <input type="checkbox" disabled aria-label="Topic Covered">
+        <input type="checkbox" data-topic-id="${esc(t.id)}" ${saved.has(String(t.id))?"checked":""} aria-label="Topic Covered">
         <span class="topic-name">${esc(t.topic||"Untitled topic")}</span>
       </label>`).join("");
+
+    box.querySelectorAll('input[data-topic-id]').forEach(cb=>{
+      cb.addEventListener("change",async()=>{
+        const lessonId=document.getElementById("lesson").value;
+        const checked=[...box.querySelectorAll('input[data-topic-id]:checked')].map(x=>x.dataset.topicId);
+        box.querySelectorAll('input[data-topic-id]').forEach(x=>x.disabled=true);
+        try{
+          await saveTopics(lessonId,checked);
+        }catch(e){
+          cb.checked=!cb.checked;
+          document.getElementById("status").textContent="Could not save: "+e.message;
+        }finally{
+          box.querySelectorAll('input[data-topic-id]').forEach(x=>x.disabled=false);
+        }
+      });
+    });
   }catch(e){
     box.innerHTML='<div class="placeholder">Could not load topics: '+esc(e.message)+'</div>';
   }
@@ -161,4 +194,3 @@ init();
 </script>
 </body>
 </html>
-   
