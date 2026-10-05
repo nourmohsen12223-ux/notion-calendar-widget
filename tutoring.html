@@ -1000,7 +1000,7 @@ const API_URL =
   "https://notion-calendar-api.nourmohsen12223.workers.dev/tutoring-lessons";
 
 const DEADLINES_API_URL =
-  "https://notion-calendar-api.nourmohsen12223.workers.dev/upcoming-data";
+  "https://notion-calendar-api.nourmohsen12223.workers.dev/tutoring-deadlines";
 
 /*
   Calendar runs from:
@@ -2273,6 +2273,7 @@ function renderDeadlines() {
         item => {
 
           const value =
+            item.dueDate ||
             item.due ||
             item.date ||
             item.start;
