@@ -319,6 +319,39 @@ h2{
   background:#FAF9F7;
 }
 
+
+.dashboard-tabs{
+  display:flex;
+  gap:6px;
+  margin:0 0 12px 0;
+  padding:4px;
+  width:max-content;
+  max-width:100%;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#F7F6F3;
+}
+.dashboard-tab{
+  appearance:none;
+  border:0;
+  border-radius:7px;
+  padding:8px 14px;
+  background:transparent;
+  color:var(--muted);
+  font:inherit;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+}
+.dashboard-tab.active{
+  background:#FFFFFF;
+  color:var(--ink);
+  box-shadow:0 1px 2px rgba(0,0,0,.06);
+}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.tab-panel .progress-title{margin-top:0}
+
 @media(max-width:700px){
   .top{align-items:stretch;flex-direction:column}
   .student{width:100%}
@@ -332,6 +365,11 @@ h2{
 </head>
 <body>
 <div class="shell">
+  <div class="dashboard-tabs" role="tablist" aria-label="Student dashboard sections">
+    <button class="dashboard-tab active" type="button" data-tab="studyTab">Study Plan</button>
+    <button class="dashboard-tab" type="button" data-tab="progressTab">Progress</button>
+  </div>
+  <div id="studyTab" class="tab-panel active">
   <h1 class="section-title">Study Plan</h1>
   <div class="top"><select id="student" class="student"><option value="">Select student…</option></select></div>
   <p id="msg" class="msg">Select a student to load the study plan.</p>
@@ -347,7 +385,8 @@ h2{
       <button id="addWeek" class="btn more" disabled>+ Add Week</button>
     </section>
   </div>
-
+  </div>
+  <div id="progressTab" class="tab-panel">
   <h1 class="section-title progress-title">Progress</h1>
   <div class="grid progress-grid">
     <section class="panel progress-panel focus-card">
@@ -379,6 +418,8 @@ h2{
       </div>
     </section>
   </div>
+  </div>
+
 </div>
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
@@ -492,6 +533,13 @@ function updateFocusDisplay(){
   $("focusDisplay").textContent=selected||"Choose a topic";
   $("focusPickerWrap").classList.toggle("is-hidden",Boolean(selected));
 }
+
+document.querySelectorAll(".dashboard-tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".dashboard-tab").forEach(b=>b.classList.toggle("active",b===btn));
+    document.querySelectorAll(".tab-panel").forEach(panel=>panel.classList.toggle("active",panel.id===btn.dataset.tab));
+  });
+});
 
 function focusStorageKey(){return studentId?`studyPlanFocus:${studentId}`:""}
 function loadFocus(){
