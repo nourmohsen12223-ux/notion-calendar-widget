@@ -815,6 +815,18 @@ body {
 
 }
 
+
+/* iPad: slightly taller time cells + lesson cards for clearer time */
+@media (min-width: 621px) and (max-width: 1180px) {
+  .lesson {
+    min-height: 40px;
+  }
+  .lesson-time {
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+}
+
 </style>
 </head>
 
@@ -1024,7 +1036,7 @@ const END_HOUR = 29;
   fits comfortably inside the iPad embed.
 */
 
-const HOUR_HEIGHT = 38;
+const HOUR_HEIGHT = (window.innerWidth >= 621 && window.innerWidth <= 1180) ? 42 : 38;
 
 
 /* ==========================================
