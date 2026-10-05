@@ -322,7 +322,7 @@ h2{
 
 .dashboard-tabs{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:6px;
   width:100%;
   margin:0 0 16px 0;
@@ -500,6 +500,30 @@ h2{
   .student-callouts{grid-template-columns:1fr}
 }
 
+
+.notes-panel{min-height:360px}
+.notes-area{
+  width:100%;
+  min-height:280px;
+  resize:vertical;
+  border:1px solid #E7E5E1;
+  border-radius:10px;
+  background:#FAF9F7;
+  color:var(--ink);
+  padding:14px 15px;
+  font:inherit;
+  font-size:14px;
+  line-height:1.6;
+  outline:none;
+}
+.notes-area:focus{border-color:#C8C4BD;background:#FFFFFF}
+.notes-save-status{
+  min-height:18px;
+  margin-top:8px;
+  font-size:12px;
+  color:var(--muted);
+}
+
 </style>
 </head>
 <body>
@@ -548,6 +572,7 @@ h2{
     <button class="dashboard-tab active" type="button" data-tab="studyTab">Study Plan</button>
     <button class="dashboard-tab" type="button" data-tab="progressTab">Progress</button>
     <button class="dashboard-tab" type="button" data-tab="lessonsTab">Lessons</button>
+    <button class="dashboard-tab" type="button" data-tab="notesTab">Notes</button>
   </div>
   <div id="studyTab" class="tab-panel active">
   <h1 class="section-title">Study Plan</h1>
@@ -618,6 +643,15 @@ h2{
     </section>
   </div>
 
+  <div id="notesTab" class="tab-panel">
+    <h1 class="section-title">Student Notes</h1>
+    <section class="panel notes-panel">
+      <h2>Notes</h2>
+      <textarea id="studentNotes" class="notes-area" placeholder="Select a student to view or add notes…" disabled></textarea>
+      <div id="notesSaveStatus" class="notes-save-status"></div>
+    </section>
+  </div>
+
 </div>
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
@@ -684,7 +718,7 @@ async function loadStudents(){
     const d=await api("/study-plan-embed-students");
     students=d.students||[];
     $("student").innerHTML='<option value="">Select student…</option>'+students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
-    if(studentId && students.some(s=>s.id===studentId)){$("student").value=studentId;renderStudentCallouts();await loadPlan();await loadLessons();await loadDeadlines()}
+    if(studentId && students.some(s=>s.id===studentId)){$("student").value=studentId;renderStudentCallouts();loadStudentNotes();await loadPlan();await loadLessons();await loadDeadlines()}
     else {studentId="";renderStudentCallouts();message("Select a student to load the study plan.");}
   }catch(e){message(e.message)}
 }
@@ -735,6 +769,7 @@ function bindTopics(){
 $("student").onchange=async e=>{
   studentId=e.target.value;
   renderStudentCallouts();
+  loadStudentNotes();
   await loadPlan();
   await loadLessons();
   await loadDeadlines();
@@ -751,6 +786,38 @@ function updateFocusDisplay(){
   $("focusDisplay").textContent=selected||"Choose a topic";
   $("focusPickerWrap").classList.toggle("is-hidden",Boolean(selected));
 }
+
+
+let notesSaveTimer=null;
+function loadStudentNotes(){
+  const s=selectedStudent();
+  $("studentNotes").disabled=!s;
+  $("studentNotes").value=s?.studentNotes||"";
+  $("studentNotes").placeholder=s?"Add notes about this student…":"Select a student to view or add notes…";
+  $("notesSaveStatus").textContent="";
+}
+async function saveStudentNotes(value){
+  const s=selectedStudent();
+  if(!s)return;
+  $("notesSaveStatus").textContent="Saving…";
+  try{
+    const d=await api("/study-plan-embed-students",{
+      method:"PATCH",
+      body:JSON.stringify({studentPageId:studentId,studentNotes:value})
+    });
+    s.studentNotes=d.studentNotes??value;
+    $("notesSaveStatus").textContent="Saved";
+  }catch(e){
+    $("notesSaveStatus").textContent="Could not save";
+    message(e.message);
+  }
+}
+$("studentNotes").addEventListener("input",()=>{
+  const value=$("studentNotes").value;
+  clearTimeout(notesSaveTimer);
+  $("notesSaveStatus").textContent="Editing…";
+  notesSaveTimer=setTimeout(()=>saveStudentNotes(value),650);
+});
 
 document.querySelectorAll(".dashboard-tab").forEach(btn=>{
   btn.addEventListener("click",()=>{
