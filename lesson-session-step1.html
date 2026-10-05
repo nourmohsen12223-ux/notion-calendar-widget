@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lesson Session</title>
+<style>
+:root{
+ --bg:#F8F7F4;--card:#fff;--ink:#37352F;--muted:#8F8B84;--line:#DDDAD5;
+ --soft:#F1F0ED;--green:#8BAF98;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:14px}
+.top{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+select{width:100%;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);padding:10px 11px;font:inherit}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:11px}
+.meta-card{border:1px solid #E8E5E0;border-radius:9px;padding:9px 10px;background:#FAF9F7}
+.meta-label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.meta-value{font-size:13px;font-weight:650;margin-top:3px}
+.section-title{font-family:Georgia,serif;font-size:21px;font-weight:500;margin:18px 0 9px;padding:10px 12px;background:#EEEDE9;border-radius:9px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px}
+.card h2{font-family:Georgia,serif;font-size:17px;font-weight:500;margin:0 0 10px}
+.check{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid #F0EFEC;font-size:13px}
+.check:last-child{border-bottom:0}
+.check input{width:16px;height:16px;accent-color:var(--green)}
+.placeholder{font-size:12px;color:var(--muted);line-height:1.55}
+.status{margin-top:8px;font-size:11px;color:var(--muted)}
+@media(max-width:760px){.grid,.meta{grid-template-columns:1fr}.wrap{padding:9px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="eyebrow">Lesson</div>
+    <select id="lesson"><option>Loading lessons…</option></select>
+    <div class="meta">
+      <div class="meta-card"><div class="meta-label">Student</div><div id="student" class="meta-value">—</div></div>
+      <div class="meta-card"><div class="meta-label">Subject</div><div id="subject" class="meta-value">—</div></div>
+      <div class="meta-card"><div class="meta-label">Date & time</div><div id="when" class="meta-value">—</div></div>
+    </div>
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="section-title">Lesson Session</div>
+  <div class="grid">
+    <section class="card">
+      <h2>Before Lesson</h2>
+      <label class="check"><input type="checkbox" disabled>24h Notice sent</label>
+      <label class="check"><input type="checkbox" disabled>1h Notice sent</label>
+      <div class="placeholder" style="margin-top:9px">The controls will be connected to the Lesson record after lesson identity is confirmed.</div>
+    </section>
+
+    <section class="card">
+      <h2>During Lesson</h2>
+      <div class="placeholder"><strong>Topics Covered</strong><br>Next step: this area will show only Study Plan topics belonging to the student attached to the selected lesson.</div>
+    </section>
+
+    <section class="card">
+      <h2>After Lesson</h2>
+      <label class="check"><input type="checkbox" disabled>Attendance recorded</label>
+      <label class="check"><input type="checkbox" disabled>Meeting transcription saved</label>
+      <label class="check"><input type="checkbox" disabled>Lesson recording saved</label>
+      <label class="check"><input type="checkbox" disabled>Lesson materials uploaded</label>
+      <label class="check"><input type="checkbox" disabled>Homework sent</label>
+      <label class="check"><input type="checkbox" disabled>Lesson notes completed</label>
+    </section>
+  </div>
+
+  <div class="section-title">Files & Resources</div>
+  <div class="grid">
+    <div class="card"><h2>Lecture Notes</h2><div class="placeholder">Connection comes after lesson identity test.</div></div>
+    <div class="card"><h2>Homework & Worksheets</h2><div class="placeholder">Connection comes after lesson identity test.</div></div>
+    <div class="card"><h2>Recording & Transcription</h2><div class="placeholder">Connection comes after lesson identity test.</div></div>
+  </div>
+</div>
+<script>
+const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
+let lessons=[];
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function fmt(d){
+  if(!d)return "—";
+  const x=new Date(d);
+  return x.toLocaleString(undefined,{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+}
+function inferStudent(title,subject){
+  let t=String(title||"").trim();
+  if(subject){
+    const rx=new RegExp("\\s*[-–—|:]?\\s*"+String(subject).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*$","i");
+    t=t.replace(rx,"").trim();
+  }
+  return t || "—";
+}
+function nearestLesson(items){
+  const now=Date.now();
+  return [...items].filter(x=>x.start).sort((a,b)=>Math.abs(new Date(a.start)-now)-Math.abs(new Date(b.start)-now))[0];
+}
+function show(id){
+  const l=lessons.find(x=>x.id===id);
+  if(!l)return;
+  document.getElementById("student").textContent=inferStudent(l.title,l.subject);
+  document.getElementById("subject").textContent=l.subject||"—";
+  document.getElementById("when").textContent=fmt(l.start);
+  document.getElementById("status").textContent=`Selected lesson: ${l.status||"Scheduled"}`;
+}
+async function init(){
+  const sel=document.getElementById("lesson");
+  try{
+    const r=await fetch(API+"/tutoring-lessons");
+    const d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.error||"Could not load lessons");
+    lessons=d.lessons||[];
+    if(!lessons.length){sel.innerHTML="<option>No lessons found</option>";return}
+    lessons.sort((a,b)=>new Date(a.start)-new Date(b.start));
+    sel.innerHTML=lessons.map(l=>`<option value="${esc(l.id)}">${esc(inferStudent(l.title,l.subject))} · ${esc(l.subject||"Lesson")} · ${esc(fmt(l.start))}</option>`).join("");
+    const q=new URLSearchParams(location.search).get("lessonId");
+    const chosen=lessons.find(x=>x.id===q)||nearestLesson(lessons);
+    if(chosen){sel.value=chosen.id;show(chosen.id)}
+    sel.onchange=()=>show(sel.value);
+  }catch(e){
+    sel.innerHTML="<option>Could not load lessons</option>";
+    document.getElementById("status").textContent=e.message;
+  }
+}
+init();
+</script>
+</body>
+</html>
