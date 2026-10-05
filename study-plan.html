@@ -617,6 +617,29 @@ h2{
   .work-save{grid-column:1/-1}
 }
 
+
+/* Work month calendar */
+.work-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.work-weekday-label{
+  padding:8px 6px;border-right:1px solid #ECEAE6;border-bottom:1px solid #ECEAE6;
+  background:#F8F7F4;text-align:center;font-size:10px;text-transform:uppercase;
+  letter-spacing:.07em;color:var(--muted);font-weight:650
+}
+.work-weekday-label:nth-child(7){border-right:0}
+.work-day{min-height:112px;border-right:1px solid #ECEAE6;border-bottom:1px solid #ECEAE6}
+.work-day:nth-child(7n){border-right:0}
+.work-day.outside-month{background:#FBFAF8}
+.work-day.outside-month .work-dom{color:#B7B2AB}
+.work-day.outside-month .work-chip{opacity:.55}
+.work-dayhead{border-bottom:0;margin-bottom:5px;padding-bottom:2px}
+.work-dow{display:none}
+.work-dom{font-size:14px;font-family:inherit;font-weight:650}
+@media(max-width:720px){
+  .work-calendar{display:grid;grid-template-columns:repeat(7,minmax(74px,1fr));overflow-x:auto}
+  .work-day{min-height:105px;border-right:1px solid #ECEAE6;border-bottom:1px solid #ECEAE6}
+  .work-day:nth-child(7n){border-right:0}
+}
+
 </style>
 </head>
 <body>
@@ -743,11 +766,11 @@ h2{
     <section class="panel lessons-panel">
       <div class="work-weekbar">
         <div class="work-weeknav">
-          <button id="workPrevWeek" class="work-navbtn" type="button" aria-label="Previous week">‹</button>
+          <button id="workPrevWeek" class="work-navbtn" type="button" aria-label="Previous month">‹</button>
           <div id="workWeekLabel" class="work-weeklabel">This week</div>
-          <button id="workNextWeek" class="work-navbtn" type="button" aria-label="Next week">›</button>
+          <button id="workNextWeek" class="work-navbtn" type="button" aria-label="Next month">›</button>
         </div>
-        <button id="toggleDeadlineForm" class="work-addbtn" type="button">+ Add deadline</button>
+        <button id="toggleDeadlineForm" class="work-addbtn" type="button">+ Add Work</button>
       </div>
 
       <form id="deadlineForm" class="work-form">
@@ -1035,9 +1058,10 @@ function mondayFor(date){
   d.setDate(d.getDate()-day);
   return d;
 }
-function selectedWeekStart(){
-  const d=mondayFor(new Date());
-  d.setDate(d.getDate()+workWeekOffset*7);
+function selectedMonthDate(){
+  const d=new Date();
+  d.setDate(1);
+  d.setMonth(d.getMonth()+workWeekOffset);
   return d;
 }
 function renderSubjectOptions(){
@@ -1061,27 +1085,37 @@ function renderWork(){
     $("workHistory").innerHTML='<span class="empty">Select a student to load work history.</span>';
     return;
   }
-  const mine=deadlines.filter(d=>d.studentPageId===studentId).filter(isStudentWork);
-  const weekStart=selectedWeekStart();
-  const weekEnd=new Date(weekStart); weekEnd.setDate(weekEnd.getDate()+6);
-  $("workWeekLabel").textContent=weekStart.toLocaleDateString(undefined,{month:"short",day:"numeric"})+" – "+weekEnd.toLocaleDateString(undefined,{month:"short",day:"numeric"});
-  const todayKey=ymd(new Date());
 
-  $("workCalendar").innerHTML=Array.from({length:7},(_,i)=>{
-    const day=new Date(weekStart); day.setDate(day.getDate()+i);
-    const key=ymd(day);
+  const mine=deadlines.filter(d=>d.studentPageId===studentId).filter(isStudentWork);
+  const month=selectedMonthDate();
+  const year=month.getFullYear(), monthIndex=month.getMonth();
+  $("workWeekLabel").textContent=month.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+
+  const first=new Date(year,monthIndex,1);
+  const gridStart=mondayFor(first);
+  const last=new Date(year,monthIndex+1,0);
+  const gridEnd=new Date(last);
+  const sundayOffset=(7-((gridEnd.getDay()+6)%7)-1);
+  gridEnd.setDate(gridEnd.getDate()+sundayOffset);
+
+  const todayKey=ymd(new Date());
+  const weekdayNames=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  let html=weekdayNames.map(x=>`<div class="work-weekday-label">${x}</div>`).join("");
+
+  for(let day=new Date(gridStart);day<=gridEnd;day.setDate(day.getDate()+1)){
+    const current=new Date(day);
+    const key=ymd(current);
     const items=mine.filter(d=>String(d.dueDate||"").slice(0,10)===key)
       .sort((a,b)=>(a.title||"").localeCompare(b.title||""));
-    return `<div class="work-day ${key===todayKey?"today":""}">
-      <div class="work-dayhead">
-        <div class="work-dow">${day.toLocaleDateString(undefined,{weekday:"short"})}</div>
-        <div class="work-dom">${day.getDate()}</div>
-      </div>
-      ${items.length?items.map(workChip).join(""):'<div class="work-emptyday">—</div>'}
+    const outside=current.getMonth()!==monthIndex;
+    html+=`<div class="work-day ${key===todayKey?"today":""} ${outside?"outside-month":""}">
+      <div class="work-dayhead"><div class="work-dom">${current.getDate()}</div></div>
+      ${items.length?items.map(workChip).join(""):""}
     </div>`;
-  }).join("");
+  }
+  $("workCalendar").innerHTML=html;
 
-  const today=mondayFor(new Date()); today.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
   const history=mine.filter(d=>{
     const dd=localDateFromDateOnly(d.dueDate);
     return (d.status||"").toLowerCase()==="done" || (dd && dd<today);
@@ -1090,6 +1124,7 @@ function renderWork(){
     const db=localDateFromDateOnly(b.dueDate)?.getTime()||0;
     return db-da;
   });
+
   $("workHistory").innerHTML=history.length?history.map(d=>{
     const dd=localDateFromDateOnly(d.dueDate);
     const label=dd?dd.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}):"";
