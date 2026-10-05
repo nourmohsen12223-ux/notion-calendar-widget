@@ -994,6 +994,9 @@ body {
 const API_URL =
   "https://notion-calendar-api.nourmohsen12223.workers.dev/tutoring-lessons";
 
+const DEADLINES_API_URL =
+  "https://notion-calendar-api.nourmohsen12223.workers.dev/upcoming-data";
+
 /*
   Calendar runs from:
 
@@ -1289,80 +1292,51 @@ function escapeHTML(value) {
 
 function parseLesson(item) {
 
-  if (
-    item.student ||
-    item.subject ||
-    item.grade
-  ) {
-
-    return {
-
-      student:
-        item.student ||
-        "Student",
-
-      subject:
-        item.subject || "",
-
-      grade:
-        item.grade || ""
-
-    };
-  }
-
-
-  const raw =
+  const rawTitle =
     String(
       item.title || ""
-    );
-
-
-  const firstLine =
-    raw
-      .split(/\r?\n/)[0]
-      .trim();
-
-
-  const nameMatch =
-    firstLine.match(
-      /^([^,]+),\s*([^(]+)/
-    );
-
+    ).trim();
 
   let student =
-    firstLine;
+    item.student || "";
 
+  let subject =
+    item.subject || "";
 
-  if (nameMatch) {
+  let grade =
+    item.grade || "";
 
-    student =
-      nameMatch[2].trim() +
-      " " +
-      nameMatch[1].trim();
+  if (
+    !student &&
+    rawTitle
+  ) {
 
-  } else {
+    const parts =
+      rawTitle.split(
+        /\s+[—–-]\s+/
+      );
 
-    student =
-      student
-        .replace(
-          /\s*\(Private Lesson\).*$/i,
-          ""
-        )
-        .trim();
+    if (
+      parts.length >= 2
+    ) {
+
+      student =
+        parts.shift().trim();
+
+      if (
+        !subject
+      ) {
+
+        subject =
+          parts.join(" — ").trim();
+      }
+
+    } else {
+
+      student =
+        rawTitle;
+    }
   }
-
-
-  const subjectMatch =
-    raw.match(
-      /Subject:\s*([^\r\n]+)/i
-    );
-
-
-  const gradeMatch =
-    raw.match(
-      /Grade:\s*([^\r\n]+)/i
-    );
-
 
   return {
 
@@ -1371,14 +1345,10 @@ function parseLesson(item) {
       "Student",
 
     subject:
-      subjectMatch
-        ? subjectMatch[1].trim()
-        : "",
+      subject || "",
 
     grade:
-      gradeMatch
-        ? gradeMatch[1].trim()
-        : ""
+      grade || ""
 
   };
 }
@@ -1987,6 +1957,27 @@ function renderLessons() {
         );
 
 
+      if (
+        item.notionUrl
+      ) {
+
+        lesson.title =
+          "Open lesson in Notion";
+
+        lesson.addEventListener(
+          "click",
+          () => {
+
+            window.open(
+              item.notionUrl,
+              "_blank",
+              "noopener,noreferrer"
+            );
+          }
+        );
+      }
+
+
       lesson.innerHTML =
         `
           <div class="lesson-name">
@@ -2195,6 +2186,46 @@ function renderUpcoming() {
       .join(
         ""
       );
+
+
+  container
+    .querySelectorAll(
+      "[data-notion-url]"
+    )
+    .forEach(
+      element => {
+
+        const openLesson =
+          () => {
+
+            window.open(
+              element.dataset.notionUrl,
+              "_blank",
+              "noopener,noreferrer"
+            );
+          };
+
+        element.addEventListener(
+          "click",
+          openLesson
+        );
+
+        element.addEventListener(
+          "keydown",
+          event => {
+
+            if (
+              event.key === "Enter" ||
+              event.key === " "
+            ) {
+
+              event.preventDefault();
+              openLesson();
+            }
+          }
+        );
+      }
+    );
 }
 
 
@@ -2397,59 +2428,75 @@ async function loadData() {
 
   try {
 
-    const response =
-      await fetch(
-        API_URL,
-        {
-          cache:
-            "no-store"
-        }
-      );
+    const [
+      lessonsResponse,
+      deadlinesResponse
+    ] =
+      await Promise.all([
+        fetch(
+          API_URL,
+          {
+            cache:
+              "no-store"
+          }
+        ),
 
+        fetch(
+          DEADLINES_API_URL,
+          {
+            cache:
+              "no-store"
+          }
+        )
+      ]);
 
     if (
-      !response.ok
+      !lessonsResponse.ok
     ) {
 
       throw new Error(
-        "Unable to load tutoring data."
+        "Unable to load tutoring lessons."
       );
     }
 
-
-    const data =
-      await response.json();
-
+    const lessonsData =
+      await lessonsResponse.json();
 
     tutoringLessons =
       Array.isArray(
-        data.tutoring
+        lessonsData.lessons
       )
-        ? data.tutoring
+        ? lessonsData.lessons
         : [];
 
+    if (
+      deadlinesResponse.ok
+    ) {
 
-    deadlines =
-      Array.isArray(
-        data.deadlines
-      )
-        ? data.deadlines
-        : [];
+      const deadlinesData =
+        await deadlinesResponse.json();
 
+      deadlines =
+        Array.isArray(
+          deadlinesData.deadlines
+        )
+          ? deadlinesData.deadlines
+          : [];
+
+    } else {
+
+      deadlines = [];
+    }
 
     renderCalendar();
-
     renderUpcoming();
-
     renderDeadlines();
-
 
   } catch (error) {
 
     console.error(
       error
     );
-
 
     document
       .getElementById(
@@ -2461,6 +2508,8 @@ async function loadData() {
             Unable to load lessons
           </div>
         `;
+
+    renderDeadlines();
   }
 }
 
