@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student Dashboard</title>
+<style>
+:root{
+  --text:#37352F;--muted:#8F8B84;--border:#DDDAD5;--soft:#F7F6F3;
+  --soft2:#EEEAE4;--white:#FFFFFF;--accent:#D8D2CA;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:transparent;color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{padding:2px}
+.wrap{max-width:1200px;margin:auto;display:grid;gap:12px}
+.panel{background:var(--white);border:1px solid var(--border);border-radius:16px}
+.profile{padding:20px;display:flex;align-items:center;gap:18px}
+.avatar{width:66px;height:66px;border-radius:50%;background:var(--soft2);display:grid;place-items:center;font:700 22px Georgia,serif;flex:0 0 auto}
+.profile-main{min-width:0;flex:1}
+.name{font:700 28px Georgia,serif;margin:0 0 9px}
+.tags{display:flex;gap:7px;flex-wrap:wrap}
+.tag{background:var(--soft);border-radius:9px;padding:6px 10px;font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;background:var(--soft);color:var(--text);padding:10px 13px;border-radius:10px;text-decoration:none;font-size:13px;cursor:pointer}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{padding:17px 18px;min-height:180px}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.title{font:700 20px Georgia,serif}
+.note{font-size:11px;color:var(--muted)}
+.row{display:grid;grid-template-columns:50px 1fr 18px;gap:12px;align-items:center;padding:11px 0;border-top:1px solid #EEECE8;cursor:pointer}
+.row:first-of-type{border-top:0}
+.date{background:var(--soft);border-radius:10px;text-align:center;padding:6px 3px}
+.mon{font-size:9px;color:var(--muted);text-transform:uppercase}.day{font-size:18px;font-weight:700}
+.rtitle{font-size:13px;font-weight:600}.meta{font-size:10px;color:var(--muted);margin-top:4px}.chev{color:var(--muted)}
+.empty{color:var(--muted);font-size:12px;padding:18px 0}
+.lower{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.simple{padding:17px 18px}
+.simple p{font-size:12px;color:var(--muted);line-height:1.55;margin:8px 0 0}
+.placeholder{background:var(--soft);border-radius:10px;padding:13px;margin-top:10px;font-size:12px;color:var(--muted)}
+.error{padding:16px;color:#6F6A63}
+@media(max-width:700px){.grid2,.lower{grid-template-columns:1fr}.profile{align-items:flex-start}.actions{width:100%}.profile{flex-wrap:wrap}.name{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="panel profile">
+    <div class="avatar" id="avatar">ST</div>
+    <div class="profile-main">
+      <h1 class="name" id="studentName">Student</h1>
+      <div class="tags" id="tags"></div>
+    </div>
+    <div class="actions">
+      <a class="btn" id="chatBtn" target="_blank" rel="noopener" hidden>Open Google Chat ↗</a>
+      <a class="btn" id="notionBtn" target="_blank" rel="noopener" hidden>View in Notion ↗</a>
+    </div>
+  </section>
+
+  <div class="grid2">
+    <section class="panel card">
+      <div class="head"><div class="title">Upcoming Lessons</div><div class="note">Next 4</div></div>
+      <div id="lessons"><div class="empty">Loading…</div></div>
+    </section>
+    <section class="panel card">
+      <div class="head"><div class="title">Upcoming Deadlines</div><div class="note">Upcoming</div></div>
+      <div id="deadlines"><div class="empty">Loading…</div></div>
+    </section>
+  </div>
+
+  <div class="lower">
+    <section class="panel simple">
+      <div class="title">Progress & Current Focus</div>
+      <div class="placeholder">Ready for your Progress / Current Focus properties when we add them to Students.</div>
+    </section>
+    <section class="panel simple">
+      <div class="title">Topics Covered & Long-Term Plan</div>
+      <div class="placeholder">Ready for your Topics Covered / Long-Term Plan data when we connect those fields.</div>
+    </section>
+  </div>
+</div>
+
+<script>
+const BASE="https://notion-calendar-api.nourmohsen12223.workers.dev";
+const qs=new URLSearchParams(location.search);
+const requestedId=qs.get("studentId");
+const requestedName=qs.get("student");
+
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const initials=name=>name.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join("").toUpperCase()||"ST";
+const month=d=>d.toLocaleDateString("en-US",{month:"short"}).toUpperCase();
+const day=d=>d.getDate();
+const time=d=>d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+
+function openRow(url){ if(url) window.open(url,"_blank","noopener,noreferrer"); }
+function dateRow(item,date,title,meta){
+  const u=item.notionUrl||"";
+  return `<div class="row" ${u?`data-url="${esc(u)}" tabindex="0"`:""}>
+    <div class="date"><div class="mon">${esc(month(date))}</div><div class="day">${day(date)}</div></div>
+    <div><div class="rtitle">${esc(title)}</div><div class="meta">${esc(meta)}</div></div>
+    <div class="chev">›</div>
+  </div>`;
+}
+function bindRows(){
+  document.querySelectorAll("[data-url]").forEach(el=>{
+    el.onclick=()=>openRow(el.dataset.url);
+    el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openRow(el.dataset.url)}};
+  });
+}
+
+async function load(){
+  try{
+    const [sr,lr,dr]=await Promise.all([
+      fetch(BASE+"/tutoring-students",{cache:"no-store"}),
+      fetch(BASE+"/tutoring-lessons",{cache:"no-store"}),
+      fetch(BASE+"/tutoring-deadlines",{cache:"no-store"})
+    ]);
+    const [sd,ld,dd]=await Promise.all([sr.json(),lr.json(),dr.json()]);
+    if(!sr.ok||!sd.success) throw new Error(sd.error||"Unable to load students.");
+
+    const students=sd.students||[];
+    let student=students.find(s=>requestedId&&s.id===requestedId);
+    if(!student&&requestedName) student=students.find(s=>s.name.toLowerCase()===requestedName.toLowerCase());
+    if(!student&&students.length===1) student=students[0];
+
+    if(!student){
+      document.getElementById("studentName").textContent="Choose a student";
+      document.getElementById("avatar").textContent="ST";
+      document.getElementById("tags").innerHTML='<span class="tag">Add ?student=Student%20Name to the widget URL</span>';
+      document.getElementById("lessons").innerHTML='<div class="empty">No student selected</div>';
+      document.getElementById("deadlines").innerHTML='<div class="empty">No student selected</div>';
+      return;
+    }
+
+    document.getElementById("studentName").textContent=student.name;
+    document.getElementById("avatar").textContent=initials(student.name);
+    document.getElementById("tags").innerHTML=[
+      student.grade?`<span class="tag">${esc("Grade "+student.grade)}</span>`:"",
+      ...(student.subjects||[]).map(s=>`<span class="tag">${esc(s)}</span>`)
+    ].join("");
+    if(student.googleChat){const b=document.getElementById("chatBtn");b.href=student.googleChat;b.hidden=false}
+    if(student.notionUrl){const b=document.getElementById("notionBtn");b.href=student.notionUrl;b.hidden=false}
+
+    const now=new Date();
+    const lessons=(ld.lessons||[]).filter(x=>x.studentPageId===student.id&&x.start&&new Date(x.start)>=now)
+      .sort((a,b)=>new Date(a.start)-new Date(b.start)).slice(0,4);
+    document.getElementById("lessons").innerHTML=lessons.length?lessons.map(x=>{
+      const d=new Date(x.start);
+      return dateRow(x,d,x.subject||x.title||"Lesson",`${time(d)}${x.status?" · "+x.status:""}`);
+    }).join(""):'<div class="empty">No upcoming lessons</div>';
+
+    const deadlines=(dd.deadlines||[]).filter(x=>x.studentPageId===student.id&&x.dueDate&&new Date(x.dueDate)>=now&&String(x.status||"").toLowerCase()!=="done")
+      .sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate)).slice(0,4);
+    document.getElementById("deadlines").innerHTML=deadlines.length?deadlines.map(x=>{
+      const d=new Date(x.dueDate);
+      return dateRow(x,d,x.title||"Deadline",[x.subject,x.type,x.status].filter(Boolean).join(" · "));
+    }).join(""):'<div class="empty">No upcoming deadlines</div>';
+    bindRows();
+  }catch(e){
+    document.body.innerHTML=`<div class="panel error">Unable to load student dashboard: ${esc(e.message)}</div>`;
+  }
+}
+load();
+setInterval(load,5*60*1000);
+</script>
+</body>
+</html>
