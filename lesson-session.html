@@ -1,496 +1,5412 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Lesson Session</title>
-<style>
-:root{
-  --ink:#37352F;
-  --muted:#8F8B84;
-  --line:#DDDAD5;
-  --card:#FFFFFF;
-  --soft:#F7F6F3;
-  --green:#8BAF98;
+import { connect } from "cloudflare:sockets";
+
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    /* =========================
+   SCHEDULE SYNC API
+========================= */
+
+if (url.pathname === "/schedule-data") {
+
+    if (request.method === "GET") {
+
+        const data = await env.SCHEDULE_KV.get("daily-schedule");
+
+        return new Response(
+            data || JSON.stringify({
+                date: "",
+                tasks: [],
+                schedule: {}
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin":
+                        "https://nourmohsen12223-ux.github.io",
+                    "Cache-Control": "no-store"
+                }
+            }
+        );
+    }
+
+    if (request.method === "POST") {
+
+        const data = await request.json();
+
+        await env.SCHEDULE_KV.put(
+            "daily-schedule",
+            JSON.stringify(data)
+        );
+
+        return new Response(
+            JSON.stringify({ success: true }),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin":
+                        "https://nourmohsen12223-ux.github.io",
+                    "Cache-Control": "no-store"
+                }
+            }
+        );
+    }
+
+    if (request.method === "OPTIONS") {
+
+        return new Response(null, {
+            headers: {
+                "Access-Control-Allow-Origin":
+                    "https://nourmohsen12223-ux.github.io",
+                "Access-Control-Allow-Methods":
+                    "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers":
+                    "Content-Type"
+            }
+        });
+    }
 }
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  min-height:100%;
-  background:#FFFFFF;
-}
-*{box-sizing:border-box}
-body{
-  color:var(--ink);
-  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  overflow-x:hidden;
-}
-.wrap{
-  width:100%;
-  max-width:none;
-  margin:0;
-  padding:0;
-  background:#FFFFFF;
-}
-.top{
-  width:100%;
-  margin:0 0 16px 0;
-  padding:16px;
-  background:#FFFFFF;
-  border:1px solid var(--line);
-  border-radius:14px;
-}
-.eyebrow{
-  margin-bottom:7px;
-  font-size:10px;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.11em;
-  color:var(--muted);
-}
-select{
-  width:100%;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#FFFFFF;
-  color:var(--ink);
-  padding:10px 12px;
-  font:inherit;
-  font-size:14px;
-}
-.meta{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-top:11px;
-}
-.meta-card{
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:10px 12px;
-  background:#FFFFFF;
-}
-.meta-label{
-  font-size:10px;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.11em;
-  color:var(--muted);
-}
-.meta-value{
-  margin-top:4px;
-  font-size:14px;
-  font-weight:600;
-  color:var(--ink);
-}
-.section-title{
-  width:100%;
-  margin:0 0 14px 0;
-  padding:16px 20px;
-  border-radius:12px;
-  background:#F7F6F3;
-  color:var(--ink);
-  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  font-size:20px;
-  line-height:1.2;
-  font-weight:650;
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  width:100%;
-  margin:0 0 18px 0;
-  padding:0;
-}
-.card{
-  background:#FFFFFF;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:16px;
-}
-.card h2{
-  margin:0 0 13px 0;
-  color:var(--ink);
-  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  font-size:16px;
-  line-height:1.25;
-  font-weight:650;
-}
-.check{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:9px 0;
-  border-bottom:1px solid #EEEDEB;
-  font-size:14px;
-  line-height:1.35;
-}
-.check:last-child{border-bottom:0}
-.check input{
-  width:17px;
-  height:17px;
-  flex:0 0 17px;
-  accent-color:var(--green);
-}
-.topic-row{
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-  padding:9px 0;
-  border-bottom:1px solid #EEEDEB;
-  font-size:14px;
-  line-height:1.35;
-}
-.topic-row:last-child{border-bottom:0}
-.topic-row input{
-  width:17px;
-  height:17px;
-  flex:0 0 17px;
-  margin-top:1px;
-  accent-color:var(--green);
-}
-.topic-done{color:var(--muted)}
-.topic-done .topic-name{text-decoration:line-through}
-.placeholder{
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.55;
-}
-.status{
-  margin-top:9px;
-  color:var(--muted);
-  font-size:12px;
-}
-@media(max-width:760px){
-  .grid,.meta{grid-template-columns:1fr}
-  .top,.card{border-radius:12px}
-  .section-title{padding:14px 16px}
+/* =========================
+   DAILY TO-DO SYNC API
+========================= */
+
+if (url.pathname === "/todo-data") {
+
+    if (request.method === "GET") {
+
+        const data = await env.SCHEDULE_KV.get("daily-todo");
+
+        return new Response(
+            data || JSON.stringify({
+                date: "",
+                todos: []
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin":
+                        "https://nourmohsen12223-ux.github.io",
+                    "Cache-Control": "no-store"
+                }
+            }
+        );
+    }
+
+
+    if (request.method === "POST") {
+
+        const data = await request.json();
+
+        await env.SCHEDULE_KV.put(
+            "daily-todo",
+            JSON.stringify(data)
+        );
+
+        return new Response(
+            JSON.stringify({ success: true }),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin":
+                        "https://nourmohsen12223-ux.github.io",
+                    "Cache-Control": "no-store"
+                }
+            }
+        );
+    }
+
+
+    if (request.method === "OPTIONS") {
+
+        return new Response(null, {
+            headers: {
+                "Access-Control-Allow-Origin":
+                    "https://nourmohsen12223-ux.github.io",
+                "Access-Control-Allow-Methods":
+                    "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers":
+                    "Content-Type"
+            }
+        });
+    }
 }
 
-.file-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
-.upload-btn{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-height:34px;padding:7px 11px;border:1px solid var(--line);
-  border-radius:9px;background:#fff;color:var(--ink);
-  font-size:12px;font-weight:600;cursor:pointer;
+    const corsHeaders = {
+      "Access-Control-Allow-Origin":
+        "https://nourmohsen12223-ux.github.io",
+      "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    };
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: corsHeaders });
+    }
+/* =========================
+   PRAYERS SYNC API
+========================= */
+
+if (url.pathname === "/prayers-data") {
+
+    if (request.method === "GET") {
+
+        const data = await env.SCHEDULE_KV.get("daily-prayers");
+
+        return new Response(
+            data || JSON.stringify({
+                date: "",
+                prayers: {}
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin":
+                        "https://nourmohsen12223-ux.github.io",
+                    "Cache-Control": "no-store"
+                }
+            }
+        );
+    }
+
+
+    if (request.method === "POST") {
+
+        const data = await request.json();
+
+        await env.SCHEDULE_KV.put(
+            "daily-prayers",
+            JSON.stringify(data)
+        );
+
+        return new Response(
+            JSON.stringify({ success: true }),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin":
+                        "https://nourmohsen12223-ux.github.io",
+                    "Cache-Control": "no-store"
+                }
+            }
+        );
+    }
+
+
+    if (request.method === "OPTIONS") {
+
+        return new Response(null, {
+            headers: {
+                "Access-Control-Allow-Origin":
+                    "https://nourmohsen12223-ux.github.io",
+                "Access-Control-Allow-Methods":
+                    "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers":
+                    "Content-Type"
+            }
+        });
+    }
 }
-.upload-btn:hover{background:var(--soft)}
-.upload-btn.busy{opacity:.55;pointer-events:none}
-.file-input{display:none}
-.file-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
-.file-link{
-  display:flex;align-items:center;gap:7px;width:100%;
-  padding:8px 9px;border:1px solid #EEEDEB;border-radius:8px;
-  color:var(--ink);text-decoration:none;font-size:12px;line-height:1.3;
-  background:#fff;overflow:hidden;
+/* =========================
+   ANGHAMI MUSIC API
+========================= */
+
+if (url.pathname === "/music-data") {
+
+    const PROFILE_URL =
+        "https://play.anghami.com/profile/62680320";
+
+    try {
+
+        const response = await fetch(PROFILE_URL, {
+            headers: {
+                "User-Agent":
+                    "Mozilla/5.0 (compatible; NouryNotionWidget/1.0)"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("Could not load Anghami profile");
+        }
+
+        const html = await response.text();
+
+        return new Response(
+            JSON.stringify({
+                success: true,
+                profile: "Nour Mohsen",
+                profileId: "62680320",
+                source: PROFILE_URL,
+                html: html
+            }),
+            {
+                headers: {
+                    "Content-Type":
+                        "application/json; charset=UTF-8",
+
+                    "Access-Control-Allow-Origin":
+                        "https://nourmohsen12223-ux.github.io",
+
+                    "Cache-Control":
+                        "public, max-age=300"
+                }
+            }
+        );
+
+    } catch (error) {
+
+        return new Response(
+            JSON.stringify({
+                success: false,
+                error: "Unable to load Anghami music."
+            }),
+            {
+                status: 500,
+
+                headers: {
+                    "Content-Type":
+                        "application/json",
+
+                    "Access-Control-Allow-Origin":
+                        "https://nourmohsen12223-ux.github.io"
+                }
+            }
+        );
+    }
 }
-.file-link span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.file-link:hover{background:var(--soft)}
-.upload-note{margin-top:7px;color:var(--muted);font-size:10px;line-height:1.4}
+    /* =====================================================
+     *      GOOGLE OAUTH
+     *   ===================================================== */
+
+    if (url.pathname === "/oauth/start") {
+      const redirectUri =
+        "https://notion-calendar-api.nourmohsen12223.workers.dev/oauth/callback";
+
+      const authUrl = new URL(
+        "https://accounts.google.com/o/oauth2/v2/auth"
+      );
+
+      authUrl.searchParams.set("client_id", env.GOOGLE_CLIENT_ID);
+      authUrl.searchParams.set("redirect_uri", redirectUri);
+      authUrl.searchParams.set("response_type", "code");
+
+      authUrl.searchParams.set(
+        "scope",
+        [
+          "https://www.googleapis.com/auth/calendar.readonly",
+          "https://www.googleapis.com/auth/gmail.readonly"
+        ].join(" ")
+      );
+
+      authUrl.searchParams.set("access_type", "offline");
+      authUrl.searchParams.set("prompt", "consent");
+      authUrl.searchParams.set("include_granted_scopes", "true");
+
+      return Response.redirect(authUrl.toString(), 302);
+    }
+
+    if (url.pathname === "/oauth/callback") {
+      const code = url.searchParams.get("code");
+
+      if (!code) {
+        return textResponse(
+          "Authorization code was not received.",
+          400
+        );
+      }
+
+      const redirectUri =
+        "https://notion-calendar-api.nourmohsen12223.workers.dev/oauth/callback";
+
+      try {
+        const response = await fetch(
+          "https://oauth2.googleapis.com/token",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+              code,
+              client_id: env.GOOGLE_CLIENT_ID,
+              client_secret: env.GOOGLE_CLIENT_SECRET,
+              redirect_uri: redirectUri,
+              grant_type: "authorization_code"
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error_description ||
+            data.error ||
+            "Google authorization failed."
+          );
+        }
+
+        return textResponse(
+`GOOGLE AUTHORIZATION SUCCESSFUL
+
+Save this directly into GOOGLE_REFRESH_TOKEN in Cloudflare.
+
+REFRESH TOKEN:
+
+${data.refresh_token || "No refresh token returned."}`
+        );
+
+      } catch (error) {
+        return textResponse(
+          "Google OAuth error: " + error.message,
+          500
+        );
+      }
+    }
+
+    /* =====================================================
+     *      MICROSOFT OAUTH
+     *   ===================================================== */
+
+    if (url.pathname === "/outlook/start") {
+      const redirectUri =
+        "https://notion-calendar-api.nourmohsen12223.workers.dev/outlook/callback";
+
+      const authUrl = new URL(
+        "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
+      );
+
+      authUrl.searchParams.set(
+        "client_id",
+        env.OUTLOOK_CLIENT_ID
+      );
+
+      authUrl.searchParams.set(
+        "response_type",
+        "code"
+      );
+
+      authUrl.searchParams.set(
+        "redirect_uri",
+        redirectUri
+      );
+
+      authUrl.searchParams.set(
+        "response_mode",
+        "query"
+      );
+
+      authUrl.searchParams.set(
+        "scope",
+        "openid profile offline_access Mail.Read"
+      );
+
+      authUrl.searchParams.set(
+        "prompt",
+        "consent"
+      );
+
+      return Response.redirect(authUrl.toString(), 302);
+    }
+
+    if (url.pathname === "/outlook/callback") {
+      const code = url.searchParams.get("code");
+
+      if (!code) {
+        return textResponse(
+          "Microsoft authorization code was not received.",
+          400
+        );
+      }
+
+      const redirectUri =
+        "https://notion-calendar-api.nourmohsen12223.workers.dev/outlook/callback";
+
+      try {
+        const response = await fetch(
+          "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+              client_id: env.OUTLOOK_CLIENT_ID,
+              client_secret: env.OUTLOOK_CLIENT_SECRET,
+              code,
+              redirect_uri: redirectUri,
+              grant_type: "authorization_code",
+              scope:
+                "openid profile offline_access Mail.Read"
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error_description ||
+            data.error ||
+            "Microsoft authorization failed."
+          );
+        }
+
+        return textResponse(
+`MICROSOFT AUTHORIZATION SUCCESSFUL
+
+Save this directly into OUTLOOK_REFRESH_TOKEN in Cloudflare.
+
+REFRESH TOKEN:
+
+${data.refresh_token || "No refresh token returned."}`
+        );
+
+      } catch (error) {
+        return textResponse(
+          "Microsoft OAuth error: " + error.message,
+          500
+        );
+      }
+    }
+
+    /* =====================================================
+     *      SECURED COMBINED INBOX
+     *   ===================================================== */
+
+    
+    const mailPathPrefix = "/mail/";
+    const isInboxQueryRoute = url.pathname === "/inbox";
+    const isInboxPathRoute =
+      url.pathname.startsWith(mailPathPrefix);
+
+    if (isInboxQueryRoute || isInboxPathRoute) {
+      /*
+       * SECURITY CHECK
+       *
+       * /inbox continues to support:
+       *   /inbox?key=PRIVATE_KEY
+       *
+       * Notion can use:
+       *   /mail/PRIVATE_KEY
+       *
+       * No email provider is contacted until
+       * the supplied key has been validated.
+       */
+
+      const suppliedKey = isInboxQueryRoute
+  ? (url.searchParams.get("key") || "")
+  : "";
+
+const suppliedFingerprint = isInboxPathRoute
+  ? url.pathname.slice(mailPathPrefix.length).toLowerCase()
+  : "";
+
+const valid = isInboxQueryRoute
+  ? await secureCompare(
+      suppliedKey,
+      env.INBOX_API_KEY || ""
+    )
+  : await secureFingerprintCompare(
+      suppliedFingerprint,
+      env.INBOX_API_KEY || ""
+    );
+      
+
+      if (!valid) {
+        return new Response(
+          renderUnauthorized(),
+          {
+            status: 401,
+            headers: {
+              "Content-Type":
+                "text/html; charset=UTF-8",
+              "Cache-Control":
+                "no-store",
+              "Referrer-Policy":
+                "no-referrer",
+              "X-Content-Type-Options":
+                "nosniff"
+            }
+          }
+        );
+      }
+
+      const results =
+        await Promise.allSettled([
+          getGmailMessages(env),
+          getOutlookMessages(env),
+          getICloudMessages(env)
+        ]);
+
+      const gmail =
+        results[0].status === "fulfilled"
+          ? results[0].value
+          : [];
+
+      const outlook =
+        results[1].status === "fulfilled"
+          ? results[1].value
+          : [];
+
+      const icloud =
+        results[2].status === "fulfilled"
+          ? results[2].value
+          : [];
+
+      const errors = [];
+
+      if (results[0].status === "rejected") {
+        console.error("Gmail:", results[0].reason);
+        errors.push("Gmail");
+      }
+
+      if (results[1].status === "rejected") {
+        console.error("Outlook:", results[1].reason);
+        errors.push("Outlook");
+      }
+
+      if (results[2].status === "rejected") {
+        console.error("iCloud:", results[2].reason);
+        errors.push("iCloud");
+      }
+
+      const all = [
+        ...gmail,
+        ...outlook,
+        ...icloud
+      ].sort(
+        (a, b) =>
+          b.timestamp - a.timestamp
+      );
+
+      return new Response(
+        renderInbox(
+          all,
+          gmail,
+          outlook,
+          icloud,
+          errors
+        ),
+        {
+          headers: {
+            "Content-Type":
+              "text/html; charset=UTF-8",
+            "Cache-Control":
+              "private, no-store, max-age=0",
+            "Pragma":
+              "no-cache",
+            "Referrer-Policy":
+              "no-referrer",
+            "X-Content-Type-Options":
+              "nosniff"
+          }
+        }
+      );
+    }
+/* =====================================================
+ *      TEMPORARY GOOGLE CALENDAR LIST
+ * ===================================================== */
+
+if (url.pathname === "/calendar-list") {
+  try {
+    const accessToken = await getGoogleAccessToken(env);
+
+    const response = await fetch(
+      "https://www.googleapis.com/calendar/v3/users/me/calendarList",
+      {
+        headers: {
+          Authorization: "Bearer " + accessToken
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error?.message ||
+        "Unable to retrieve calendars."
+      );
+    }
+
+    const calendars = (data.items || []).map(calendar => ({
+      name: calendar.summary,
+      id: calendar.id,
+      primary: calendar.primary || false
+    }));
+
+    return jsonResponse(
+      { calendars },
+      200,
+      corsHeaders
+    );
+
+  } catch (error) {
+    return jsonResponse(
+      {
+        error:
+          error.message ||
+          "Unable to retrieve calendar list."
+      },
+      500,
+      corsHeaders
+    );
+  }
+}
+    /* =====================================================
+     *      GOOGLE CALENDAR
+     *   ===================================================== */
+/* =====================================================
+ *      UPCOMING DATA
+ * ===================================================== */
+
+/* =========================================================
+ *  TUTORING LESSONS — READ FROM NOTION
+ * ========================================================= */
+
+
+/* =========================================================
+ *  TUTORING STUDENTS — SAFE READ FROM NOTION
+ * ========================================================= */
+
+if (url.pathname === "/tutoring-students") {
+  try {
+    if (!env.NOTION_TOKEN || !env.STUDENTS_DATABASE_ID) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Notion students configuration missing."
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "no-store"
+          }
+        }
+      );
+    }
+
+    let allStudents = [];
+    let cursor = null;
+
+    do {
+      const body = {
+        page_size: 100,
+        sorts: [
+          {
+            property: "Student Name",
+            direction: "ascending"
+          }
+        ]
+      };
+
+      if (cursor) body.start_cursor = cursor;
+
+      const notionResponse = await fetch(
+        `https://api.notion.com/v1/databases/${env.STUDENTS_DATABASE_ID}/query`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${env.NOTION_TOKEN}`,
+            "Notion-Version": "2022-06-28",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        }
+      );
+
+      const notionData = await notionResponse.json();
+
+      if (!notionResponse.ok) {
+        throw new Error(
+          notionData.message || "Could not read Students database."
+        );
+      }
+
+      allStudents.push(...(notionData.results || []));
+      cursor = notionData.has_more ? notionData.next_cursor : null;
+    } while (cursor);
+
+    const students = allStudents.map(page => {
+      const properties = page.properties || {};
+
+      const name = (properties["Student Name"]?.title || [])
+        .map(item => item.plain_text || "")
+        .join("")
+        .trim();
+
+      const grade = properties["Grade"]?.select?.name || "";
+
+      const subjects = (properties["Subject"]?.multi_select || [])
+        .map(item => item.name)
+        .filter(Boolean);
+
+      const status = properties["Status"]?.status?.name || "";
+
+      return {
+        id: page.id,
+        name,
+        grade,
+        subjects,
+        status,
+        googleChat: properties["Google Chat"]?.url || null,
+        notionUrl: page.url || null
+      };
+    });
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        count: students.length,
+        students
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-store"
+        }
+      }
+    );
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message || "Could not load tutoring students."
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-store"
+        }
+      }
+    );
+  }
+}
+
+/* =========================================================
+ *  STUDY PLAN EMBED PROXY — CLEAN NOTION-EMBED API
+ *
+ *  The public GitHub widget calls these Cloudflare endpoints.
+ *  The private STUDY_PLAN_EMBED_TOKEN stays only in Cloudflare.
+ * ========================================================= */
+if (url.pathname === "/study-plan-embed-students") {
+  const embedCors = {
+    "Access-Control-Allow-Origin": "https://nourmohsen12223-ux.github.io",
+    "Access-Control-Allow-Methods": "GET, PATCH, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Cache-Control": "no-store"
+  };
+
+  if (request.method === "OPTIONS") {
+    return new Response(null, { headers: embedCors });
+  }
+
+  if (!["GET", "PATCH"].includes(request.method)) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Method not allowed." }),
+      { status: 405, headers: { ...embedCors, "Content-Type": "application/json" } }
+    );
+  }
+
+  const internalUrl = new URL(request.url);
+  internalUrl.pathname = "/study-plan-students";
+
+  const headers = new Headers(request.headers);
+  headers.set("Authorization", `Bearer ${env.STUDY_PLAN_EMBED_TOKEN || ""}`);
+
+  const internalRequest = new Request(internalUrl.toString(), {
+    method: request.method,
+    headers,
+    body: request.method === "GET" ? undefined : request.body
+  });
+
+  const response = await this.fetch(internalRequest, env);
+  return new Response(response.body, {
+    status: response.status,
+    headers: { ...embedCors, "Content-Type": "application/json" }
+  });
+}
+
+
+/* ==========================================
+   LESSON SESSION — FILTERED TOPICS
+   Dedicated read-only endpoint
+========================================== */
+if (url.pathname === "/lesson-session-topics") {
+  const topicCors = {
+    "Access-Control-Allow-Origin": "https://nourmohsen12223-ux.github.io",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Cache-Control": "no-store"
+  };
+
+  if (request.method === "OPTIONS") {
+    return new Response(null, { headers: topicCors });
+  }
+
+  if (request.method !== "GET") {
+    return new Response(
+      JSON.stringify({ success: false, error: "Method not allowed." }),
+      { status: 405, headers: { ...topicCors, "Content-Type": "application/json" } }
+    );
+  }
+
+  try {
+    const studentPageId = (url.searchParams.get("studentPageId") || "").trim();
+    if (!studentPageId) throw new Error("studentPageId is required.");
+    if (!env.NOTION_TOKEN || !env.STUDY_PLAN_DATABASE_ID) {
+      throw new Error("Study Plan configuration is missing.");
+    }
+
+    const notionHeaders = {
+      Authorization: `Bearer ${env.NOTION_TOKEN}`,
+      "Notion-Version": "2022-06-28",
+      "Content-Type": "application/json"
+    };
+
+    let results = [];
+    let cursor = null;
+
+    do {
+      const body = {
+        page_size: 100,
+        filter: {
+          property: "Student",
+          relation: { contains: studentPageId }
+        },
+        sorts: [{ property: "Order", direction: "ascending" }]
+      };
+      if (cursor) body.start_cursor = cursor;
+
+      const r = await fetch(
+        `https://api.notion.com/v1/databases/${env.STUDY_PLAN_DATABASE_ID}/query`,
+        {
+          method: "POST",
+          headers: notionHeaders,
+          body: JSON.stringify(body)
+        }
+      );
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.message || "Could not read Study Plan.");
+
+      results.push(...(d.results || []));
+      cursor = d.has_more ? d.next_cursor : null;
+    } while (cursor);
+
+    const topics = results.map(page => {
+      const p = page.properties || {};
+      return {
+        id: page.id,
+        topic: (p["Topic"]?.title || [])
+          .map(x => x.plain_text || "")
+          .join("")
+          .trim(),
+        weeks: (p["Weeks"]?.multi_select || []).map(x => x.name).filter(Boolean),
+        completed: !!p["Completed"]?.checkbox,
+        order: typeof p["Order"]?.number === "number" ? p["Order"].number : 0
+      };
+    });
+
+    return new Response(
+      JSON.stringify({ success: true, studentPageId, count: topics.length, topics }),
+      { headers: { ...topicCors, "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error.message || "Could not load topics." }),
+      {
+        status: 500,
+        headers: { ...topicCors, "Content-Type": "application/json" }
+      }
+    );
+  }
+}
+
+if (url.pathname === "/study-plan-embed") {
+  const embedCors = {
+    "Access-Control-Allow-Origin": "https://nourmohsen12223-ux.github.io",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Cache-Control": "no-store"
+  };
+
+  if (request.method === "OPTIONS") {
+    return new Response(null, { headers: embedCors });
+  }
+
+  /* Direct GET for Lesson Session / Student Dashboard.
+     This avoids a recursive Worker fetch, which can surface as
+     "Failed to fetch" in the GitHub Pages iframe. */
+  if (request.method === "GET") {
+    try {
+      if (!env.NOTION_TOKEN || !env.STUDY_PLAN_DATABASE_ID) {
+        throw new Error("Study Plan Notion configuration missing.");
+      }
+
+      const studentPageId = (url.searchParams.get("studentPageId") || "").trim();
+      if (!studentPageId) {
+        return new Response(
+          JSON.stringify({ success: false, error: "studentPageId is required." }),
+          { status: 400, headers: { ...embedCors, "Content-Type": "application/json" } }
+        );
+      }
+
+      const notionHeaders = {
+        Authorization: `Bearer ${env.NOTION_TOKEN}`,
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json"
+      };
+
+      let pages = [];
+      let cursor = null;
+
+      do {
+        const body = {
+          page_size: 100,
+          filter: { property: "Student", relation: { contains: studentPageId } },
+          sorts: [{ property: "Order", direction: "ascending" }]
+        };
+        if (cursor) body.start_cursor = cursor;
+
+        const r = await fetch(
+          `https://api.notion.com/v1/databases/${env.STUDY_PLAN_DATABASE_ID}/query`,
+          { method: "POST", headers: notionHeaders, body: JSON.stringify(body) }
+        );
+        const d = await r.json();
+
+        if (!r.ok) {
+          throw new Error(d.message || "Could not read Study Plan database.");
+        }
+
+        pages.push(...(d.results || []));
+        cursor = d.has_more ? d.next_cursor : null;
+      } while (cursor);
+
+      const topics = pages.map(page => {
+        const p = page.properties || {};
+        return {
+          id: page.id,
+          topic: (p["Topic"]?.title || [])
+            .map(x => x.plain_text || "")
+            .join("")
+            .trim(),
+          weeks: (p["Weeks"]?.multi_select || []).map(x => x.name).filter(Boolean),
+          completed: Boolean(p["Completed"]?.checkbox),
+          order: typeof p["Order"]?.number === "number" ? p["Order"].number : 0
+        };
+      });
+
+      return new Response(
+        JSON.stringify({ success: true, studentPageId, count: topics.length, topics }),
+        { headers: { ...embedCors, "Content-Type": "application/json" } }
+      );
+    } catch (error) {
+      return new Response(
+        JSON.stringify({ success: false, error: error.message || "Study Plan API error." }),
+        {
+          status: 500,
+          headers: { ...embedCors, "Content-Type": "application/json" }
+        }
+      );
+    }
+  }
+
+  /* Keep the existing authenticated proxy for write operations. */
+  const internalUrl = new URL(request.url);
+  internalUrl.pathname = "/study-plan";
+
+  const headers = new Headers(request.headers);
+  headers.set("Authorization", `Bearer ${env.STUDY_PLAN_EMBED_TOKEN || ""}`);
+
+  const internalRequest = new Request(internalUrl.toString(), {
+    method: request.method,
+    headers,
+    body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body
+  });
+
+  const response = await this.fetch(internalRequest, env);
+  return new Response(response.body, {
+    status: response.status,
+    headers: { ...embedCors, "Content-Type": "application/json" }
+  });
+}
+
+/* =========================================================
+ *  STUDY PLAN STUDENTS — AUTHENTICATED SAFE LIST
+ * ========================================================= */
+if (url.pathname === "/study-plan-students") {
+  const studentCors = {
+    "Access-Control-Allow-Origin": "https://nourmohsen12223-ux.github.io",
+    "Access-Control-Allow-Methods": "GET, PATCH, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Cache-Control": "no-store"
+  };
+
+  if (request.method === "OPTIONS") {
+    return new Response(null, { headers: studentCors });
+  }
+
+  try {
+    if (!env.NOTION_TOKEN || !env.STUDENTS_DATABASE_ID) {
+      throw new Error("Students Notion configuration missing.");
+    }
+    if (!env.STUDY_PLAN_EMBED_TOKEN) {
+      throw new Error("Study Plan embed token is missing.");
+    }
+
+    const authHeader = request.headers.get("Authorization") || "";
+    const suppliedToken = authHeader.startsWith("Bearer ")
+      ? authHeader.slice(7).trim()
+      : "";
+
+    const authorized = await secureCompare(
+      suppliedToken,
+      env.STUDY_PLAN_EMBED_TOKEN
+    );
+
+    if (!authorized) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized." }),
+        { status: 401, headers: { ...studentCors, "Content-Type": "application/json" } }
+      );
+    }
+
+    const notionHeaders = {
+      Authorization: `Bearer ${env.NOTION_TOKEN}`,
+      "Notion-Version": "2022-06-28",
+      "Content-Type": "application/json"
+    };
+
+    if (request.method === "PATCH") {
+      const body = await request.json().catch(() => ({}));
+      const studentPageId = String(body.studentPageId || "").trim();
+      const hasGoogleChat = Object.prototype.hasOwnProperty.call(body, "googleChat");
+      const hasStudentNotes = Object.prototype.hasOwnProperty.call(body, "studentNotes");
+      const googleChat = hasGoogleChat ? String(body.googleChat || "").trim() : "";
+      const studentNotes = hasStudentNotes ? String(body.studentNotes || "") : "";
+
+      if (!studentPageId) {
+        return new Response(
+          JSON.stringify({ success: false, error: "studentPageId is required." }),
+          { status: 400, headers: { ...studentCors, "Content-Type": "application/json" } }
+        );
+      }
+
+      if (hasGoogleChat && googleChat && !/^https?:\/\//i.test(googleChat)) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Google Chat must be a valid http(s) link." }),
+          { status: 400, headers: { ...studentCors, "Content-Type": "application/json" } }
+        );
+      }
+
+      const properties = {};
+      if (hasGoogleChat) properties["Google Chat"] = { url: googleChat || null };
+      if (hasStudentNotes) {
+        properties["Student Notes"] = {
+          rich_text: studentNotes
+            ? [{ type: "text", text: { content: studentNotes } }]
+            : []
+        };
+      }
+
+      if (!Object.keys(properties).length) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Nothing to update." }),
+          { status: 400, headers: { ...studentCors, "Content-Type": "application/json" } }
+        );
+      }
+
+      const response = await fetch(
+        `https://api.notion.com/v1/pages/${studentPageId}`,
+        {
+          method: "PATCH",
+          headers: notionHeaders,
+          body: JSON.stringify({ properties })
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Could not update Google Chat.");
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          studentPageId,
+          ...(hasGoogleChat ? { googleChat: googleChat || null } : {}),
+          ...(hasStudentNotes ? { studentNotes } : {})
+        }),
+        { headers: { ...studentCors, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (request.method !== "GET") {
+      return new Response(
+        JSON.stringify({ success: false, error: "Method not allowed." }),
+        { status: 405, headers: { ...studentCors, "Content-Type": "application/json" } }
+      );
+    }
+
+    let pages = [];
+    let cursor = null;
+    do {
+      const body = {
+        page_size: 100,
+        sorts: [{ property: "Student Name", direction: "ascending" }]
+      };
+      if (cursor) body.start_cursor = cursor;
+
+      const response = await fetch(
+        `https://api.notion.com/v1/databases/${env.STUDENTS_DATABASE_ID}/query`,
+        {
+          method: "POST",
+          headers: notionHeaders,
+          body: JSON.stringify(body)
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Could not read Students database.");
+      }
+      pages.push(...(data.results || []));
+      cursor = data.has_more ? data.next_cursor : null;
+    } while (cursor);
+
+    const students = pages.map(page => {
+      const p = page.properties || {};
+      return {
+        id: page.id,
+        name: (p["Student Name"]?.title || []).map(x => x.plain_text || "").join("").trim(),
+        grade: p["Grade"]?.select?.name || "",
+        subjects: (p["Subject"]?.multi_select || []).map(x => x.name).filter(Boolean),
+        status: p["Status"]?.status?.name || "",
+        googleChat: p["Google Chat"]?.url || null,
+        studentNotes: (p["Student Notes"]?.rich_text || []).map(x => x.plain_text || "").join("")
+      };
+    }).filter(student => student.name);
+
+    return new Response(
+      JSON.stringify({ success: true, count: students.length, students }),
+      { headers: { ...studentCors, "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error.message || "Could not load students." }),
+      { status: 500, headers: { ...studentCors, "Content-Type": "application/json" } }
+    );
+  }
+}
+
+/* =========================================================
+ *  STUDY PLAN — NOTION READ / WRITE
+ * ========================================================= */
+if (url.pathname === "/study-plan") {
+  const studyCors = {
+    "Access-Control-Allow-Origin": "https://nourmohsen12223-ux.github.io",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Cache-Control": "no-store"
+  };
+  if (request.method === "OPTIONS") return new Response(null, { headers: studyCors });
+  try {
+    if (!env.NOTION_TOKEN || !env.STUDY_PLAN_DATABASE_ID) throw new Error("Study Plan Notion configuration missing.");
+    if (!env.STUDY_PLAN_EMBED_TOKEN) throw new Error("Study Plan embed token is missing.");
+
+    const authHeader = request.headers.get("Authorization") || "";
+    const suppliedToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+    const authorized = await secureCompare(suppliedToken, env.STUDY_PLAN_EMBED_TOKEN);
+
+    if (!authorized) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized." }),
+        {
+          status: 401,
+          headers: { ...studyCors, "Content-Type": "application/json" }
+        }
+      );
+    }
+    const notionHeaders = { Authorization: `Bearer ${env.NOTION_TOKEN}`, "Notion-Version": "2022-06-28", "Content-Type": "application/json" };
+
+    if (request.method === "GET") {
+      const studentPageId = (url.searchParams.get("studentPageId") || "").trim();
+      if (!studentPageId) return new Response(JSON.stringify({success:false,error:"studentPageId is required."}), {status:400,headers:{...studyCors,"Content-Type":"application/json"}});
+      let pages=[], cursor=null;
+      do {
+        const body={page_size:100,filter:{property:"Student",relation:{contains:studentPageId}},sorts:[{property:"Order",direction:"ascending"}]};
+        if(cursor) body.start_cursor=cursor;
+        const r=await fetch(`https://api.notion.com/v1/databases/${env.STUDY_PLAN_DATABASE_ID}/query`,{method:"POST",headers:notionHeaders,body:JSON.stringify(body)});
+        const d=await r.json(); if(!r.ok) throw new Error(d.message||"Could not read Study Plan database.");
+        pages.push(...(d.results||[])); cursor=d.has_more?d.next_cursor:null;
+      } while(cursor);
+      const topics=pages.map(page=>{const p=page.properties||{};return {id:page.id,topic:(p["Topic"]?.title||[]).map(x=>x.plain_text||"").join("").trim(),weeks:(p["Weeks"]?.multi_select||[]).map(x=>x.name).filter(Boolean),completed:Boolean(p["Completed"]?.checkbox),order:typeof p["Order"]?.number==="number"?p["Order"].number:0};});
+      return new Response(JSON.stringify({success:true,studentPageId,count:topics.length,topics}),{headers:{...studyCors,"Content-Type":"application/json"}});
+    }
+
+    if (request.method === "POST") {
+      const body=await request.json(); const studentPageId=String(body.studentPageId||"").trim(); const topic=String(body.topic||"").trim();
+      if(!studentPageId||!topic||topic.length>200) return new Response(JSON.stringify({success:false,error:"Valid studentPageId and topic (1–200 characters) are required."}),{status:400,headers:{...studyCors,"Content-Type":"application/json"}});
+      const q=await fetch(`https://api.notion.com/v1/databases/${env.STUDY_PLAN_DATABASE_ID}/query`,{method:"POST",headers:notionHeaders,body:JSON.stringify({page_size:100,filter:{property:"Student",relation:{contains:studentPageId}},sorts:[{property:"Order",direction:"descending"}]})});
+      const qd=await q.json(); if(!q.ok) throw new Error(qd.message||"Could not calculate Study Plan order.");
+      const highest=(qd.results||[]).map(x=>x.properties?.["Order"]?.number).filter(x=>typeof x==="number").reduce((m,x)=>Math.max(m,x),0);
+      const r=await fetch("https://api.notion.com/v1/pages",{method:"POST",headers:notionHeaders,body:JSON.stringify({parent:{database_id:env.STUDY_PLAN_DATABASE_ID},properties:{"Topic":{title:[{text:{content:topic}}]},"Student":{relation:[{id:studentPageId}]},"Weeks":{multi_select:[]},"Completed":{checkbox:false},"Order":{number:highest+1}}})});
+      const d=await r.json(); if(!r.ok) throw new Error(d.message||"Could not create Study Plan topic.");
+      return new Response(JSON.stringify({success:true,topic:{id:d.id,topic,weeks:[],completed:false,order:highest+1}}),{status:201,headers:{...studyCors,"Content-Type":"application/json"}});
+    }
+
+    if (request.method === "PATCH") {
+      const body=await request.json(), id=String(body.id||"").trim(); if(!id) return new Response(JSON.stringify({success:false,error:"Topic page id is required."}),{status:400,headers:{...studyCors,"Content-Type":"application/json"}});
+      const properties={};
+      if(Object.prototype.hasOwnProperty.call(body,"weeks")){const weeks=Array.isArray(body.weeks)?body.weeks.map(x=>String(x).trim()).filter(Boolean):[];if(weeks.some(w=>!/^Week [1-9][0-9]{0,2}$/.test(w)))return new Response(JSON.stringify({success:false,error:"weeks must be an array such as [\"Week 1\", \"Week 2\"]."}),{status:400,headers:{...studyCors,"Content-Type":"application/json"}});properties["Weeks"]={multi_select:[...new Set(weeks)].map(name=>({name}))};}
+      if(Object.prototype.hasOwnProperty.call(body,"completed")) properties["Completed"]={checkbox:Boolean(body.completed)};
+      if(Object.prototype.hasOwnProperty.call(body,"order")){const o=Number(body.order);if(!Number.isFinite(o))return new Response(JSON.stringify({success:false,error:"order must be a number."}),{status:400,headers:{...studyCors,"Content-Type":"application/json"}});properties["Order"]={number:o};}
+      if(Object.prototype.hasOwnProperty.call(body,"topic")){const t=String(body.topic||"").trim();if(!t||t.length>200)return new Response(JSON.stringify({success:false,error:"topic must contain 1–200 characters."}),{status:400,headers:{...studyCors,"Content-Type":"application/json"}});properties["Topic"]={title:[{text:{content:t}}]};}
+      if(!Object.keys(properties).length) return new Response(JSON.stringify({success:false,error:"No Study Plan changes supplied."}),{status:400,headers:{...studyCors,"Content-Type":"application/json"}});
+      const r=await fetch(`https://api.notion.com/v1/pages/${encodeURIComponent(id)}`,{method:"PATCH",headers:notionHeaders,body:JSON.stringify({properties})}); const d=await r.json(); if(!r.ok) throw new Error(d.message||"Could not update Study Plan topic.");
+      return new Response(JSON.stringify({success:true,id:d.id}),{headers:{...studyCors,"Content-Type":"application/json"}});
+    }
+
+    if (request.method === "DELETE") {
+      const id=(url.searchParams.get("id")||"").trim(); if(!id) return new Response(JSON.stringify({success:false,error:"Topic page id is required."}),{status:400,headers:{...studyCors,"Content-Type":"application/json"}});
+      const r=await fetch(`https://api.notion.com/v1/pages/${encodeURIComponent(id)}`,{method:"PATCH",headers:notionHeaders,body:JSON.stringify({archived:true})}); const d=await r.json(); if(!r.ok) throw new Error(d.message||"Could not remove Study Plan topic.");
+      return new Response(JSON.stringify({success:true,id}),{headers:{...studyCors,"Content-Type":"application/json"}});
+    }
+    return new Response(JSON.stringify({success:false,error:"Method not allowed."}),{status:405,headers:{...studyCors,"Content-Type":"application/json"}});
+  } catch(error) {
+    return new Response(JSON.stringify({success:false,error:error.message||"Study Plan API error."}),{status:500,headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"https://nourmohsen12223-ux.github.io","Cache-Control":"no-store"}});
+  }
+}
+
+
+/* ==========================================
+   LESSON SESSION — DIRECT FILE UPLOADS
+   Lecture Notes / Homework & Worksheets
+   Notion Direct Upload, up to 20 MB per file
+========================================== */
+if (url.pathname === "/tutoring-lesson-files") {
+  const fileCors = {
+    "Access-Control-Allow-Origin": "https://nourmohsen12223-ux.github.io",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Cache-Control": "no-store"
+  };
+
+  if (request.method === "OPTIONS") {
+    return new Response(null, { headers: fileCors });
+  }
+
+  if (request.method !== "POST") {
+    return new Response(
+      JSON.stringify({ success: false, error: "Method not allowed." }),
+      { status: 405, headers: { ...fileCors, "Content-Type": "application/json" } }
+    );
+  }
+
+  try {
+    if (!env.NOTION_TOKEN) throw new Error("Notion token is missing.");
+
+    const form = await request.formData();
+    const lessonId = String(form.get("lessonId") || "").trim();
+    const category = String(form.get("category") || "").trim();
+
+    const propertyMap = {
+      lectureNotes: "Lecture Notes",
+      homeworkWorksheets: "Homework & Worksheets"
+    };
+    const propertyName = propertyMap[category];
+
+    if (!lessonId || !propertyName) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Valid lessonId and category are required." }),
+        { status: 400, headers: { ...fileCors, "Content-Type": "application/json" } }
+      );
+    }
+
+    const files = form.getAll("files").filter(v => v && typeof v === "object" && "arrayBuffer" in v);
+    if (!files.length) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Choose at least one file." }),
+        { status: 400, headers: { ...fileCors, "Content-Type": "application/json" } }
+      );
+    }
+
+    for (const file of files) {
+      if (file.size > 20 * 1024 * 1024) {
+        return new Response(
+          JSON.stringify({ success: false, error: `${file.name} is larger than 20 MB.` }),
+          { status: 400, headers: { ...fileCors, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    const notionHeaders = {
+      Authorization: `Bearer ${env.NOTION_TOKEN}`,
+      "Notion-Version": "2026-03-11"
+    };
+
+    const uploaded = [];
+
+    for (const file of files) {
+      const createRes = await fetch("https://api.notion.com/v1/file_uploads", {
+        method: "POST",
+        headers: { ...notionHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "single_part",
+          filename: file.name,
+          content_type: file.type || "application/octet-stream"
+        })
+      });
+      const created = await createRes.json();
+      if (!createRes.ok) throw new Error(created.message || `Could not prepare ${file.name}.`);
+
+      const sendForm = new FormData();
+      sendForm.append("file", file, file.name);
+
+      const sendRes = await fetch(
+        `https://api.notion.com/v1/file_uploads/${encodeURIComponent(created.id)}/send`,
+        {
+          method: "POST",
+          headers: notionHeaders,
+          body: sendForm
+        }
+      );
+      const sent = await sendRes.json();
+      if (!sendRes.ok) throw new Error(sent.message || `Could not upload ${file.name}.`);
+
+      uploaded.push({
+        type: "file_upload",
+        file_upload: { id: created.id },
+        name: file.name
+      });
+    }
+
+    /* This sets the selected upload batch as the files for this category.
+       The widget supports selecting multiple files in one upload. */
+    const attachRes = await fetch(
+      `https://api.notion.com/v1/pages/${encodeURIComponent(lessonId)}`,
+      {
+        method: "PATCH",
+        headers: { ...notionHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          properties: {
+            [propertyName]: {
+              type: "files",
+              files: uploaded
+            }
+          }
+        })
+      }
+    );
+    const attached = await attachRes.json();
+    if (!attachRes.ok) throw new Error(attached.message || "Could not attach files to the lesson.");
+
+    const savedFiles = (attached.properties?.[propertyName]?.files || []).map(item => ({
+      name: item.name || "File",
+      url: item.file?.url || item.external?.url || null
+    }));
+
+    return new Response(
+      JSON.stringify({ success: true, lessonId, category, files: savedFiles }),
+      { headers: { ...fileCors, "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error.message || "File upload failed." }),
+      { status: 500, headers: { ...fileCors, "Content-Type": "application/json" } }
+    );
+  }
+}
+
+if (url.pathname === "/tutoring-lessons") {
+
+  try {
+
+    /* -----------------------------------------
+       LESSON SESSION — SAVE TOPICS COVERED
+    ----------------------------------------- */
+    if (request.method === "PATCH") {
+      if (!env.NOTION_TOKEN || !env.LESSONS_DATABASE_ID) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Notion lessons configuration missing." }),
+          {
+            status: 500,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "https://nourmohsen12223-ux.github.io",
+              "Cache-Control": "no-store"
+            }
+          }
+        );
+      }
+
+      const body = await request.json().catch(() => ({}));
+      const lessonId = String(body.lessonId || "").trim();
+      const topicIds = Array.isArray(body.topicIds)
+        ? [...new Set(body.topicIds.map(id => String(id || "").trim()).filter(Boolean))]
+        : null;
+
+      const checklist = body.checklist && typeof body.checklist === "object"
+        ? body.checklist
+        : null;
+
+      if (!lessonId || (!topicIds && !checklist)) {
+        return new Response(
+          JSON.stringify({ success: false, error: "lessonId and either topicIds or checklist are required." }),
+          {
+            status: 400,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "https://nourmohsen12223-ux.github.io",
+              "Cache-Control": "no-store"
+            }
+          }
+        );
+      }
+
+      const notionResponse = await fetch(
+        `https://api.notion.com/v1/pages/${encodeURIComponent(lessonId)}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${env.NOTION_TOKEN}`,
+            "Notion-Version": "2022-06-28",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            properties: {
+              ...(topicIds ? {
+                "Topics Covered": {
+                  relation: topicIds.map(id => ({ id }))
+                }
+              } : {}),
+              ...(checklist ? {
+                "24 hour notice sent": { checkbox: !!checklist.notice24h },
+                "1 hour notice sent": { checkbox: !!checklist.notice1h },
+                "Attendance Taken": { checkbox: !!checklist.attendance },
+                "Homework sent": { checkbox: !!checklist.homeworkSent },
+                "Lesson Notes sent": { checkbox: !!checklist.lessonNotesSent },
+                "Meeting Transcription saved": { checkbox: !!checklist.transcriptionSaved },
+                "Lesson Recording saved": { checkbox: !!checklist.recordingSaved },
+                "Lesson Materials uploaded": { checkbox: !!checklist.materialsUploaded }
+              } : {})
+            }
+          })
+        }
+      );
+
+      const notionData = await notionResponse.json();
+
+      if (!notionResponse.ok) {
+        throw new Error(
+          notionData.message || "Could not save Topics Covered."
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          lessonId,
+          ...(topicIds ? { topicsCoveredIds: topicIds } : {}),
+          ...(checklist ? { checklist } : {})
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "https://nourmohsen12223-ux.github.io",
+            "Cache-Control": "no-store"
+          }
+        }
+      );
+    }
+
+    if (!env.NOTION_TOKEN || !env.LESSONS_DATABASE_ID) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Notion configuration missing."
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+          }
+        }
+      );
+    }
+
+
+    /* -----------------------------------------
+       DATE RANGE
+
+       Optional:
+       ?start=2026-10-01T00:00:00Z
+       &end=2026-11-01T00:00:00Z
+
+       If omitted:
+       30 days back → 90 days forward
+    ----------------------------------------- */
+
+    const now = new Date();
+
+    const defaultStart =
+      new Date(
+        now.getTime() -
+        30 * 24 * 60 * 60 * 1000
+      );
+
+    const defaultEnd =
+      new Date(
+        now.getTime() +
+        90 * 24 * 60 * 60 * 1000
+      );
+
+
+    const requestedStart =
+      url.searchParams.get("start");
+
+    const requestedEnd =
+      url.searchParams.get("end");
+
+
+    const startDate =
+      requestedStart
+        ? new Date(requestedStart)
+        : defaultStart;
+
+    const endDate =
+      requestedEnd
+        ? new Date(requestedEnd)
+        : defaultEnd;
+
+
+    if (
+      Number.isNaN(startDate.getTime()) ||
+      Number.isNaN(endDate.getTime())
+    ) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Invalid date range."
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+          }
+        }
+      );
+    }
+
+
+    /* -----------------------------------------
+       QUERY NOTION
+    ----------------------------------------- */
+
+    let allLessons = [];
+    let cursor = null;
+
+
+    do {
+
+      const body = {
+        page_size: 100,
+
+        filter: {
+          and: [
+            {
+              property: "Date & time",
+              date: {
+                on_or_after:
+                  startDate.toISOString()
+              }
+            },
+            {
+              property: "Date & time",
+              date: {
+                before:
+                  endDate.toISOString()
+              }
+            }
+          ]
+        },
+
+        sorts: [
+          {
+            property: "Date & time",
+            direction: "ascending"
+          }
+        ]
+      };
+
+
+      if (cursor) {
+        body.start_cursor = cursor;
+      }
+
+
+      const notionResponse =
+        await fetch(
+          `https://api.notion.com/v1/databases/${env.LESSONS_DATABASE_ID}/query`,
+          {
+            method: "POST",
+
+            headers: {
+              Authorization:
+                `Bearer ${env.NOTION_TOKEN}`,
+
+              "Notion-Version":
+                "2022-06-28",
+
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify(body)
+          }
+        );
+
+
+      const notionData =
+        await notionResponse.json();
+
+
+      if (!notionResponse.ok) {
+        throw new Error(
+          notionData.message ||
+          "Could not read Lessons database."
+        );
+      }
+
+
+      allLessons.push(
+        ...(notionData.results || [])
+      );
+
+
+      cursor =
+        notionData.has_more
+          ? notionData.next_cursor
+          : null;
+
+
+    } while (cursor);
+
+
+    /* -----------------------------------------
+       CLEAN SAFE DATA FOR THE WIDGET
+
+       Deliberately NOT exposing:
+       - Zoom Link
+       - Google Event ID
+       - private lesson notes
+       - template/page contents
+    ----------------------------------------- */
+
+    const lessons =
+      allLessons.map(page => {
+
+        const properties =
+          page.properties || {};
+
+
+        const title =
+          (properties["Lesson"]
+            ?.title || [])
+            .map(item =>
+              item.plain_text || ""
+            )
+            .join("")
+            .trim();
+
+
+        const subject =
+          properties["Subject"]
+            ?.select
+            ?.name || "";
+
+
+        const status =
+          properties["Status"]
+            ?.status
+            ?.name || "";
+
+
+        const date =
+          properties["Date & time"]
+            ?.date || null;
+
+
+        const studentRelation =
+          properties["Student"]
+            ?.relation || [];
+
+
+        return {
+          id: page.id,
+
+          title: title,
+
+          subject: subject,
+
+          status: status,
+
+          start:
+            date?.start || null,
+
+          end:
+            date?.end || null,
+
+          studentPageId:
+            studentRelation[0]?.id ||
+            null,
+
+          topicsCoveredIds:
+            (properties["Topics Covered"]?.relation || [])
+              .map(item => item.id)
+              .filter(Boolean),
+
+          checklist: {
+            notice24h: !!properties["24 hour notice sent"]?.checkbox,
+            notice1h: !!properties["1 hour notice sent"]?.checkbox,
+            attendance: !!properties["Attendance Taken"]?.checkbox,
+            homeworkSent: !!properties["Homework sent"]?.checkbox,
+            lessonNotesSent: !!properties["Lesson Notes sent"]?.checkbox,
+            transcriptionSaved: !!properties["Meeting Transcription saved"]?.checkbox,
+            recordingSaved: !!properties["Lesson Recording saved"]?.checkbox,
+            materialsUploaded: !!properties["Lesson Materials uploaded"]?.checkbox
+          },
+
+          resources: {
+            lectureNotes: (properties["Lecture Notes"]?.files || []).map(item => ({
+              name: item.name || "File",
+              url: item.file?.url || item.external?.url || null
+            })),
+            homeworkWorksheets: (properties["Homework & Worksheets"]?.files || []).map(item => ({
+              name: item.name || "File",
+              url: item.file?.url || item.external?.url || null
+            }))
+          },
+
+          notionUrl:
+            page.url || null
+        };
+
+      });
+
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        count: lessons.length,
+        lessons: lessons
+      }),
+      {
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          "Access-Control-Allow-Origin":
+            "*",
+
+          "Cache-Control":
+            "no-store"
+        }
+      }
+    );
+
+
+  } catch (error) {
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error:
+          error.message ||
+          "Could not load tutoring lessons."
+      }),
+      {
+        status: 500,
+
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          "Access-Control-Allow-Origin":
+            "*"
+        }
+      }
+    );
+
+  }
+}
+/* =========================================================
+ *  TUTORING DEADLINES — READ FROM NOTION
+ * ========================================================= */
+
+if (url.pathname === "/tutoring-deadlines") {
+  try {
+    if (request.method === "POST") {
+      if (!env.NOTION_TOKEN || !env.DEADLINES_DATABASE_ID) {
+        return new Response(JSON.stringify({ success:false, error:"Notion deadlines configuration missing." }), {
+          status:500,
+          headers:{ "Content-Type":"application/json", "Access-Control-Allow-Origin":"*", "Cache-Control":"no-store" }
+        });
+      }
+
+      const body = await request.json().catch(() => ({}));
+      const title = String(body.title || "").trim();
+      const dueDate = String(body.dueDate || "").trim();
+      const type = String(body.type || "").trim();
+      const subject = String(body.subject || "").trim();
+      const studentPageId = String(body.studentPageId || "").trim();
+      const allowedTypes = ["Homework","Quiz","Exam","Assignment"];
+
+      if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate) || !studentPageId || !allowedTypes.includes(type)) {
+        return new Response(JSON.stringify({ success:false, error:"Title, valid date, student, and valid work type are required." }), {
+          status:400,
+          headers:{ "Content-Type":"application/json", "Access-Control-Allow-Origin":"*", "Cache-Control":"no-store" }
+        });
+      }
+
+      const properties = {
+        "Deadline": { title:[{ text:{ content:title } }] },
+        "Due Date": { date:{ start:dueDate } },
+        "Student": { relation:[{ id:studentPageId }] },
+        "Type": { select:{ name:type } },
+        "Status": { status:{ name:"Upcoming" } }
+      };
+      if (subject) properties["Subject"] = { select:{ name:subject } };
+
+      const notionResponse = await fetch("https://api.notion.com/v1/pages", {
+        method:"POST",
+        headers:{
+          Authorization:`Bearer ${env.NOTION_TOKEN}`,
+          "Notion-Version":"2022-06-28",
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          parent:{ database_id:env.DEADLINES_DATABASE_ID },
+          properties
+        })
+      });
+      const page = await notionResponse.json();
+      if (!notionResponse.ok) throw new Error(page.message || "Could not create deadline.");
+
+      return new Response(JSON.stringify({
+        success:true,
+        deadline:{
+          id:page.id,
+          title,
+          dueDate,
+          dueEnd:null,
+          subject,
+          type,
+          status:"Upcoming",
+          studentPageId,
+          lessonPageId:null,
+          notionUrl:page.url || ""
+        }
+      }), {
+        status:201,
+        headers:{ "Content-Type":"application/json", "Access-Control-Allow-Origin":"*", "Cache-Control":"no-store" }
+      });
+    }
+
+    if (!env.NOTION_TOKEN || !env.DEADLINES_DATABASE_ID) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Notion deadlines configuration missing."
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "no-store"
+          }
+        }
+      );
+    }
+
+    const now = new Date();
+    const defaultStart = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+    const defaultEnd = new Date(now.getTime() + 180 * 24 * 60 * 60 * 1000);
+
+    const requestedStart = url.searchParams.get("start");
+    const requestedEnd = url.searchParams.get("end");
+
+    const startDate = requestedStart ? new Date(requestedStart) : defaultStart;
+    const endDate = requestedEnd ? new Date(requestedEnd) : defaultEnd;
+
+    if (
+      Number.isNaN(startDate.getTime()) ||
+      Number.isNaN(endDate.getTime())
+    ) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Invalid date range."
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "no-store"
+          }
+        }
+      );
+    }
+
+    let allDeadlines = [];
+    let cursor = null;
+
+    do {
+      const body = {
+        page_size: 100,
+        filter: {
+          and: [
+            {
+              property: "Due Date",
+              date: {
+                on_or_after: startDate.toISOString()
+              }
+            },
+            {
+              property: "Due Date",
+              date: {
+                before: endDate.toISOString()
+              }
+            }
+          ]
+        },
+        sorts: [
+          {
+            property: "Due Date",
+            direction: "ascending"
+          }
+        ]
+      };
+
+      if (cursor) {
+        body.start_cursor = cursor;
+      }
+
+      const notionResponse = await fetch(
+        `https://api.notion.com/v1/databases/${env.DEADLINES_DATABASE_ID}/query`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${env.NOTION_TOKEN}`,
+            "Notion-Version": "2022-06-28",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        }
+      );
+
+      const notionData = await notionResponse.json();
+
+      if (!notionResponse.ok) {
+        throw new Error(
+          notionData.message ||
+          "Could not read Deadlines database."
+        );
+      }
+
+      allDeadlines.push(...(notionData.results || []));
+      cursor = notionData.has_more ? notionData.next_cursor : null;
+    } while (cursor);
+
+    const deadlines = await Promise.all(
+      allDeadlines.map(async page => {
+        const properties = page.properties || {};
+
+        const title = (properties["Deadline"]?.title || [])
+          .map(item => item.plain_text || "")
+          .join("")
+          .trim();
+
+        const dueDate = properties["Due Date"]?.date || null;
+        const subject = properties["Subject"]?.select?.name || "";
+        const type = properties["Type"]?.select?.name || "";
+        const status = properties["Status"]?.status?.name || "";
+        const studentRelation = properties["Student"]?.relation || [];
+        const lessonRelation = properties["Lesson"]?.relation || [];
+
+        const studentPageId = studentRelation[0]?.id || null;
+        let student = "";
+
+        if (studentPageId) {
+          try {
+            const studentResponse = await fetch(
+              `https://api.notion.com/v1/pages/${studentPageId}`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${env.NOTION_TOKEN}`,
+                  "Notion-Version": "2022-06-28",
+                  "Content-Type": "application/json"
+                }
+              }
+            );
+
+            const studentData = await studentResponse.json();
+
+            if (studentResponse.ok) {
+              student = (
+                studentData.properties?.["Student Name"]?.title || []
+              )
+                .map(item => item.plain_text || "")
+                .join("")
+                .trim();
+            }
+          } catch (error) {
+            console.error(
+              "Could not resolve deadline student:",
+              studentPageId,
+              error
+            );
+          }
+        }
+
+        return {
+          id: page.id,
+          title,
+          dueDate: dueDate?.start || null,
+          dueEnd: dueDate?.end || null,
+          subject,
+          type,
+          status,
+          student,
+          studentName: student,
+          studentPageId,
+          lessonPageId: lessonRelation[0]?.id || null,
+          notionUrl: page.url || null
+        };
+      })
+    );
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        count: deadlines.length,
+        deadlines
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-store"
+        }
+      }
+    );
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message || "Could not load tutoring deadlines."
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-store"
+        }
+      }
+    );
+  }
+}
+
+if (url.pathname === "/upcoming-data") {
+  try {
+    const accessToken = await getGoogleAccessToken(env);
+
+    // Exact Google Calendar IDs
+    const PERSONAL_CALENDAR =
+      "nourmohsen12223@gmail.com";
+
+    const DEPH_CALENDAR =
+      "c_3e61ae019fdaf52f6265d1a47656ae294c882afa5ebf32c030963fc55f44a90d@group.calendar.google.com";
+
+    const SOLOMON_TUTORING_CALENDAR =
+      "vve5u98nci5c36ku27a590vekcml9hdn@import.calendar.google.com";
+
+    // From now until 90 days from now
+    const now = new Date();
+    const future = new Date(
+      now.getTime() + 90 * 24 * 60 * 60 * 1000
+    );
+
+    async function getUpcomingEvents(
+      calendarId,
+      calendarName
+    ) {
+      const eventsURL = new URL(
+        "https://www.googleapis.com/calendar/v3/calendars/" +
+        encodeURIComponent(calendarId) +
+        "/events"
+      );
+
+      eventsURL.searchParams.set(
+        "timeMin",
+        now.toISOString()
+      );
+
+      eventsURL.searchParams.set(
+        "timeMax",
+        future.toISOString()
+      );
+
+      eventsURL.searchParams.set(
+        "singleEvents",
+        "true"
+      );
+
+      eventsURL.searchParams.set(
+        "orderBy",
+        "startTime"
+      );
+
+      eventsURL.searchParams.set(
+        "maxResults",
+        "100"
+      );
+
+      const response = await fetch(
+        eventsURL.toString(),
+        {
+          headers: {
+            Authorization:
+              "Bearer " + accessToken
+          }
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error?.message ||
+          "Unable to retrieve " +
+            calendarName +
+            " calendar."
+        );
+      }
+
+      return (data.items || [])
+        .filter(event => event.status !== "cancelled")
+        .map(event => ({
+          id: event.id,
+
+          title:
+            event.summary ||
+            "(Untitled)",
+
+          start:
+            event.start?.dateTime ||
+            event.start?.date ||
+            "",
+
+          end:
+            event.end?.dateTime ||
+            event.end?.date ||
+            "",
+
+          allDay:
+            Boolean(
+              event.start?.date &&
+              !event.start?.dateTime
+            ),
+
+          location:
+            event.location || "",
+
+          calendar:
+            calendarName
+        }));
+    }
+
+    const [
+      personalEvents,
+      dephEvents,
+      tutoringEvents
+    ] = await Promise.all([
+      getUpcomingEvents(
+        PERSONAL_CALENDAR,
+        "Personal"
+      ),
+
+      getUpcomingEvents(
+        DEPH_CALENDAR,
+        "DEPH Training"
+      ),
+
+      getUpcomingEvents(
+        SOLOMON_TUTORING_CALENDAR,
+        "Solomon Tutoring"
+      )
+    ]);
+
+    // Personal + DEPH become normal Events
+    const events = [
+      ...personalEvents,
+      ...dephEvents
+    ].sort((a, b) => {
+      return (
+        new Date(a.start) -
+        new Date(b.start)
+      );
+    });
+
+    // Solomon stays in its own Tutoring section
+    const tutoring = [
+      ...tutoringEvents
+    ].sort((a, b) => {
+      return (
+        new Date(a.start) -
+        new Date(b.start)
+      );
+    });
+
+    return jsonResponse(
+      {
+        events,
+        tutoring,
+
+        // These will be connected later
+        // to your Notion databases.
+        expenses: [],
+        deadlines: []
+      },
+      200,
+      {
+        ...corsHeaders,
+        "Cache-Control": "no-store"
+      }
+    );
+
+  } catch (error) {
+    return jsonResponse(
+      {
+        error:
+          error.message ||
+          "Unable to retrieve upcoming items."
+      },
+      500,
+      {
+        ...corsHeaders,
+        "Cache-Control": "no-store"
+      }
+    );
+  }
+}
+/* =====================================================
+   NOTION LESSONS CONNECTION TEST
+===================================================== */
+
+if (url.pathname === "/notion-lessons-test") {
+
+  try {
+
+    // Make sure the required Cloudflare variables exist
+    if (!env.NOTION_TOKEN) {
+      return new Response(
+        JSON.stringify(
+          {
+            success: false,
+            error: "NOTION_TOKEN is missing in Cloudflare."
+          },
+          null,
+          2
+        ),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store"
+          }
+        }
+      );
+    }
+
+    if (!env.LESSONS_DATABASE_ID) {
+      return new Response(
+        JSON.stringify(
+          {
+            success: false,
+            error: "LESSONS_DATABASE_ID is missing in Cloudflare."
+          },
+          null,
+          2
+        ),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store"
+          }
+        }
+      );
+    }
+
+
+    // Read the Lessons database from Notion
+    const notionResponse = await fetch(
+      `https://api.notion.com/v1/databases/${env.LESSONS_DATABASE_ID}`,
+      {
+        method: "GET",
+
+        headers: {
+          "Authorization": `Bearer ${env.NOTION_TOKEN}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+
+    const notionData = await notionResponse.json();
+
+
+    // Notion returned an error
+    if (!notionResponse.ok) {
+
+      return new Response(
+        JSON.stringify(
+          {
+            success: false,
+            status: notionResponse.status,
+            error:
+              notionData.message ||
+              "Notion could not access the Lessons database.",
+            code:
+              notionData.code ||
+              null
+          },
+          null,
+          2
+        ),
+        {
+          status: notionResponse.status,
+
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store"
+          }
+        }
+      );
+    }
+
+
+    // Only return the information we need.
+    // The Notion token is NEVER returned.
+    const properties = {};
+
+    for (
+      const [name, property]
+      of Object.entries(notionData.properties || {})
+    ) {
+
+      properties[name] = {
+        id: property.id,
+        type: property.type
+      };
+    }
+
+
+    const databaseTitle =
+      (notionData.title || [])
+        .map(item => item.plain_text || "")
+        .join("") ||
+      "Lessons";
+
+
+    return new Response(
+      JSON.stringify(
+        {
+          success: true,
+
+          database: {
+            id: notionData.id,
+            title: databaseTitle,
+            properties: properties
+          }
+        },
+        null,
+        2
+      ),
+      {
+        status: 200,
+
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff"
+        }
+      }
+    );
+
+
+  } catch (error) {
+
+    return new Response(
+      JSON.stringify(
+        {
+          success: false,
+          error:
+            error.message ||
+            "Unexpected Notion connection error."
+        },
+        null,
+        2
+      ),
+      {
+        status: 500,
+
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store"
+        }
+      }
+    );
+  }
+}
+/* =====================================================
+   SOLOMON → NOTION
+   STAGE 1 — ONE LESSON TEST
+===================================================== */
+
+/* =====================================================
+   SOLOMON → NOTION
+   STAGE 1 — TEMPLATE TEST
+===================================================== */
+
+
+
+    if (url.pathname === "/events") {
+      try {
+        const accessToken =
+          await getGoogleAccessToken(env);
+
+        const timeMin =
+          url.searchParams.get("timeMin");
+
+        const timeMax =
+          url.searchParams.get("timeMax");
+
+        if (!timeMin || !timeMax) {
+          return jsonResponse(
+            {
+              error:
+                "timeMin and timeMax are required."
+            },
+            400,
+            corsHeaders
+          );
+        }
+
+        const response = await fetch(
+          "https://www.googleapis.com/calendar/v3/users/me/calendarList",
+          {
+            headers: {
+              Authorization:
+                "Bearer " + accessToken
+            }
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error?.message ||
+            "Unable to retrieve calendars."
+          );
+        }
+
+        const calendars =
+          (data.items || []).filter(
+            calendar =>
+              calendar.selected !== false
+          );
+
+        const requests =
+          calendars.map(
+            async calendar => {
+              const eventsURL =
+                new URL(
+                  "https://www.googleapis.com/calendar/v3/calendars/" +
+                  encodeURIComponent(calendar.id) +
+                  "/events"
+                );
+
+              eventsURL.searchParams.set(
+                "timeMin",
+                timeMin
+              );
+
+              eventsURL.searchParams.set(
+                "timeMax",
+                timeMax
+              );
+
+              eventsURL.searchParams.set(
+                "singleEvents",
+                "true"
+              );
+
+              eventsURL.searchParams.set(
+                "orderBy",
+                "startTime"
+              );
+
+              eventsURL.searchParams.set(
+                "maxResults",
+                "2500"
+              );
+
+              const eventResponse =
+                await fetch(
+                  eventsURL.toString(),
+                  {
+                    headers: {
+                      Authorization:
+                        "Bearer " + accessToken
+                    }
+                  }
+                );
+
+              const eventData =
+                await eventResponse.json();
+
+              if (!eventResponse.ok) {
+                return [];
+              }
+
+              return (
+                eventData.items || []
+              ).map(
+                event => ({
+                  ...event,
+
+                  calendarName:
+                    calendar.summary,
+
+                  calendarColor:
+                    calendar.backgroundColor ||
+                    "#eeeeec",
+
+                  calendarTextColor:
+                    calendar.foregroundColor ||
+                    "#37352f"
+                })
+              );
+            }
+          );
+
+        const results =
+          await Promise.all(requests);
+
+        const events =
+          results.flat();
+
+        events.sort(
+          (a, b) => {
+            const first =
+              a.start?.dateTime ||
+              a.start?.date ||
+              "";
+
+            const second =
+              b.start?.dateTime ||
+              b.start?.date ||
+              "";
+
+            return (
+              new Date(first) -
+              new Date(second)
+            );
+          }
+        );
+
+        return jsonResponse(
+          { events },
+          200,
+          corsHeaders
+        );
+
+      } catch (error) {
+        return jsonResponse(
+          {
+            error:
+              error.message ||
+              "Calendar API error."
+          },
+          500,
+          corsHeaders
+        );
+      }
+    }
+
+    return textResponse(
+      "Notion Calendar & Inbox API is running."
+    );
+    },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(
+      syncSolomonToNotion(env)
+    );
+  }
+};
+
+/* =========================================================
+ *  SECURE KEY COMPARISON
+ *========================================================= */
+
+async function secureCompare(a, b) {
+  if (!a || !b) {
+    return false;
+  }
+
+  const encoder =
+    new TextEncoder();
+
+  const aHash =
+    new Uint8Array(
+      await crypto.subtle.digest(
+        "SHA-256",
+        encoder.encode(a)
+      )
+    );
+
+  const bHash =
+    new Uint8Array(
+      await crypto.subtle.digest(
+        "SHA-256",
+        encoder.encode(b)
+      )
+    );
+
+  let difference = 0;
+
+  for (
+    let i = 0;
+    i < aHash.length;
+    i++
+  ) {
+    difference |=
+      aHash[i] ^ bHash[i];
+  }
+
+  return difference === 0;
+}
+async function secureFingerprintCompare(fingerprint, secret) {
+  if (!fingerprint || !secret) {
+    return false;
+  }
+
+  if (!/^[a-f0-9]{64}$/.test(fingerprint)) {
+    return false;
+  }
+
+  const encoder = new TextEncoder();
+
+  const hashBuffer = await crypto.subtle.digest(
+    "SHA-256",
+    encoder.encode(secret)
+  );
+
+  const hashArray = Array.from(
+    new Uint8Array(hashBuffer)
+  );
+
+  const expectedFingerprint = hashArray
+    .map(byte => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+  return await secureCompare(
+    fingerprint,
+    expectedFingerprint
+  );
+}
+
+/* =========================================================
+ *  GOOGLE TOKEN
+ *========================================================= */
+
+async function getGoogleAccessToken(env) {
+  const response = await fetch(
+    "https://oauth2.googleapis.com/token",
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/x-www-form-urlencoded"
+      },
+
+      body: new URLSearchParams({
+        client_id:
+          env.GOOGLE_CLIENT_ID,
+
+        client_secret:
+          env.GOOGLE_CLIENT_SECRET,
+
+        refresh_token:
+          env.GOOGLE_REFRESH_TOKEN,
+
+        grant_type:
+          "refresh_token"
+      })
+    }
+  );
+
+  const data =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.error_description ||
+      data.error ||
+      "Unable to refresh Google token."
+    );
+  }
+
+  return data.access_token;
+}
+
+/* =========================================================
+ *  OUTLOOK TOKEN
+ *========================================================= */
+
+async function getOutlookAccessToken(env) {
+  const response = await fetch(
+    "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/x-www-form-urlencoded"
+      },
+
+      body: new URLSearchParams({
+        client_id:
+          env.OUTLOOK_CLIENT_ID,
+
+        client_secret:
+          env.OUTLOOK_CLIENT_SECRET,
+
+        refresh_token:
+          env.OUTLOOK_REFRESH_TOKEN,
+
+        grant_type:
+          "refresh_token",
+
+        scope:
+          "openid profile offline_access Mail.Read"
+      })
+    }
+  );
+
+  const data =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.error_description ||
+      data.error ||
+      "Unable to refresh Outlook token."
+    );
+  }
+
+  return data.access_token;
+}
+
+/* =========================================================
+ *  GMAIL
+ *========================================================= */
+
+async function getGmailMessages(env) {
+  const accessToken =
+    await getGoogleAccessToken(env);
+
+  const url = new URL(
+    "https://gmail.googleapis.com/gmail/v1/users/me/messages"
+  );
+
+  url.searchParams.set(
+    "maxResults",
+    "12"
+  );
+
+  url.searchParams.set(
+    "labelIds",
+    "INBOX"
+  );
+
+  const response =
+    await fetch(
+      url.toString(),
+      {
+        headers: {
+          Authorization:
+            "Bearer " + accessToken
+        }
+      }
+    );
+
+  const data =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.error?.message ||
+      "Unable to retrieve Gmail."
+    );
+  }
+
+  const messages =
+    await Promise.all(
+      (data.messages || []).map(
+        async ref => {
+          const messageURL =
+            new URL(
+              "https://gmail.googleapis.com/gmail/v1/users/me/messages/" +
+              encodeURIComponent(ref.id)
+            );
+
+          messageURL.searchParams.set(
+            "format",
+            "metadata"
+          );
+
+          [
+            "From",
+            "Subject",
+            "Date"
+          ].forEach(
+            header =>
+              messageURL.searchParams.append(
+                "metadataHeaders",
+                header
+              )
+          );
+
+          const messageResponse =
+            await fetch(
+              messageURL.toString(),
+              {
+                headers: {
+                  Authorization:
+                    "Bearer " +
+                    accessToken
+                }
+              }
+            );
+
+          const message =
+            await messageResponse.json();
+
+          if (!messageResponse.ok) {
+            return null;
+          }
+
+          const headers =
+            message.payload?.headers ||
+            [];
+
+          const getHeader =
+            name =>
+              headers.find(
+                h =>
+                  h.name.toLowerCase() ===
+                  name.toLowerCase()
+              )?.value || "";
+
+          return {
+            provider: "gmail",
+            providerLabel: "Gmail",
+
+            sender:
+              cleanSender(
+                getHeader("From")
+              ),
+
+            subject:
+              decodeMimeWords(
+                getHeader("Subject") ||
+                "(No subject)"
+              ),
+
+            preview:
+              message.snippet || "",
+
+            timestamp:
+              Number(
+                message.internalDate ||
+                0
+              ),
+
+            unread:
+              (
+                message.labelIds || []
+              ).includes("UNREAD"),
+
+            url:
+              "https://mail.google.com/mail/u/0/#inbox/" +
+              encodeURIComponent(
+                message.threadId
+              )
+          };
+        }
+      )
+    );
+
+  return messages.filter(Boolean);
+}
+
+/* =========================================================
+ *  OUTLOOK
+ *========================================================= */
+
+async function getOutlookMessages(env) {
+  const accessToken =
+    await getOutlookAccessToken(env);
+
+  const url = new URL(
+    "https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages"
+  );
+
+  url.searchParams.set(
+    "$top",
+    "12"
+  );
+
+  url.searchParams.set(
+    "$orderby",
+    "receivedDateTime desc"
+  );
+
+  url.searchParams.set(
+    "$select",
+    "id,subject,from,receivedDateTime,isRead,bodyPreview,webLink"
+  );
+
+  const response =
+    await fetch(
+      url.toString(),
+      {
+        headers: {
+          Authorization:
+            "Bearer " +
+            accessToken,
+
+          Accept:
+            "application/json"
+        }
+      }
+    );
+
+  const data =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.error?.message ||
+      "Unable to retrieve Outlook."
+    );
+  }
+
+  return (
+    data.value || []
+  ).map(
+    message => ({
+      provider: "outlook",
+
+      providerLabel:
+        "Outlook",
+
+      sender:
+        message.from
+          ?.emailAddress
+          ?.name ||
+        message.from
+          ?.emailAddress
+          ?.address ||
+        "Unknown sender",
+
+      subject:
+        message.subject ||
+        "(No subject)",
+
+      preview:
+        message.bodyPreview ||
+        "",
+
+      timestamp:
+        new Date(
+          message.receivedDateTime
+        ).getTime(),
+
+      unread:
+        !message.isRead,
+
+      url:
+        message.webLink ||
+        "https://outlook.live.com/mail/"
+    })
+  );
+}
+/* =========================================================
+ *  ICLOUD
+ *========================================================= */
+
+async function getICloudMessages(env) {
+  if (
+    !env.ICLOUD_EMAIL ||
+    !env.ICLOUD_APP_PASSWORD
+  ) {
+    throw new Error(
+      "iCloud credentials are missing."
+    );
+  }
+
+  const socket = connect(
+    {
+      hostname: "imap.mail.me.com",
+      port: 993
+    },
+    {
+      secureTransport: "on",
+      allowHalfOpen: false
+    }
+  );
+
+  await socket.opened;
+
+  const reader =
+    socket.readable.getReader();
+
+  const writer =
+    socket.writable.getWriter();
+
+  const decoder =
+    new TextDecoder();
+
+  const encoder =
+    new TextEncoder();
+
+  let buffer = "";
+
+  async function readMore() {
+    const {
+      value,
+      done
+    } = await reader.read();
+
+    if (done) {
+      throw new Error(
+        "iCloud connection closed unexpectedly."
+      );
+    }
+
+    buffer +=
+      decoder.decode(
+        value,
+        { stream: true }
+      );
+  }
+
+  async function waitForGreeting() {
+    while (
+      !buffer.includes("\r\n")
+    ) {
+      await readMore();
+    }
+
+    const end =
+      buffer.indexOf("\r\n") + 2;
+
+    const line =
+      buffer.slice(0, end);
+
+    buffer =
+      buffer.slice(end);
+
+    if (
+      !line.startsWith("* OK") &&
+      !line.startsWith("* PREAUTH")
+    ) {
+      throw new Error(
+        "Unexpected iCloud IMAP response."
+      );
+    }
+  }
+
+  let tagNumber = 1;
+
+  async function command(commandText) {
+    const tag =
+      "A" +
+      String(tagNumber++)
+        .padStart(3, "0");
+
+    await writer.write(
+      encoder.encode(
+        tag +
+        " " +
+        commandText +
+        "\r\n"
+      )
+    );
+
+    const regex =
+      new RegExp(
+        "(?:^|\\r\\n)" +
+        tag +
+        " (?:OK|NO|BAD)[^\\r\\n]*\\r\\n"
+      );
+
+    let match;
+
+    while (
+      !(match = buffer.match(regex))
+    ) {
+      await readMore();
+    }
+
+    const end =
+      match.index +
+      match[0].length;
+
+    const responseText =
+      buffer.slice(0, end);
+
+    buffer =
+      buffer.slice(end);
+
+    const statusLine =
+      match[0].trim();
+
+    if (
+      !statusLine.startsWith(
+        tag + " OK"
+      )
+    ) {
+      throw new Error(
+        "iCloud IMAP command failed: " +
+        statusLine
+      );
+    }
+
+    return responseText;
+  }
+
+  try {
+    await waitForGreeting();
+
+    await command(
+      `LOGIN "${imapEscape(
+        env.ICLOUD_EMAIL
+      )}" "${imapEscape(
+        env.ICLOUD_APP_PASSWORD
+      )}"`
+    );
+
+    await command(
+      'SELECT "INBOX"'
+    );
+
+    const searchResult =
+      await command(
+        "UID SEARCH ALL"
+      );
+
+    const searchLine =
+      searchResult.match(
+        /\* SEARCH ([^\r\n]*)/
+      );
+
+    if (!searchLine) {
+      return [];
+    }
+
+    const uids =
+      searchLine[1]
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    const latest =
+      uids
+        .slice(-12)
+        .reverse();
+
+    const messages = [];
+
+    for (const uid of latest) {
+      const raw =
+        await command(
+          `UID FETCH ${uid} (FLAGS INTERNALDATE BODY.PEEK[])`
+        );
+
+      const message =
+        parseICloudMessage(
+          raw,
+          uid
+        );
+
+      if (message) {
+        messages.push(message);
+      }
+    }
+
+    try {
+      await command("LOGOUT");
+    } catch {}
+
+    return messages;
+
+  } finally {
+    try {
+      writer.releaseLock();
+    } catch {}
+
+    try {
+      reader.releaseLock();
+    } catch {}
+
+    try {
+      await socket.close();
+    } catch {}
+  }
+}
+
+/* =========================================================
+ *  ICLOUD PARSER
+ *========================================================= */
+
+function parseICloudMessage(
+  raw,
+  uid
+) {
+  const flagsMatch =
+    raw.match(
+      /FLAGS \(([^)]*)\)/i
+    );
+
+  const internalDateMatch =
+    raw.match(
+      /INTERNALDATE "([^"]+)"/i
+    );
+
+  const literalMatch =
+    raw.match(
+      /\{\d+\}\r\n/
+    );
+
+  let email = "";
+
+  if (literalMatch) {
+    const start =
+      literalMatch.index +
+      literalMatch[0].length;
+
+    email =
+      raw.slice(start);
+
+    const ending =
+      email.lastIndexOf(
+        "\r\n)\r\n"
+      );
+
+    if (ending !== -1) {
+      email =
+        email.slice(
+          0,
+          ending
+        );
+    }
+  }
+
+  const headerEnd =
+    email.indexOf(
+      "\r\n\r\n"
+    );
+
+  const headerText =
+    headerEnd >= 0
+      ? email.slice(
+          0,
+          headerEnd
+        )
+      : email;
+
+  const bodyText =
+    headerEnd >= 0
+      ? email.slice(
+          headerEnd + 4
+        )
+      : "";
+
+  const headers =
+    parseMailHeaders(
+      headerText
+    );
+
+  const from =
+    decodeMimeWords(
+      headers["from"] ||
+      ""
+    );
+
+  const subject =
+    decodeMimeWords(
+      headers["subject"] ||
+      "(No subject)"
+    );
+
+  let timestamp =
+    Date.parse(
+      headers["date"] ||
+      ""
+    );
+
+  if (
+    !Number.isFinite(timestamp) &&
+    internalDateMatch
+  ) {
+    timestamp =
+      Date.parse(
+        internalDateMatch[1]
+      );
+  }
+
+  if (
+    !Number.isFinite(timestamp)
+  ) {
+    timestamp =
+      Date.now();
+  }
+
+  const flags =
+    flagsMatch
+      ? flagsMatch[1]
+      : "";
+
+  return {
+    provider: "icloud",
+
+    providerLabel:
+      "iCloud",
+
+    sender:
+      cleanSender(from) ||
+      "Unknown sender",
+
+    subject,
+
+    preview:
+      createMailPreview(
+        bodyText,
+        headers
+      ),
+
+    timestamp,
+
+    unread:
+      !/\\Seen/i.test(
+        flags
+      ),
+
+    url:
+      "https://www.icloud.com/mail/"
+  };
+}
+
+/* =========================================================
+ *  MAIL HELPERS
+ *========================================================= */
+
+function parseMailHeaders(text) {
+  const unfolded =
+    text.replace(
+      /\r\n[ \t]+/g,
+      " "
+    );
+
+  const headers = {};
+
+  for (
+    const line of
+    unfolded.split("\r\n")
+  ) {
+    const colon =
+      line.indexOf(":");
+
+    if (colon <= 0) {
+      continue;
+    }
+
+    const name =
+      line
+        .slice(0, colon)
+        .trim()
+        .toLowerCase();
+
+    headers[name] =
+      line
+        .slice(colon + 1)
+        .trim();
+  }
+
+  return headers;
+}
+
+function createMailPreview(
+  body,
+  headers
+) {
+  let text =
+    body || "";
+
+  const encoding =
+    (
+      headers[
+        "content-transfer-encoding"
+      ] || ""
+    ).toLowerCase();
+
+  if (
+    encoding.includes(
+      "quoted-printable"
+    )
+  ) {
+    text =
+      decodeQuotedPrintable(
+        text
+      );
+  }
+
+  text =
+    text
+      .replace(
+        /<style[\s\S]*?<\/style>/gi,
+        " "
+      )
+      .replace(
+        /<script[\s\S]*?<\/script>/gi,
+        " "
+      )
+      .replace(
+        /<[^>]+>/g,
+        " "
+      )
+      .replace(
+        /--[-=_A-Za-z0-9.]+/g,
+        " "
+      )
+      .replace(
+        /Content-[^:\r\n]+:[^\r\n]*/gi,
+        " "
+      )
+      .replace(
+        /MIME-Version:[^\r\n]*/gi,
+        " "
+      )
+      .replace(
+        /\r?\n/g,
+        " "
+      )
+      .replace(
+        /\s+/g,
+        " "
+      )
+      .trim();
+
+  if (
+    !text ||
+    (
+      /^[A-Za-z0-9+/=\s]+$/.test(
+        text
+      ) &&
+      text.length > 500
+    )
+  ) {
+    return "";
+  }
+
+  return text.slice(
+    0,
+    220
+  );
+}
+
+function decodeMimeWords(value) {
+  if (!value) {
+    return "";
+  }
+
+  return value.replace(
+    /=\?([^?]+)\?([bBqQ])\?([^?]*)\?=/g,
+    (
+      match,
+      charset,
+      encoding,
+      encoded
+    ) => {
+      try {
+        let bytes;
+
+        if (
+          encoding.toUpperCase() ===
+          "B"
+        ) {
+          const binary =
+            atob(encoded);
+
+          bytes =
+            Uint8Array.from(
+              binary,
+              char =>
+                char.charCodeAt(0)
+            );
+
+        } else {
+          let text =
+            encoded.replace(
+              /_/g,
+              " "
+            );
+
+          text =
+            text.replace(
+              /=([0-9A-Fa-f]{2})/g,
+              (_, hex) =>
+                String.fromCharCode(
+                  parseInt(
+                    hex,
+                    16
+                  )
+                )
+            );
+
+          bytes =
+            Uint8Array.from(
+              text,
+              char =>
+                char.charCodeAt(0)
+            );
+        }
+
+        let decoder;
+
+        try {
+          decoder =
+            new TextDecoder(
+              charset
+            );
+        } catch {
+          decoder =
+            new TextDecoder(
+              "utf-8"
+            );
+        }
+
+        return decoder.decode(
+          bytes
+        );
+
+      } catch {
+        return match;
+      }
+    }
+  );
+}
+
+function decodeQuotedPrintable(
+  text
+) {
+  return text
+    .replace(
+      /=\r?\n/g,
+      ""
+    )
+    .replace(
+      /=([0-9A-Fa-f]{2})/g,
+      (_, hex) =>
+        String.fromCharCode(
+          parseInt(
+            hex,
+            16
+          )
+        )
+    );
+}
+
+function imapEscape(value) {
+  return String(value)
+    .replace(
+      /\\/g,
+      "\\\\"
+    )
+    .replace(
+      /"/g,
+      '\\"'
+    );
+}
+
+/* =========================================================
+ *  WHITE MINIMAL INBOX UI
+ *========================================================= */
+
+function renderInbox(
+  all,
+  gmail,
+  outlook,
+  icloud,
+  errors
+) {
+  const counts = {
+    all:
+      all.filter(m => m.unread).length,
+
+    gmail:
+      gmail.filter(m => m.unread).length,
+
+    outlook:
+      outlook.filter(m => m.unread).length,
+
+    icloud:
+      icloud.filter(m => m.unread).length
+  };
+
+  const rows =
+    all
+      .slice(0, 24)
+      .map(renderMailRow)
+      .join("");
+
+  const errorNotice =
+    errors.length
+      ? '<div class="notice">Couldn\'t load: ' +
+        escapeHTML(
+          errors.join(", ")
+        ) +
+        "</div>"
+      : "";
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>Inbox</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+
+  background: #FFFFFF;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: #37352F;
+}
+
+body {
+  padding: 2px;
+}
+
+.mail {
+  width: 100%;
+  max-width: 780px;
+
+  margin: 0 auto;
+
+  background: #FFFFFF;
+
+  border:
+    1px solid #E8E6E1;
+
+  border-radius: 16px;
+
+  overflow: hidden;
+}
+
+/* TABS */
+
+.head {
+  padding:
+    8px 24px 0;
+}
+
+.tabs {
+  display: flex;
+
+  gap: 25px;
+
+  margin-top: 0;
+
+  border-bottom:
+    1px solid #E8E6E1;
+
+  overflow-x: auto;
+
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  position: relative;
+
+  appearance: none;
+
+  border: 0;
+
+  background: transparent;
+
+  padding:
+    12px 0 11px;
+
+  color: #999691;
+
+  font: inherit;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: #37352F;
+}
+
+.tab.active {
+  color: #37352F;
+}
+
+.tab.active::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: -1px;
+
+  height: 2px;
+
+  background: #7A0026;
+
+  border-radius: 2px;
+}
+
+.count {
+  margin-left: 3px;
+
+  color: #AAA7A2;
+
+  font-size: 10px;
+
+  font-weight: 400;
+}
+
+.tab.active .count {
+  color: #7A0026;
+}
+
+/* ERROR */
+
+.notice {
+  margin:
+    13px 24px 0;
+
+  padding:
+    9px 11px;
+
+  background: #F7F5F3;
+
+  border-radius: 8px;
+
+  color: #7A0026;
+
+  font-size: 11px;
+}
+
+/* LIST */
+
+.list {
+  padding:
+    0 24px;
+}
+
+.row {
+  display: flex;
+
+  gap: 12px;
+
+  padding:
+    15px 0;
+
+  border-bottom:
+    1px solid #E8E6E1;
+
+  color: inherit;
+
+  text-decoration: none;
+
+  transition:
+    opacity 0.15s ease;
+}
+
+.row:hover {
+  opacity: 0.68;
+}
+
+.row.hidden {
+  display: none;
+}
+
+/* UNREAD DOT */
+
+.dotwrap {
+  width: 8px;
+
+  flex:
+    0 0 8px;
+
+  padding-top: 7px;
+}
+
+.dot {
+  display: block;
+
+  width: 6px;
+
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #7A0026;
+}
+
+/* EMAIL */
+
+.content {
+  flex: 1;
+
+  min-width: 0;
+}
+
+.top {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: 10px;
+}
+
+.sender {
+  flex: 1;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  color: #4B4945;
+
+  font-size: 13px;
+
+  font-weight: 500;
+}
+
+.row.unread .sender {
+  color: #37352F;
+
+  font-weight: 650;
+}
+
+.time {
+  flex:
+    0 0 auto;
+
+  color: #AAA7A2;
+
+  font-size: 10.5px;
+}
+
+.subjectline {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  margin-top: 3px;
+}
+
+.subject {
+  flex: 1;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  color: #57544F;
+
+  font-size: 13px;
+}
+
+.row.unread .subject {
+  color: #37352F;
+
+  font-weight: 600;
+}
+
+.provider {
+  flex:
+    0 0 auto;
+
+  color: #A09D98;
+
+  font-size: 9px;
+
+  font-weight: 500;
+
+  letter-spacing:
+    0.25px;
+}
+
+.preview {
+  margin-top: 4px;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  color: #96938E;
+
+  font-size: 11.5px;
+
+  line-height: 1.45;
+}
+
+.empty {
+  display: none;
+
+  padding:
+    34px 0;
+
+  color: #96938E;
+
+  font-size: 12px;
+
+  text-align: center;
+}
+
+/* BOTTOM */
+
+.actions {
+  display: flex;
+
+  align-items: center;
+
+  justify-content:
+    space-between;
+
+  gap: 15px;
+
+  min-height: 48px;
+
+  padding:
+    8px 24px 12px;
+
+  border-top:
+    1px solid #E8E6E1;
+}
+
+.more {
+  appearance: none;
+
+  border: 0;
+
+  background: transparent;
+
+  padding:
+    5px 0;
+
+  color: #77736E;
+
+  font: inherit;
+
+  font-size: 11px;
+
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.more:hover {
+  color: #7A0026;
+}
+
+.links {
+  display: flex;
+
+  gap: 16px;
+}
+
+.links a {
+  color: #96938E;
+
+  text-decoration: none;
+
+  font-size: 10.5px;
+
+  font-weight: 500;
+}
+
+.links a:hover {
+  color: #7A0026;
+}
+
+/* MOBILE */
+
+@media (max-width: 540px) {
+
+  .head {
+    padding:
+      8px 18px 0;
+  }
+
+  .tabs {
+    gap: 20px;
+  }
+
+  .list {
+    padding:
+      0 18px;
+  }
+
+  .notice {
+    margin:
+      13px 18px 0;
+  }
+
+  .actions {
+    padding:
+      8px 18px 12px;
+  }
+
+  .provider {
+    display: none;
+  }
+}
 
 </style>
+
 </head>
+
 <body>
-<div class="wrap">
-  <div class="top">
-    <div class="eyebrow">Lesson</div>
-    <select id="lesson"><option>Loading lessons…</option></select>
-    <div class="meta">
-      <div class="meta-card"><div class="meta-label">Student</div><div id="student" class="meta-value">—</div></div>
-      <div class="meta-card"><div class="meta-label">Subject</div><div id="subject" class="meta-value">—</div></div>
-      <div class="meta-card"><div class="meta-label">Date & time</div><div id="when" class="meta-value">—</div></div>
+
+<div class="mail">
+
+  <div class="head">
+
+    <div class="tabs">
+
+      <button
+        class="tab active"
+        data-filter="all"
+        type="button"
+      >
+        All
+        <span class="count">${counts.all}</span>
+      </button>
+
+      <button
+        class="tab"
+        data-filter="gmail"
+        type="button"
+      >
+        Gmail
+        <span class="count">${counts.gmail}</span>
+      </button>
+
+      <button
+        class="tab"
+        data-filter="outlook"
+        type="button"
+      >
+        Outlook
+        <span class="count">${counts.outlook}</span>
+      </button>
+
+      <button
+        class="tab"
+        data-filter="icloud"
+        type="button"
+      >
+        iCloud
+        <span class="count">${counts.icloud}</span>
+      </button>
+
     </div>
-    <div id="status" class="status"></div>
+
   </div>
 
-  <div class="section-title">Lesson Session</div>
-  <div class="grid">
-    <section class="card">
-      <h2>Before Lesson</h2>
-      <label class="check"><input id="notice24h" data-checklist="notice24h" type="checkbox">24h Notice sent</label>
-      <label class="check"><input id="notice1h" data-checklist="notice1h" type="checkbox">1h Notice sent</label>
-      <div class="placeholder" style="margin-top:9px">The controls will be connected to the Lesson record after lesson identity is confirmed.</div>
-    </section>
+  ${errorNotice}
 
-    <section class="card">
-      <h2>During Lesson</h2>
-      <div class="placeholder"><strong>Topics Covered</strong></div>
-      <div id="topics" style="margin-top:7px"><div class="placeholder">Select a lesson to load this student's Study Plan.</div></div>
-    </section>
+  <div class="list">
 
-    <section class="card">
-      <h2>After Lesson</h2>
-      <label class="check"><input id="attendance" data-checklist="attendance" type="checkbox">Attendance recorded</label>
-      <label class="check"><input id="transcriptionSaved" data-checklist="transcriptionSaved" type="checkbox">Meeting transcription saved</label>
-      <label class="check"><input id="recordingSaved" data-checklist="recordingSaved" type="checkbox">Lesson recording saved</label>
-      <label class="check"><input id="materialsUploaded" data-checklist="materialsUploaded" type="checkbox">Lesson materials uploaded</label>
-      <label class="check"><input id="homeworkSent" data-checklist="homeworkSent" type="checkbox">Homework sent</label>
-      <label class="check"><input id="lessonNotesSent" data-checklist="lessonNotesSent" type="checkbox">Lesson notes completed</label>
-    </section>
+    ${rows}
+
+    <div
+      class="empty"
+      id="empty"
+    >
+      Nothing here.
+    </div>
+
   </div>
 
-  <div class="section-title">Files & Resources</div>
-  <div class="grid">
-    <div class="card">
-      <h2>Lecture Notes</h2>
-      <div class="file-actions">
-        <label class="upload-btn" id="lectureNotesBtn">+ Upload file
-          <input class="file-input" id="lectureNotesInput" type="file" multiple>
-        </label>
-      </div>
-      <div class="file-list" id="lectureNotesList"></div>
-      <div class="upload-note">PDF, Word, PowerPoint, images and other Notion-supported files · up to 20 MB each</div>
+  <div class="actions">
+
+    <button
+      class="more"
+      id="more"
+      type="button"
+    >
+      Show more
+    </button>
+
+    <div class="links">
+
+      <a
+        href="https://mail.google.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Gmail ↗
+      </a>
+
+      <a
+        href="https://outlook.live.com/mail/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Outlook ↗
+      </a>
+
+      <a
+        href="https://www.icloud.com/mail/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        iCloud ↗
+      </a>
+
     </div>
-    <div class="card">
-      <h2>Homework & Worksheets</h2>
-      <div class="file-actions">
-        <label class="upload-btn" id="homeworkWorksheetsBtn">+ Upload files
-          <input class="file-input" id="homeworkWorksheetsInput" type="file" multiple>
-        </label>
-      </div>
-      <div class="file-list" id="homeworkWorksheetsList"></div>
-      <div class="upload-note">You can select several homework/worksheet files together · up to 20 MB each</div>
-    </div>
-    <div class="card"><h2>Recording & Transcription</h2><div class="placeholder">Next step</div></div>
+
   </div>
+
 </div>
+
 <script>
-const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
-let lessons=[];
 
-function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-function fmt(d){
-  if(!d)return "—";
-  const x=new Date(d);
-  return x.toLocaleString(undefined,{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
-}
-function inferStudent(title,subject){
-  let t=String(title||"").trim();
-  if(subject){
-    const rx=new RegExp("\\s*[-–—|:]?\\s*"+String(subject).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*$","i");
-    t=t.replace(rx,"").trim();
-  }
-  return t || "—";
-}
-function nearestLesson(items){
-  const now=Date.now();
-  return [...items].filter(x=>x.start).sort((a,b)=>Math.abs(new Date(a.start)-now)-Math.abs(new Date(b.start)-now))[0];
-}
-async function saveTopics(lessonId, topicIds){
-  const status=document.getElementById("status");
-  status.textContent="Saving Topics Covered…";
-  const r=await fetch(API+"/tutoring-lessons",{
-    method:"PATCH",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({lessonId,topicIds})
-  });
-  const d=await r.json();
-  if(!r.ok||!d.success)throw new Error(d.error||"Could not save Topics Covered");
-  const lesson=lessons.find(x=>x.id===lessonId);
-  if(lesson) lesson.topicsCoveredIds=[...topicIds];
-  status.textContent="Topics Covered saved ✓";
-}
+const tabs =
+  Array.from(
+    document.querySelectorAll(".tab")
+  );
 
+const rows =
+  Array.from(
+    document.querySelectorAll(".row")
+  );
 
+const empty =
+  document.getElementById("empty");
 
-function renderResourceFiles(lesson){
-  const groups={
-    lectureNotes: lesson?.resources?.lectureNotes || [],
-    homeworkWorksheets: lesson?.resources?.homeworkWorksheets || []
-  };
-  Object.entries(groups).forEach(([category,files])=>{
-    const box=document.getElementById(category+"List");
-    if(!box)return;
-    if(!files.length){
-      box.innerHTML='<div class="placeholder">No files uploaded yet.</div>';
-      return;
-    }
-    box.innerHTML=files.map(f=>{
-      const safeName=escapeHTML(f.name||"File");
-      return f.url
-        ? `<a class="file-link" href="${escapeHTML(f.url)}" target="_blank" rel="noopener">📎 <span>${safeName}</span></a>`
-        : `<div class="file-link">📎 <span>${safeName}</span></div>`;
-    }).join("");
-  });
-}
+const more =
+  document.getElementById("more");
 
-async function uploadLessonFiles(category,fileList){
-  const lessonId=document.getElementById("lesson").value;
-  if(!lessonId || !fileList?.length)return;
+let activeFilter = "all";
+let expanded = false;
 
-  const files=[...fileList];
-  const oversized=files.find(f=>f.size>20*1024*1024);
-  if(oversized){
-    document.getElementById("status").textContent=`${oversized.name} is larger than 20 MB.`;
-    return;
-  }
+const INITIAL_VISIBLE = 6;
 
-  const btn=document.getElementById(category+"Btn");
-  const input=document.getElementById(category+"Input");
-  btn.classList.add("busy");
-  document.getElementById("status").textContent="Uploading file…";
+function updateRows() {
 
-  try{
-    const form=new FormData();
-    form.append("lessonId",lessonId);
-    form.append("category",category);
-    files.forEach(file=>form.append("files",file,file.name));
-
-    const r=await fetch(API+"/tutoring-lesson-files",{method:"POST",body:form});
-    const d=await r.json();
-    if(!r.ok||!d.success)throw new Error(d.error||"Upload failed.");
-
-    const lesson=lessons.find(x=>x.id===lessonId);
-    if(lesson){
-      lesson.resources=lesson.resources||{};
-      lesson.resources[category]=d.files||[];
-      renderResourceFiles(lesson);
-    }
-    document.getElementById("status").textContent="Files uploaded ✓";
-  }catch(e){
-    document.getElementById("status").textContent="Could not upload: "+e.message;
-  }finally{
-    btn.classList.remove("busy");
-    input.value="";
-  }
-}
-
-function bindResourceUploads(){
-  ["lectureNotes","homeworkWorksheets"].forEach(category=>{
-    document.getElementById(category+"Input")?.addEventListener("change",e=>{
-      uploadLessonFiles(category,e.target.files);
-    });
-  });
-}
-
-function checklistState(){
-  const state={};
-  document.querySelectorAll('input[data-checklist]').forEach(cb=>{
-    state[cb.dataset.checklist]=cb.checked;
-  });
-  return state;
-}
-function loadChecklist(lesson){
-  const saved=lesson?.checklist||{};
-  document.querySelectorAll('input[data-checklist]').forEach(cb=>{
-    cb.checked=!!saved[cb.dataset.checklist];
-    cb.disabled=false;
-  });
-}
-async function saveChecklist(){
-  const lessonId=document.getElementById("lesson").value;
-  const boxes=[...document.querySelectorAll('input[data-checklist]')];
-  const checklist=checklistState();
-  const status=document.getElementById("status");
-  boxes.forEach(x=>x.disabled=true);
-  status.textContent="Saving checklist…";
-  try{
-    const r=await fetch(API+"/tutoring-lessons",{
-      method:"PATCH",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({lessonId,checklist})
-    });
-    const d=await r.json();
-    if(!r.ok||!d.success)throw new Error(d.error||"Could not save checklist");
-    const lesson=lessons.find(x=>x.id===lessonId);
-    if(lesson) lesson.checklist={...checklist};
-    status.textContent="Checklist saved ✓";
-  }finally{
-    boxes.forEach(x=>x.disabled=false);
-  }
-}
-function bindChecklist(){
-  document.querySelectorAll('input[data-checklist]').forEach(cb=>{
-    cb.addEventListener("change",async()=>{
-      const previous=!cb.checked;
-      try{
-        await saveChecklist();
-      }catch(e){
-        cb.checked=previous;
-        document.getElementById("status").textContent="Could not save: "+e.message;
+  const matching =
+    rows.filter(
+      function(row) {
+        return (
+          activeFilter === "all" ||
+          row.dataset.provider === activeFilter
+        );
       }
-    });
-  });
-}
+    );
 
-async function loadTopics(studentPageId){
-  const box=document.getElementById("topics");
-  const lesson=lessons.find(x=>x.id===document.getElementById("lesson").value);
-  if(!studentPageId){
-    box.innerHTML='<div class="placeholder">No student is attached to this lesson.</div>';
-    return;
-  }
-  box.innerHTML='<div class="placeholder">Loading Study Plan…</div>';
-  try{
-    const r=await fetch(API+"/study-plan-embed?studentPageId="+encodeURIComponent(studentPageId));
-    const d=await r.json();
-    if(!r.ok||!d.success)throw new Error(d.error||"Could not load Study Plan");
-    const topics=d.topics||[];
-    if(!topics.length){
-      box.innerHTML='<div class="placeholder">No Study Plan topics have been added for this student yet.</div>';
-      return;
+  rows.forEach(
+    function(row) {
+      row.classList.add("hidden");
     }
-    const saved=new Set((lesson?.topicsCoveredIds||[]).map(String));
-    box.innerHTML=topics.map(t=>`
-      <label class="topic-row ${t.completed?"topic-done":""}">
-        <input type="checkbox" data-topic-id="${esc(t.id)}" ${saved.has(String(t.id))?"checked":""} aria-label="Topic Covered">
-        <span class="topic-name">${esc(t.topic||"Untitled topic")}</span>
-      </label>`).join("");
+  );
 
-    box.querySelectorAll('input[data-topic-id]').forEach(cb=>{
-      cb.addEventListener("change",async()=>{
-        const lessonId=document.getElementById("lesson").value;
-        const checked=[...box.querySelectorAll('input[data-topic-id]:checked')].map(x=>x.dataset.topicId);
-        box.querySelectorAll('input[data-topic-id]').forEach(x=>x.disabled=true);
-        try{
-          await saveTopics(lessonId,checked);
-        }catch(e){
-          cb.checked=!cb.checked;
-          document.getElementById("status").textContent="Could not save: "+e.message;
-        }finally{
-          box.querySelectorAll('input[data-topic-id]').forEach(x=>x.disabled=false);
-        }
-      });
-    });
-  }catch(e){
-    box.innerHTML='<div class="placeholder">Could not load topics: '+esc(e.message)+'</div>';
+  const limit =
+    expanded
+      ? matching.length
+      : INITIAL_VISIBLE;
+
+  matching
+    .slice(0, limit)
+    .forEach(
+      function(row) {
+        row.classList.remove("hidden");
+      }
+    );
+
+  empty.style.display =
+    matching.length
+      ? "none"
+      : "block";
+
+  if (
+    matching.length >
+    INITIAL_VISIBLE
+  ) {
+    more.style.display =
+      "block";
+
+    if (expanded) {
+      more.textContent =
+        "Show less";
+    } else {
+      more.textContent =
+        "Show more (" +
+        (
+          matching.length -
+          INITIAL_VISIBLE
+        ) +
+        ")";
+    }
+
+  } else {
+    more.style.display =
+      "none";
   }
 }
-function show(id){
-  const l=lessons.find(x=>x.id===id);
-  if(!l)return;
-  document.getElementById("student").textContent=inferStudent(l.title,l.subject);
-  document.getElementById("subject").textContent=l.subject||"—";
-  document.getElementById("when").textContent=fmt(l.start);
-  document.getElementById("status").textContent=`Selected lesson: ${l.status||"Scheduled"}`;
-  loadChecklist(l);
-  renderResourceFiles(l);
-  loadTopics(l.studentPageId);
-}
-async function init(){
-  const sel=document.getElementById("lesson");
-  try{
-    const r=await fetch(API+"/tutoring-lessons");
-    const d=await r.json();
-    if(!r.ok||!d.success)throw new Error(d.error||"Could not load lessons");
-    lessons=d.lessons||[];
-    if(!lessons.length){sel.innerHTML="<option>No lessons found</option>";return}
-    lessons.sort((a,b)=>new Date(a.start)-new Date(b.start));
-    sel.innerHTML=lessons.map(l=>`<option value="${esc(l.id)}">${esc(inferStudent(l.title,l.subject))} · ${esc(l.subject||"Lesson")} · ${esc(fmt(l.start))}</option>`).join("");
-    const q=new URLSearchParams(location.search).get("lessonId");
-    const chosen=lessons.find(x=>x.id===q)||nearestLesson(lessons);
-    if(chosen){sel.value=chosen.id;show(chosen.id)}
-    sel.onchange=()=>show(sel.value);
-  }catch(e){
-    sel.innerHTML="<option>Could not load lessons</option>";
-    document.getElementById("status").textContent=e.message;
+
+tabs.forEach(
+  function(tab) {
+
+    tab.addEventListener(
+      "click",
+      function() {
+
+        tabs.forEach(
+          function(item) {
+            item.classList.remove(
+              "active"
+            );
+          }
+        );
+
+        tab.classList.add(
+          "active"
+        );
+
+        activeFilter =
+          tab.dataset.filter;
+
+        expanded = false;
+
+        updateRows();
+      }
+    );
   }
-}
-bindChecklist();
-bindResourceUploads();
-init();
+);
+
+more.addEventListener(
+  "click",
+  function() {
+
+    expanded =
+      !expanded;
+
+    updateRows();
+  }
+);
+
+updateRows();
+
 </script>
+
 </body>
 </html>
+`;
+}
+
+/* =========================================================
+ *  MAIL ROW
+ *========================================================= */
+
+function renderMailRow(message) {
+  return `
+<a
+  class="row ${message.unread ? "unread" : ""}"
+  data-provider="${escapeHTML(message.provider)}"
+  href="${escapeHTML(message.url)}"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+
+  <div class="dotwrap">
+    ${message.unread ? '<span class="dot"></span>' : ""}
+  </div>
+
+  <div class="content">
+
+    <div class="top">
+
+      <div class="sender">
+        ${escapeHTML(message.sender)}
+      </div>
+
+      <div class="time">
+        ${escapeHTML(
+          formatEmailTime(
+            message.timestamp
+          )
+        )}
+      </div>
+
+    </div>
+
+    <div class="subjectline">
+
+      <div class="subject">
+        ${escapeHTML(message.subject)}
+      </div>
+
+      <div class="provider">
+        ${escapeHTML(message.providerLabel)}
+      </div>
+
+    </div>
+
+    ${
+      message.preview
+        ? '<div class="preview">' +
+          escapeHTML(message.preview) +
+          "</div>"
+        : ""
+    }
+
+  </div>
+
+</a>
+`;
+}
+
+/* =========================================================
+ *  UNAUTHORIZED PAGE
+ *========================================================= */
+
+function renderUnauthorized() {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>Private Inbox</title>
+
+<style>
+
+body {
+  margin: 0;
+
+  min-height: 100vh;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #FFFFFF;
+
+  color: #37352F;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.card {
+  text-align: center;
+
+  padding: 32px;
+
+  max-width: 420px;
+}
+
+h2 {
+  margin:
+    0 0 8px;
+
+  font-size: 18px;
+}
+
+p {
+  margin: 0;
+
+  color:
+    #8F8D88;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+  <h2>
+    Private Inbox
+  </h2>
+
+  <p>
+    Authorization is required to view this inbox.
+  </p>
+
+</div>
+
+</body>
+</html>
+`;
+}
+
+/* =========================================================
+ *  GENERAL HELPERS
+ *========================================================= */
+
+function cleanSender(value) {
+  if (!value) {
+    return "Unknown sender";
+  }
+
+  const match =
+    value.match(
+      /^"?([^"<]+)"?\s*</
+    );
+
+  if (match) {
+    return match[1].trim();
+  }
+
+  return value
+    .replace(/[<>]/g, "")
+    .trim();
+}
+
+function escapeHTML(value = "") {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatEmailTime(timestamp) {
+  const date =
+    new Date(timestamp);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "";
+  }
+
+  const now =
+    new Date();
+
+  const sameDay =
+    date.getFullYear() ===
+      now.getFullYear() &&
+    date.getMonth() ===
+      now.getMonth() &&
+    date.getDate() ===
+      now.getDate();
+
+  if (sameDay) {
+    return date.toLocaleTimeString(
+      [],
+      {
+        hour: "numeric",
+        minute: "2-digit"
+      }
+    );
+  }
+
+  const yesterday =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() - 1
+    );
+
+  const isYesterday =
+    date.getFullYear() ===
+      yesterday.getFullYear() &&
+    date.getMonth() ===
+      yesterday.getMonth() &&
+    date.getDate() ===
+      yesterday.getDate();
+
+  if (isYesterday) {
+    return "Yesterday";
+  }
+
+  if (
+    date.getFullYear() ===
+    now.getFullYear()
+  ) {
+    return date.toLocaleDateString(
+      [],
+      {
+        month: "short",
+        day: "numeric"
+      }
+    );
+  }
+
+  return date.toLocaleDateString(
+    [],
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    }
+  );
+}
+
+function textResponse(
+  text,
+  status = 200
+) {
+  return new Response(
+    text,
+    {
+      status,
+      headers: {
+        "Content-Type":
+          "text/plain; charset=UTF-8",
+        "Cache-Control":
+          "no-store"
+      }
+    }
+  );
+}
+
+function jsonResponse(
+  data,
+  status = 200,
+  extraHeaders = {}
+) {
+  return new Response(
+    JSON.stringify(data),
+    {
+      status,
+      headers: {
+        "Content-Type":
+          "application/json; charset=UTF-8",
+        "Cache-Control":
+          "no-store",
+        ...extraHeaders
+      }
+    }
+  );
+}
+/* =========================================================
+ *  AUTOMATIC SOLOMON → NOTION SYNC
+ * ========================================================= */
+
+async function syncSolomonToNotion(env) {
+
+  const SOLOMON_CALENDAR =
+    "vve5u98nci5c36ku27a590vekcml9hdn@import.calendar.google.com";
+
+  const LESSON_TEMPLATE_ID =
+    "3efda12fe2d080a8ac10c0fce1683d0c";
+
+  if (!env.NOTION_TOKEN) {
+    throw new Error("NOTION_TOKEN is missing.");
+  }
+
+  if (!env.LESSONS_DATABASE_ID) {
+    throw new Error("LESSONS_DATABASE_ID is missing.");
+  }
+
+  if (!env.STUDENTS_DATABASE_ID) {
+    throw new Error("STUDENTS_DATABASE_ID is missing.");
+  }
+
+
+  /* =========================
+     GOOGLE CALENDAR
+  ========================= */
+
+  const googleAccessToken =
+    await getGoogleAccessToken(env);
+
+  const now = new Date();
+
+  const future = new Date(
+    now.getTime() +
+    90 * 24 * 60 * 60 * 1000
+  );
+
+  const googleURL = new URL(
+    "https://www.googleapis.com/calendar/v3/calendars/" +
+    encodeURIComponent(SOLOMON_CALENDAR) +
+    "/events"
+  );
+
+  googleURL.searchParams.set(
+    "timeMin",
+    now.toISOString()
+  );
+
+  googleURL.searchParams.set(
+    "timeMax",
+    future.toISOString()
+  );
+
+  googleURL.searchParams.set(
+    "singleEvents",
+    "true"
+  );
+
+  googleURL.searchParams.set(
+    "orderBy",
+    "startTime"
+  );
+
+  googleURL.searchParams.set(
+    "maxResults",
+    "250"
+  );
+
+
+  const googleResponse =
+    await fetch(
+      googleURL.toString(),
+      {
+        headers: {
+          Authorization:
+            "Bearer " + googleAccessToken
+        }
+      }
+    );
+
+
+  const googleData =
+    await googleResponse.json();
+
+
+  if (!googleResponse.ok) {
+    throw new Error(
+      googleData.error?.message ||
+      "Could not read Solomon Calendar."
+    );
+  }
+
+
+  const events =
+    (googleData.items || []).filter(
+      event =>
+        event.status !== "cancelled"
+    );
+
+
+  const results = {
+    checked: events.length,
+    created: 0,
+    updated: 0,
+    unchanged: 0,
+    studentsCreated: 0,
+    errors: []
+  };
+
+
+  /* =========================
+     PROCESS EACH LESSON
+  ========================= */
+
+  for (const event of events) {
+
+    try {
+
+      const rawText = [
+        event.summary || "",
+        event.description || "",
+        event.location || ""
+      ].join("\n");
+
+
+      /* STUDENT NAME */
+
+      const firstLine =
+        (event.summary || "")
+          .split("\n")[0]
+          .trim();
+
+
+      const rawName =
+        firstLine
+          .replace(
+            /\s*\(Private Lesson\).*$/i,
+            ""
+          )
+          .trim();
+
+
+      const nameParts =
+        rawName
+          .split(",")
+          .map(part => part.trim())
+          .filter(Boolean);
+
+
+      const studentName =
+        nameParts.length >= 2
+          ? (
+              nameParts.slice(1).join(" ") +
+              " " +
+              nameParts[0]
+            ).trim()
+          : rawName;
+
+
+      if (!studentName) {
+        throw new Error(
+          "Student name could not be identified."
+        );
+      }
+
+
+      /* SUBJECT */
+
+      const subjectMatch =
+        rawText.match(
+          /Subject:\s*([^\n\r]+)/i
+        );
+
+      const subject =
+        subjectMatch
+          ? subjectMatch[1].trim()
+          : "Tutoring";
+
+
+      /* GRADE */
+
+      const gradeMatch =
+        rawText.match(
+          /Grade:\s*([^\n\r]+)/i
+        );
+
+      const grade =
+        gradeMatch
+          ? gradeMatch[1].trim()
+          : "";
+
+
+      /* ZOOM */
+
+      const zoomMatch =
+        rawText.match(
+          /https:\/\/[^\s<>"']*zoom\.us\/[^\s<>"']+/i
+        );
+
+      let zoomLink =
+        zoomMatch
+          ? zoomMatch[0]
+          : "";
+
+      zoomLink =
+        zoomLink.replace(
+          /[),.;]+$/,
+          ""
+        );
+
+
+      /* DATE */
+
+      const start =
+        event.start?.dateTime ||
+        event.start?.date ||
+        "";
+
+      const end =
+        event.end?.dateTime ||
+        event.end?.date ||
+        "";
+
+
+      if (!start) {
+        throw new Error(
+          "Lesson has no start time."
+        );
+      }
+
+
+      /* =========================
+         DOES LESSON EXIST?
+      ========================= */
+
+      const existingResponse =
+        await fetch(
+          `https://api.notion.com/v1/databases/${env.LESSONS_DATABASE_ID}/query`,
+          {
+            method: "POST",
+
+            headers: {
+              Authorization:
+                `Bearer ${env.NOTION_TOKEN}`,
+
+              "Notion-Version":
+                "2022-06-28",
+
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              filter: {
+                property:
+                  "Google Event ID",
+
+                rich_text: {
+                  equals: event.id
+                }
+              },
+
+              page_size: 1
+            })
+          }
+        );
+
+
+      const existingData =
+        await existingResponse.json();
+
+
+      if (!existingResponse.ok) {
+        throw new Error(
+          existingData.message ||
+          "Could not check existing lesson."
+        );
+      }
+
+
+      const existingLesson =
+        existingData.results?.[0] ||
+        null;
+
+
+      /* =========================
+         FIND / CREATE STUDENT
+      ========================= */
+
+      const studentQueryResponse =
+        await fetch(
+          `https://api.notion.com/v1/databases/${env.STUDENTS_DATABASE_ID}/query`,
+          {
+            method: "POST",
+
+            headers: {
+              Authorization:
+                `Bearer ${env.NOTION_TOKEN}`,
+
+              "Notion-Version":
+                "2022-06-28",
+
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              filter: {
+                property:
+                  "Student Name",
+
+                title: {
+                  equals:
+                    studentName
+                }
+              },
+
+              page_size: 1
+            })
+          }
+        );
+
+
+      const studentQueryData =
+        await studentQueryResponse.json();
+
+
+      if (!studentQueryResponse.ok) {
+        throw new Error(
+          studentQueryData.message ||
+          "Could not search Students database."
+        );
+      }
+
+
+      let studentPage =
+        studentQueryData.results?.[0] ||
+        null;
+
+
+      if (!studentPage) {
+
+        const studentProperties = {
+
+          "Student Name": {
+            title: [
+              {
+                text: {
+                  content:
+                    studentName
+                }
+              }
+            ]
+          },
+
+          "Status": {
+            status: {
+              name: "Active"
+            }
+          }
+
+        };
+
+
+        if (grade) {
+          studentProperties["Grade"] = {
+            select: {
+              name: grade
+            }
+          };
+        }
+
+
+        if (subject) {
+          studentProperties["Subject"] = {
+            multi_select: [
+              {
+                name: subject
+              }
+            ]
+          };
+        }
+
+
+        const createStudentResponse =
+          await fetch(
+            "https://api.notion.com/v1/pages",
+            {
+              method: "POST",
+
+              headers: {
+                Authorization:
+                  `Bearer ${env.NOTION_TOKEN}`,
+
+                "Notion-Version":
+                  "2025-09-03",
+
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+
+                parent: {
+                  database_id:
+                    env.STUDENTS_DATABASE_ID
+                },
+
+                properties:
+                  studentProperties
+
+              })
+            }
+          );
+
+
+        const createStudentData =
+          await createStudentResponse.json();
+
+
+        if (!createStudentResponse.ok) {
+          throw new Error(
+            createStudentData.message ||
+            "Could not create student."
+          );
+        }
+
+
+        studentPage =
+          createStudentData;
+
+        results.studentsCreated++;
+      }
+
+
+      /* =========================
+         CREATE NEW LESSON
+      ========================= */
+
+      if (!existingLesson) {
+
+        const lessonProperties = {
+
+          "Lesson": {
+            title: [
+              {
+                text: {
+                  content:
+                    studentName +
+                    " — " +
+                    subject
+                }
+              }
+            ]
+          },
+
+          "Date & time": {
+            date: {
+              start: start,
+              ...(end
+                ? { end: end }
+                : {})
+            }
+          },
+
+          "Student": {
+            relation: [
+              {
+                id:
+                  studentPage.id
+              }
+            ]
+          },
+
+          "Subject": {
+            select: {
+              name: subject
+            }
+          },
+
+          "Status": {
+            status: {
+              name: "Scheduled"
+            }
+          },
+
+          "Google Event ID": {
+            rich_text: [
+              {
+                text: {
+                  content:
+                    event.id
+                }
+              }
+            ]
+          }
+
+        };
+
+
+        if (zoomLink) {
+          lessonProperties["Zoom Link"] = {
+            url: zoomLink
+          };
+        }
+
+
+        const createLessonResponse =
+          await fetch(
+            "https://api.notion.com/v1/pages",
+            {
+              method: "POST",
+
+              headers: {
+                Authorization:
+                  `Bearer ${env.NOTION_TOKEN}`,
+
+                "Notion-Version":
+                  "2025-09-03",
+
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+
+                parent: {
+                  database_id:
+                    env.LESSONS_DATABASE_ID
+                },
+
+                properties:
+                  lessonProperties,
+
+                template: {
+                  type:
+                    "template_id",
+
+                  template_id:
+                    LESSON_TEMPLATE_ID
+                }
+
+              })
+            }
+          );
+
+
+        const createLessonData =
+          await createLessonResponse.json();
+
+
+        if (!createLessonResponse.ok) {
+          throw new Error(
+            createLessonData.message ||
+            "Could not create lesson."
+          );
+        }
+
+
+        results.created++;
+
+        continue;
+      }
+
+
+      /* =========================
+         UPDATE EXISTING LESSON
+      ========================= */
+
+      const currentStatus =
+        existingLesson
+          .properties
+          ?.Status
+          ?.status
+          ?.name ||
+        "";
+
+
+      /*
+         We deliberately preserve manually
+         completed outcomes.
+      */
+
+      const preserveStatus =
+        currentStatus === "Attended" ||
+        currentStatus === "No Show" ||
+        currentStatus === "Cancelled";
+
+
+      const updateProperties = {
+
+        "Lesson": {
+          title: [
+            {
+              text: {
+                content:
+                  studentName +
+                  " — " +
+                  subject
+              }
+            }
+          ]
+        },
+
+        "Date & time": {
+          date: {
+            start: start,
+            ...(end
+              ? { end: end }
+              : {})
+          }
+        },
+
+        "Student": {
+          relation: [
+            {
+              id:
+                studentPage.id
+            }
+          ]
+        },
+
+        "Subject": {
+          select: {
+            name: subject
+          }
+        }
+
+      };
+
+
+      if (zoomLink) {
+        updateProperties["Zoom Link"] = {
+          url: zoomLink
+        };
+      }
+
+
+      if (!preserveStatus) {
+        updateProperties["Status"] = {
+          status: {
+            name: "Scheduled"
+          }
+        };
+      }
+
+
+      const updateResponse =
+        await fetch(
+          "https://api.notion.com/v1/pages/" +
+          existingLesson.id,
+          {
+            method: "PATCH",
+
+            headers: {
+              Authorization:
+                `Bearer ${env.NOTION_TOKEN}`,
+
+              "Notion-Version":
+                "2022-06-28",
+
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              properties:
+                updateProperties
+            })
+          }
+        );
+
+
+      const updateData =
+        await updateResponse.json();
+
+
+      if (!updateResponse.ok) {
+        throw new Error(
+          updateData.message ||
+          "Could not update lesson."
+        );
+      }
+
+
+      results.updated++;
+
+
+    } catch (error) {
+
+      results.errors.push({
+        eventId:
+          event.id || null,
+
+        error:
+          error.message ||
+          "Unknown sync error."
+      });
+
+    }
+  }
+
+
+  console.log(
+    "Solomon → Notion sync:",
+    JSON.stringify(results)
+  );
+
+
+  return results;
+}
