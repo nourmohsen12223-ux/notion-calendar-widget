@@ -20,7 +20,7 @@ body{padding:2px}
 .name{font:700 28px Georgia,serif;margin:0 0 9px}
 .tags{display:flex;gap:7px;flex-wrap:wrap}
 .tag{background:var(--soft);border-radius:9px;padding:6px 10px;font-size:12px}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.selector{min-width:190px;border:1px solid var(--border);background:var(--white);color:var(--text);padding:10px 34px 10px 12px;border-radius:10px;font-size:13px;outline:none}
 .btn{border:0;background:var(--soft);color:var(--text);padding:10px 13px;border-radius:10px;text-decoration:none;font-size:13px;cursor:pointer}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .card{padding:17px 18px;min-height:180px}
@@ -50,6 +50,9 @@ body{padding:2px}
       <div class="tags" id="tags"></div>
     </div>
     <div class="actions">
+      <select class="selector" id="studentSelector" aria-label="Choose student">
+        <option value="">Choose student…</option>
+      </select>
       <a class="btn" id="chatBtn" target="_blank" rel="noopener" hidden>Open Google Chat ↗</a>
       <a class="btn" id="notionBtn" target="_blank" rel="noopener" hidden>View in Notion ↗</a>
     </div>
@@ -106,6 +109,50 @@ function bindRows(){
   });
 }
 
+let allStudents=[], allLessons=[], allDeadlines=[];
+
+function selectStudent(student){
+  const chat=document.getElementById("chatBtn");
+  const notion=document.getElementById("notionBtn");
+  chat.hidden=true; notion.hidden=true;
+
+  if(!student){
+    document.getElementById("studentName").textContent="Student Dashboard";
+    document.getElementById("avatar").textContent="ST";
+    document.getElementById("tags").innerHTML='<span class="tag">Choose a student above</span>';
+    document.getElementById("lessons").innerHTML='<div class="empty">Choose a student to view lessons</div>';
+    document.getElementById("deadlines").innerHTML='<div class="empty">Choose a student to view deadlines</div>';
+    return;
+  }
+
+  localStorage.setItem("studentDashboardSelected",student.id);
+  document.getElementById("studentName").textContent=student.name;
+  document.getElementById("avatar").textContent=initials(student.name);
+  document.getElementById("tags").innerHTML=[
+    student.grade?`<span class="tag">${esc("Grade "+student.grade)}</span>`:"",
+    ...(student.subjects||[]).map(x=>`<span class="tag">${esc(x)}</span>`)
+  ].join("");
+
+  if(student.googleChat){chat.href=student.googleChat;chat.hidden=false}
+  if(student.notionUrl){notion.href=student.notionUrl;notion.hidden=false}
+
+  const now=new Date();
+  const lessons=allLessons.filter(x=>x.studentPageId===student.id&&x.start&&new Date(x.start)>=now)
+    .sort((a,b)=>new Date(a.start)-new Date(b.start)).slice(0,4);
+  document.getElementById("lessons").innerHTML=lessons.length?lessons.map(x=>{
+    const d=new Date(x.start);
+    return dateRow(x,d,x.subject||x.title||"Lesson",`${time(d)}${x.status?" · "+x.status:""}`);
+  }).join(""):'<div class="empty">No upcoming lessons</div>';
+
+  const deadlines=allDeadlines.filter(x=>x.studentPageId===student.id&&x.dueDate&&new Date(x.dueDate)>=now&&String(x.status||"").toLowerCase()!=="done")
+    .sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate)).slice(0,4);
+  document.getElementById("deadlines").innerHTML=deadlines.length?deadlines.map(x=>{
+    const d=new Date(x.dueDate);
+    return dateRow(x,d,x.title||"Deadline",[x.subject,x.type,x.status].filter(Boolean).join(" · "));
+  }).join(""):'<div class="empty">No upcoming deadlines</div>';
+  bindRows();
+}
+
 async function load(){
   try{
     const [sr,lr,dr]=await Promise.all([
@@ -116,44 +163,25 @@ async function load(){
     const [sd,ld,dd]=await Promise.all([sr.json(),lr.json(),dr.json()]);
     if(!sr.ok||!sd.success) throw new Error(sd.error||"Unable to load students.");
 
-    const students=sd.students||[];
-    let student=students.find(s=>requestedId&&s.id===requestedId);
-    if(!student&&requestedName) student=students.find(s=>s.name.toLowerCase()===requestedName.toLowerCase());
-    if(!student&&students.length===1) student=students[0];
+    allStudents=sd.students||[];
+    allLessons=ld.lessons||[];
+    allDeadlines=dd.deadlines||[];
 
-    if(!student){
-      document.getElementById("studentName").textContent="Choose a student";
-      document.getElementById("avatar").textContent="ST";
-      document.getElementById("tags").innerHTML='<span class="tag">Add ?student=Student%20Name to the widget URL</span>';
-      document.getElementById("lessons").innerHTML='<div class="empty">No student selected</div>';
-      document.getElementById("deadlines").innerHTML='<div class="empty">No student selected</div>';
-      return;
-    }
+    const selector=document.getElementById("studentSelector");
+    const previous=selector.value || localStorage.getItem("studentDashboardSelected") || "";
+    selector.innerHTML='<option value="">Choose student…</option>'+
+      allStudents.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("");
 
-    document.getElementById("studentName").textContent=student.name;
-    document.getElementById("avatar").textContent=initials(student.name);
-    document.getElementById("tags").innerHTML=[
-      student.grade?`<span class="tag">${esc("Grade "+student.grade)}</span>`:"",
-      ...(student.subjects||[]).map(s=>`<span class="tag">${esc(s)}</span>`)
-    ].join("");
-    if(student.googleChat){const b=document.getElementById("chatBtn");b.href=student.googleChat;b.hidden=false}
-    if(student.notionUrl){const b=document.getElementById("notionBtn");b.href=student.notionUrl;b.hidden=false}
+    let chosen=allStudents.find(x=>x.id===previous);
+    if(!chosen&&requestedId) chosen=allStudents.find(x=>x.id===requestedId);
+    if(!chosen&&requestedName) chosen=allStudents.find(x=>x.name.toLowerCase()===requestedName.toLowerCase());
+    if(chosen) selector.value=chosen.id;
 
-    const now=new Date();
-    const lessons=(ld.lessons||[]).filter(x=>x.studentPageId===student.id&&x.start&&new Date(x.start)>=now)
-      .sort((a,b)=>new Date(a.start)-new Date(b.start)).slice(0,4);
-    document.getElementById("lessons").innerHTML=lessons.length?lessons.map(x=>{
-      const d=new Date(x.start);
-      return dateRow(x,d,x.subject||x.title||"Lesson",`${time(d)}${x.status?" · "+x.status:""}`);
-    }).join(""):'<div class="empty">No upcoming lessons</div>';
-
-    const deadlines=(dd.deadlines||[]).filter(x=>x.studentPageId===student.id&&x.dueDate&&new Date(x.dueDate)>=now&&String(x.status||"").toLowerCase()!=="done")
-      .sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate)).slice(0,4);
-    document.getElementById("deadlines").innerHTML=deadlines.length?deadlines.map(x=>{
-      const d=new Date(x.dueDate);
-      return dateRow(x,d,x.title||"Deadline",[x.subject,x.type,x.status].filter(Boolean).join(" · "));
-    }).join(""):'<div class="empty">No upcoming deadlines</div>';
-    bindRows();
+    selector.onchange=()=>{
+      const st=allStudents.find(x=>x.id===selector.value);
+      selectStudent(st||null);
+    };
+    selectStudent(chosen||null);
   }catch(e){
     document.body.innerHTML=`<div class="panel error">Unable to load student dashboard: ${esc(e.message)}</div>`;
   }
