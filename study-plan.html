@@ -37,13 +37,12 @@ h2{font:600 18px Georgia,serif;margin:0 0 13px}.add{display:flex;gap:8px;margin-
 </div>
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
-const qs=new URLSearchParams(location.search), TOKEN=qs.get("token")||"";
+const qs=new URLSearchParams(location.search);
 let studentId=qs.get("studentId")||"", topics=[], weekCount=6, drag=null, lastTap={id:null,time:0};
 
 const $=id=>document.getElementById(id);
-const authHeaders=(json=false)=>({"Authorization":"Bearer "+TOKEN,...(json?{"Content-Type":"application/json"}:{})});
 async function api(path,opt={}) {
-  const r=await fetch(API+path,{...opt,headers:{...authHeaders(Boolean(opt.body)),...(opt.headers||{})}});
+  const r=await fetch(API+path,{...opt,headers:{...(opt.body?{"Content-Type":"application/json"}:{}),...(opt.headers||{})}});
   const d=await r.json().catch(()=>({}));
   if(!r.ok) throw new Error(d.error||("Request failed: "+r.status));
   return d;
@@ -63,9 +62,8 @@ function render(){
   bindTopics();
 }
 async function loadStudents(){
-  if(!TOKEN){message("This widget needs its private Study Plan token in the embed URL.");return}
   try{
-    const d=await api("/study-plan-students");
+    const d=await api("/study-plan-embed-students");
     $("student").innerHTML='<option value="">Select student…</option>'+d.students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
     if(studentId && d.students.some(s=>s.id===studentId)){$("student").value=studentId;await loadPlan()}
     else message("Select a student to load the study plan.");
@@ -74,18 +72,18 @@ async function loadStudents(){
 async function loadPlan(){
   if(!studentId){topics=[];render();message("Select a student to load the study plan.");return}
   message("Loading…");
-  try{const d=await api("/study-plan?studentPageId="+encodeURIComponent(studentId));topics=d.topics||[];weekCount=Math.max(6,maxAssignedWeek());render();message("")}
+  try{const d=await api("/study-plan-embed?studentPageId="+encodeURIComponent(studentId));topics=d.topics||[];weekCount=Math.max(6,maxAssignedWeek());render();message("")}
   catch(e){message(e.message)}
 }
 async function addTopic(){
   const input=$("topicInput"), topic=input.value.trim(); if(!topic||!studentId)return;
   $("addBtn").disabled=true;
-  try{const d=await api("/study-plan",{method:"POST",body:JSON.stringify({studentPageId:studentId,topic})});topics.push(d.topic);input.value="";render()}
+  try{const d=await api("/study-plan-embed",{method:"POST",body:JSON.stringify({studentPageId:studentId,topic})});topics.push(d.topic);input.value="";render()}
   catch(e){message(e.message)} finally{$("addBtn").disabled=false}
 }
 async function patchTopic(t,changes){
   const old=JSON.parse(JSON.stringify(t));Object.assign(t,changes);render();
-  try{await api("/study-plan",{method:"PATCH",body:JSON.stringify({id:t.id,...changes})})}
+  try{await api("/study-plan-embed",{method:"PATCH",body:JSON.stringify({id:t.id,...changes})})}
   catch(e){Object.assign(t,old);render();message(e.message)}
 }
 async function assign(id,week){const t=topics.find(x=>x.id===id);if(!t||t.weeks.includes(week))return;await patchTopic(t,{weeks:[...t.weeks,week]})}
