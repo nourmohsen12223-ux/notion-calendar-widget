@@ -360,8 +360,11 @@ h2{
 .tab-panel .progress-title{margin-top:0}
 
 
-.lessons-stack{display:grid;grid-template-columns:1fr;gap:14px}
+.lessons-stack{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .lessons-panel{min-height:0}
+.history-panel{margin-top:14px}
+.lesson-covered{margin-top:5px;font-size:12px;color:#6F6A63}
+.deadline-type{font-size:11px;color:var(--muted);margin-top:3px}
 .lesson-list{display:flex;flex-direction:column;gap:8px}
 .lesson-row{
   display:grid;
@@ -391,6 +394,7 @@ h2{
 }
 
 @media(max-width:700px){
+  .lessons-stack{grid-template-columns:1fr}
   .top{align-items:stretch;flex-direction:column}
   .student{width:100%}
   .grid{grid-template-columns:1fr}
@@ -467,10 +471,15 @@ h2{
         <div id="upcomingLessons" class="lesson-list"><span class="empty">Select a student to load lessons.</span></div>
       </section>
       <section class="panel lessons-panel">
-        <h2>Lesson History</h2>
-        <div id="lessonHistory" class="lesson-list"><span class="empty">Select a student to load lesson history.</span></div>
+        <h2>Upcoming Deadlines</h2>
+        <div id="upcomingDeadlines" class="lesson-list"><span class="empty">Select a student to load deadlines.</span></div>
       </section>
     </div>
+
+    <section class="panel lessons-panel history-panel">
+      <h2>Lesson History</h2>
+      <div id="lessonHistory" class="lesson-list"><span class="empty">Select a student to load lesson history.</span></div>
+    </section>
   </div>
 
 </div>
@@ -478,7 +487,7 @@ h2{
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
 const qs=new URLSearchParams(location.search);
 const SAVED_STUDENT_KEY="studyPlanSelectedStudent";
-let studentId=qs.get("studentId")||localStorage.getItem(SAVED_STUDENT_KEY)||"", topics=[], lessons=[], weekCount=6, drag=null, lastTap={id:null,time:0};
+let studentId=qs.get("studentId")||localStorage.getItem(SAVED_STUDENT_KEY)||"", topics=[], lessons=[], deadlines=[], weekCount=6, drag=null, lastTap={id:null,time:0};
 
 const $=id=>document.getElementById(id);
 async function api(path,opt={}) {
@@ -574,6 +583,7 @@ $("student").onchange=async e=>{
   else localStorage.removeItem(SAVED_STUDENT_KEY);
   await loadPlan();
   await loadLessons();
+  await loadDeadlines();
 };
 $("addBtn").onclick=addTopic;$("topicInput").onkeydown=e=>{if(e.key==="Enter")addTopic()};
 $("addWeek").onclick=()=>{weekCount++;render()};
@@ -604,13 +614,15 @@ function fmtLessonDate(iso){
   const d=new Date(iso);
   return d.toLocaleDateString(undefined,{month:"short",day:"numeric"})+"<br>"+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
 }
-function lessonRow(l){
+function lessonRow(l,isHistory=false){
   const href=l.notionUrl||"#";
+  const covered=isHistory?`<div class="lesson-covered">Topic covered: ${esc(l.topicCovered||"Not recorded yet")}</div>`:"";
   return `<a class="lesson-row" href="${esc(href)}" target="_blank" rel="noopener">
     <div class="lesson-date">${fmtLessonDate(l.start)}</div>
     <div class="lesson-main">
       <div class="lesson-title">${esc(l.title||"Lesson")}</div>
       <div class="lesson-subject">${esc(l.subject||"")}</div>
+      ${covered}
     </div>
     <div class="lesson-status">${esc(l.status||"Scheduled")}</div>
   </a>`;
@@ -621,8 +633,35 @@ function renderLessons(){
   const upcoming=mine.filter(l=>new Date(l.start).getTime()>=now).sort((a,b)=>new Date(a.start)-new Date(b.start));
   const history=mine.filter(l=>new Date(l.start).getTime()<now).sort((a,b)=>new Date(b.start)-new Date(a.start));
   $("upcomingLessons").innerHTML=studentId?(upcoming.length?upcoming.map(lessonRow).join(""):'<span class="empty">No upcoming lessons.</span>'):'<span class="empty">Select a student to load lessons.</span>';
-  $("lessonHistory").innerHTML=studentId?(history.length?history.map(lessonRow).join(""):'<span class="empty">No lesson history yet.</span>'):'<span class="empty">Select a student to load lesson history.</span>';
+  $("lessonHistory").innerHTML=studentId?(history.length?history.map(l=>lessonRow(l,true)).join(""):'<span class="empty">No lesson history yet.</span>'):'<span class="empty">Select a student to load lesson history.</span>';
 }
+function deadlineRow(d){
+  const href=d.notionUrl||"#";
+  return `<a class="lesson-row" href="${esc(href)}" target="_blank" rel="noopener">
+    <div class="lesson-date">${fmtLessonDate(d.dueDate||d.dueEnd||"")}</div>
+    <div class="lesson-main">
+      <div class="lesson-title">${esc(d.title||"Deadline")}</div>
+      <div class="lesson-subject">${esc(d.subject||"")}</div>
+      <div class="deadline-type">${esc(d.type||"")}</div>
+    </div>
+    <div class="lesson-status">${esc(d.status||"Upcoming")}</div>
+  </a>`;
+}
+function renderDeadlines(){
+  if(!studentId){$("upcomingDeadlines").innerHTML='<span class="empty">Select a student to load deadlines.</span>';return}
+  const now=Date.now();
+  const mine=deadlines.filter(d=>d.studentPageId===studentId)
+    .filter(d=>!d.dueDate||new Date(d.dueDate).getTime()>=now)
+    .filter(d=>(d.status||"").toLowerCase()!=="done")
+    .sort((a,b)=>new Date(a.dueDate||0)-new Date(b.dueDate||0));
+  $("upcomingDeadlines").innerHTML=mine.length?mine.map(deadlineRow).join(""):'<span class="empty">No upcoming deadlines.</span>';
+}
+async function loadDeadlines(){
+  if(!studentId){deadlines=[];renderDeadlines();return}
+  try{const d=await api("/tutoring-deadlines");deadlines=d.deadlines||[];renderDeadlines()}
+  catch(e){$("upcomingDeadlines").innerHTML='<span class="empty">Could not load deadlines.</span>'}
+}
+
 async function loadLessons(){
   if(!studentId){lessons=[];renderLessons();return}
   try{
