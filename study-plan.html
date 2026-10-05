@@ -662,6 +662,27 @@ h2{
   .work-history-panel{margin-top:0}
 }
 
+
+/* Small iPad adjustment only: keep the Add Work form on one row */
+@media (min-width:621px) and (max-width:1180px){
+  .work-form-grid{
+    grid-template-columns:minmax(0,1.7fr) minmax(0,.9fr) minmax(0,.9fr) minmax(0,.9fr) auto;
+    gap:6px;
+  }
+  .work-field{min-width:0}
+  .work-field input,.work-field select{
+    min-width:0;
+    max-width:100%;
+    padding:7px 6px;
+    font-size:12px;
+  }
+  .work-save{
+    min-width:58px;
+    padding:8px 9px;
+    font-size:12px;
+  }
+}
+
 </style>
 </head>
 <body>
