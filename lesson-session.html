@@ -304,6 +304,24 @@ async function saveTopics(lessonId, topicIds){
 
 
 
+
+async function loadLessonResources(lesson){
+  if(!lesson?.id)return;
+  try{
+    const r=await fetch(
+      API+"/tutoring-lesson-resources?lessonId="+encodeURIComponent(lesson.id)+"&_="+Date.now(),
+      {cache:"no-store"}
+    );
+    const d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.error||"Could not load resources.");
+    lesson.resources=d.resources||{};
+    renderResourceFiles(lesson);
+  }catch(e){
+    renderResourceFiles(lesson);
+    document.getElementById("status").textContent="Could not load resources: "+e.message;
+  }
+}
+
 function renderResourceFiles(lesson){
   const groups={
     lectureNotes: lesson?.resources?.lectureNotes || [],
@@ -359,22 +377,8 @@ async function uploadLessonFiles(category,fileList){
       renderResourceFiles(lesson);
     }
 
-    // Re-read the selected lesson from Notion so the uploaded filename/file
-    // is visible immediately and remains visible after reopening the lesson.
-    try{
-      const refreshRes=await fetch(API+"/tutoring-lessons?_="+Date.now(),{cache:"no-store"});
-      const refreshData=await refreshRes.json();
-      if(refreshRes.ok && refreshData.success && Array.isArray(refreshData.lessons)){
-        const fresh=refreshData.lessons.find(x=>x.id===lessonId);
-        if(fresh){
-          const index=lessons.findIndex(x=>x.id===lessonId);
-          if(index>=0) lessons[index]=fresh;
-          renderResourceFiles(fresh);
-        }
-      }
-    }catch(_refreshError){
-      // The immediate upload response above still renders the file if refresh fails.
-    }
+    // Refresh only this lesson's resources; lesson loading remains untouched.
+    if(lesson) await loadLessonResources(lesson);
 
     document.getElementById("status").textContent="Files uploaded ✓";
   }catch(e){
@@ -495,6 +499,7 @@ function show(id){
   document.getElementById("status").textContent=`Selected lesson: ${l.status||"Scheduled"}`;
   loadChecklist(l);
   renderResourceFiles(l);
+  loadLessonResources(l);
   loadTopics(l.studentPageId);
 }
 async function init(){
