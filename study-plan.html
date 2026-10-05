@@ -578,8 +578,6 @@ function bindTopics(){
 }
 $("student").onchange=async e=>{
   studentId=e.target.value;
-  if(studentId) 
-  else 
   await loadPlan();
   await loadLessons();
   await loadDeadlines();
