@@ -322,7 +322,7 @@ h2{
 
 .dashboard-tabs{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(5,1fr);
   gap:6px;
   width:100%;
   margin:0 0 16px 0;
@@ -524,6 +524,55 @@ h2{
   color:var(--muted);
 }
 
+
+.work-toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-bottom:14px;
+}
+.work-filter{
+  appearance:none;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#FFFFFF;
+  color:#6F6A63;
+  padding:7px 11px;
+  font:inherit;
+  font-size:12px;
+  cursor:pointer;
+}
+.work-filter.active{
+  background:#F1F0ED;
+  color:var(--ink);
+  font-weight:650;
+}
+.work-list{display:flex;flex-direction:column;gap:8px}
+.work-row{
+  display:grid;
+  grid-template-columns:88px minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  padding:11px 12px;
+  border:1px solid #E7E5E1;
+  border-radius:9px;
+  background:#FFFFFF;
+  color:var(--ink);
+  text-decoration:none;
+}
+.work-row:hover{background:#FAF9F7}
+.work-date{font-size:12px;color:var(--muted);line-height:1.35}
+.work-title{font-size:14px;font-weight:600}
+.work-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.work-type{
+  padding:5px 8px;
+  border-radius:999px;
+  background:#F1F0ED;
+  color:#6F6A63;
+  font-size:11px;
+  white-space:nowrap;
+}
+
 </style>
 </head>
 <body>
@@ -572,6 +621,7 @@ h2{
     <button class="dashboard-tab active" type="button" data-tab="studyTab">Study Plan</button>
     <button class="dashboard-tab" type="button" data-tab="progressTab">Progress</button>
     <button class="dashboard-tab" type="button" data-tab="lessonsTab">Lessons</button>
+    <button class="dashboard-tab" type="button" data-tab="workTab">Work</button>
     <button class="dashboard-tab" type="button" data-tab="notesTab">Notes</button>
   </div>
   <div id="studyTab" class="tab-panel active">
@@ -643,6 +693,21 @@ h2{
     </section>
   </div>
 
+  <div id="workTab" class="tab-panel">
+    <h1 class="section-title">Work</h1>
+    <section class="panel lessons-panel">
+      <h2>Tests, Assignments & Homework</h2>
+      <div class="work-toolbar" id="workFilters">
+        <button class="work-filter active" type="button" data-work-filter="All">All</button>
+        <button class="work-filter" type="button" data-work-filter="Homework">Homework</button>
+        <button class="work-filter" type="button" data-work-filter="Quiz">Quizzes</button>
+        <button class="work-filter" type="button" data-work-filter="Exam">Exams</button>
+        <button class="work-filter" type="button" data-work-filter="Assignment">Assignments</button>
+      </div>
+      <div id="workList" class="work-list"><span class="empty">Select a student to load work.</span></div>
+    </section>
+  </div>
+
   <div id="notesTab" class="tab-panel">
     <h1 class="section-title">Student Notes</h1>
     <section class="panel notes-panel">
@@ -656,7 +721,7 @@ h2{
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
 const qs=new URLSearchParams(location.search);
-let studentId=qs.get("studentId")||"", students=[], topics=[], lessons=[], deadlines=[], weekCount=6, drag=null, lastTap={id:null,time:0};
+let studentId=qs.get("studentId")||"", students=[], topics=[], lessons=[], deadlines=[], workFilter="All", weekCount=6, drag=null, lastTap={id:null,time:0};
 
 const $=id=>document.getElementById(id);
 async function api(path,opt={}) {
@@ -868,6 +933,46 @@ function deadlineRow(d){
     <div class="lesson-status">${esc(d.status||"Upcoming")}</div>
   </a>`;
 }
+
+function workTypeMatches(d){
+  const studentTypes=["Homework","Quiz","Exam","Assignment"];
+  const type=d.type||"";
+  if(!studentTypes.includes(type)) return false;
+  if(workFilter==="All") return true;
+  return type===workFilter;
+}
+function workRow(d){
+  const href=d.notionUrl||"#";
+  const due=d.dueDate||d.dueEnd||"";
+  return `<a class="work-row" href="${esc(href)}" target="_blank" rel="noopener">
+    <div class="work-date">${fmtLessonDate(due)}</div>
+    <div>
+      <div class="work-title">${esc(d.title||"Work item")}</div>
+      <div class="work-meta">${esc(d.subject||"")}${d.status?` · ${esc(d.status)}`:""}</div>
+    </div>
+    <div class="work-type">${esc(d.type||"Other")}</div>
+  </a>`;
+}
+function renderWork(){
+  if(!$("workList")) return;
+  if(!studentId){
+    $("workList").innerHTML='<span class="empty">Select a student to load work.</span>';
+    return;
+  }
+  const mine=deadlines
+    .filter(d=>d.studentPageId===studentId)
+    .filter(workTypeMatches)
+    .sort((a,b)=>new Date(a.dueDate||a.dueEnd||0)-new Date(b.dueDate||b.dueEnd||0));
+  $("workList").innerHTML=mine.length?mine.map(workRow).join(""):'<span class="empty">No items in this category.</span>';
+}
+document.querySelectorAll("[data-work-filter]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    workFilter=btn.dataset.workFilter;
+    document.querySelectorAll("[data-work-filter]").forEach(b=>b.classList.toggle("active",b===btn));
+    renderWork();
+  });
+});
+
 function renderDeadlines(){
   if(!studentId){$("upcomingDeadlines").innerHTML='<span class="empty">Select a student to load deadlines.</span>';return}
   const now=Date.now();
@@ -878,9 +983,16 @@ function renderDeadlines(){
   $("upcomingDeadlines").innerHTML=mine.length?mine.map(deadlineRow).join(""):'<span class="empty">No upcoming deadlines.</span>';
 }
 async function loadDeadlines(){
-  if(!studentId){deadlines=[];renderDeadlines();return}
-  try{const d=await api("/tutoring-deadlines");deadlines=d.deadlines||[];renderDeadlines()}
-  catch(e){$("upcomingDeadlines").innerHTML='<span class="empty">Could not load deadlines.</span>'}
+  if(!studentId){deadlines=[];renderDeadlines();renderWork();return}
+  try{
+    const d=await api("/tutoring-deadlines");
+    deadlines=d.deadlines||[];
+    renderDeadlines();
+    renderWork();
+  }catch(e){
+    $("upcomingDeadlines").innerHTML='<span class="empty">Could not load deadlines.</span>';
+    $("workList").innerHTML='<span class="empty">Could not load work.</span>';
+  }
 }
 
 async function loadLessons(){
