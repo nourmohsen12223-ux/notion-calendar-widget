@@ -53,8 +53,8 @@ select{width:100%;border:1px solid var(--line);border-radius:9px;background:#fff
   <div class="grid">
     <section class="card">
       <h2>Before Lesson</h2>
-      <label class="check"><input type="checkbox" disabled>24h Notice sent</label>
-      <label class="check"><input type="checkbox" disabled>1h Notice sent</label>
+      <label class="check"><input id="notice24h" data-checklist="notice24h" type="checkbox">24h Notice sent</label>
+      <label class="check"><input id="notice1h" data-checklist="notice1h" type="checkbox">1h Notice sent</label>
       <div class="placeholder" style="margin-top:9px">The controls will be connected to the Lesson record after lesson identity is confirmed.</div>
     </section>
 
@@ -66,12 +66,12 @@ select{width:100%;border:1px solid var(--line);border-radius:9px;background:#fff
 
     <section class="card">
       <h2>After Lesson</h2>
-      <label class="check"><input type="checkbox" disabled>Attendance recorded</label>
+      <label class="check"><input id="attendance" data-checklist="attendance" type="checkbox">Attendance recorded</label>
       <label class="check"><input type="checkbox" disabled>Meeting transcription saved</label>
       <label class="check"><input type="checkbox" disabled>Lesson recording saved</label>
       <label class="check"><input type="checkbox" disabled>Lesson materials uploaded</label>
-      <label class="check"><input type="checkbox" disabled>Homework sent</label>
-      <label class="check"><input type="checkbox" disabled>Lesson notes completed</label>
+      <label class="check"><input id="homeworkSent" data-checklist="homeworkSent" type="checkbox">Homework sent</label>
+      <label class="check"><input id="lessonNotesSent" data-checklist="lessonNotesSent" type="checkbox">Lesson notes completed</label>
     </section>
   </div>
 
@@ -117,6 +117,57 @@ async function saveTopics(lessonId, topicIds){
   const lesson=lessons.find(x=>x.id===lessonId);
   if(lesson) lesson.topicsCoveredIds=[...topicIds];
   status.textContent="Topics Covered saved ✓";
+}
+
+
+function checklistState(){
+  const state={};
+  document.querySelectorAll('input[data-checklist]').forEach(cb=>{
+    state[cb.dataset.checklist]=cb.checked;
+  });
+  return state;
+}
+function loadChecklist(lesson){
+  const saved=lesson?.checklist||{};
+  document.querySelectorAll('input[data-checklist]').forEach(cb=>{
+    cb.checked=!!saved[cb.dataset.checklist];
+    cb.disabled=false;
+  });
+}
+async function saveChecklist(){
+  const lessonId=document.getElementById("lesson").value;
+  const boxes=[...document.querySelectorAll('input[data-checklist]')];
+  const checklist=checklistState();
+  const status=document.getElementById("status");
+  boxes.forEach(x=>x.disabled=true);
+  status.textContent="Saving checklist…";
+  try{
+    const r=await fetch(API+"/tutoring-lessons",{
+      method:"PATCH",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({lessonId,checklist})
+    });
+    const d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.error||"Could not save checklist");
+    const lesson=lessons.find(x=>x.id===lessonId);
+    if(lesson) lesson.checklist={...checklist};
+    status.textContent="Checklist saved ✓";
+  }finally{
+    boxes.forEach(x=>x.disabled=false);
+  }
+}
+function bindChecklist(){
+  document.querySelectorAll('input[data-checklist]').forEach(cb=>{
+    cb.addEventListener("change",async()=>{
+      const previous=!cb.checked;
+      try{
+        await saveChecklist();
+      }catch(e){
+        cb.checked=previous;
+        document.getElementById("status").textContent="Could not save: "+e.message;
+      }
+    });
+  });
 }
 
 async function loadTopics(studentPageId){
@@ -169,6 +220,7 @@ function show(id){
   document.getElementById("subject").textContent=l.subject||"—";
   document.getElementById("when").textContent=fmt(l.start);
   document.getElementById("status").textContent=`Selected lesson: ${l.status||"Scheduled"}`;
+  loadChecklist(l);
   loadTopics(l.studentPageId);
 }
 async function init(){
@@ -190,6 +242,7 @@ async function init(){
     document.getElementById("status").textContent=e.message;
   }
 }
+bindChecklist();
 init();
 </script>
 </body>
