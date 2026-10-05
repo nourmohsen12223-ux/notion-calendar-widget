@@ -496,15 +496,11 @@ body {
 
   line-height: 1.1;
 
-  white-space: normal;
+  white-space: nowrap;
 
   overflow: hidden;
 
-  text-overflow: clip;
-
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
 }
 
 
@@ -1028,7 +1024,7 @@ const END_HOUR = 29;
   fits comfortably inside the iPad embed.
 */
 
-const HOUR_HEIGHT = 62;
+const HOUR_HEIGHT = 38;
 
 
 /* ==========================================
@@ -2606,44 +2602,6 @@ setInterval(
 </html>
 
 <style>
-/* iPad-safe lesson cards: keep all three lines visible */
-.lesson{
-  box-sizing:border-box !important;
-  padding:4px 5px !important;
-  overflow:hidden !important;
-}
-.lesson-title{
-  font-size:8px !important;
-  line-height:1.08 !important;
-  white-space:normal !important;
-  overflow:hidden !important;
-  text-overflow:clip !important;
-  display:-webkit-box !important;
-  -webkit-box-orient:vertical !important;
-  -webkit-line-clamp:2 !important;
-}
-.lesson-time{
-  font-size:7px !important;
-  line-height:1.05 !important;
-  white-space:nowrap !important;
-  overflow:visible !important;
-  text-overflow:clip !important;
-}
-.lesson-subject{
-  margin-top:1px !important;
-  font-size:7.5px !important;
-  line-height:1.05 !important;
-  white-space:normal !important;
-  overflow:visible !important;
-  text-overflow:clip !important;
-  display:block !important;
-}
-@media (min-width:600px) and (max-width:1180px){
-  .lesson{
-    padding:3px 4px !important;
-  }
-  .lesson-title{font-size:7.5px !important;}
-  .lesson-time{font-size:6.8px !important;}
-  .lesson-subject{font-size:7.2px !important;}
-}
+/* Compact calendar: subject intentionally hidden from lesson cards */
+.lesson-subject { display: none !important; }
 </style>
