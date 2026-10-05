@@ -9,7 +9,7 @@
 html{margin:0;padding:0;background:#fff;}
 :root{--ink:#37352F;--muted:#8F8B84;--line:#DDDAD5;--bg:#F8F7F4;--card:#fff;--chip:#E9E5DF;--chip2:#EEEAE4;--today:#D8D2CA}
 *{box-sizing:border-box} body{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serifmargin:0;padding:0;background:#fff;}
-.shell{max-width:1100px;margin:auto;padding:18px}.top{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.shell{width:100%;max-width:none;margin:0;padding:0;background:#fff}.top{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
 h1{font:600 26px Georgia,serif;margin:0}.student{min-width:220px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink)}
 .grid{display:grid;grid-template-columns:minmax(260px,.8fr) minmax(360px,1.2fr);gap:14px}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;min-height:420px}
@@ -67,6 +67,16 @@ body {
   width: 100% !important;
   max-width: none !important;
   margin: 0 !important;
+}
+
+
+/* TRUE EDGE-TO-EDGE FIX */
+html,body,.shell{
+  margin:0 !important;
+  padding:0 !important;
+  width:100% !important;
+  max-width:none !important;
+  background:#fff !important;
 }
 
 </style>
