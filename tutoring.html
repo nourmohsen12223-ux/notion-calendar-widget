@@ -2268,6 +2268,7 @@ function renderDeadlines() {
         item => {
 
           const value =
+            item.dueDate ||
             item.due ||
             item.date ||
             item.start;
@@ -2299,11 +2300,13 @@ function renderDeadlines() {
       .sort(
         (a, b) =>
           new Date(
+            a.dueDate ||
             a.due ||
             a.date ||
             a.start
           ) -
           new Date(
+            b.dueDate ||
             b.due ||
             b.date ||
             b.start
@@ -2339,7 +2342,8 @@ function renderDeadlines() {
 
           const date =
             new Date(
-              item.due ||
+              item.dueDate ||
+            item.due ||
               item.date ||
               item.start
             );
