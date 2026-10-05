@@ -26,6 +26,11 @@ select{width:100%;border:1px solid var(--line);border-radius:9px;background:#fff
 .check{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid #F0EFEC;font-size:13px}
 .check:last-child{border-bottom:0}
 .check input{width:16px;height:16px;accent-color:var(--green)}
+.topic-row{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid #F0EFEC;font-size:13px}
+.topic-row:last-child{border-bottom:0}
+.topic-row input{width:16px;height:16px;margin-top:1px;accent-color:var(--green)}
+.topic-done{color:var(--muted)}
+.topic-done .topic-name{text-decoration:line-through}
 .placeholder{font-size:12px;color:var(--muted);line-height:1.55}
 .status{margin-top:8px;font-size:11px;color:var(--muted)}
 @media(max-width:760px){.grid,.meta{grid-template-columns:1fr}.wrap{padding:9px}}
@@ -55,7 +60,8 @@ select{width:100%;border:1px solid var(--line);border-radius:9px;background:#fff
 
     <section class="card">
       <h2>During Lesson</h2>
-      <div class="placeholder"><strong>Topics Covered</strong><br>Next step: this area will show only Study Plan topics belonging to the student attached to the selected lesson.</div>
+      <div class="placeholder"><strong>Topics Covered</strong></div>
+      <div id="topics" style="margin-top:7px"><div class="placeholder">Select a lesson to load this student's Study Plan.</div></div>
     </section>
 
     <section class="card">
@@ -98,6 +104,31 @@ function nearestLesson(items){
   const now=Date.now();
   return [...items].filter(x=>x.start).sort((a,b)=>Math.abs(new Date(a.start)-now)-Math.abs(new Date(b.start)-now))[0];
 }
+async function loadTopics(studentPageId){
+  const box=document.getElementById("topics");
+  if(!studentPageId){
+    box.innerHTML='<div class="placeholder">No student is attached to this lesson.</div>';
+    return;
+  }
+  box.innerHTML='<div class="placeholder">Loading Study Plan…</div>';
+  try{
+    const r=await fetch(API+"/study-plan-embed?studentPageId="+encodeURIComponent(studentPageId));
+    const d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.error||"Could not load Study Plan");
+    const topics=d.topics||[];
+    if(!topics.length){
+      box.innerHTML='<div class="placeholder">No Study Plan topics have been added for this student yet.</div>';
+      return;
+    }
+    box.innerHTML=topics.map(t=>`
+      <label class="topic-row ${t.completed?"topic-done":""}">
+        <input type="checkbox" disabled aria-label="Topic Covered">
+        <span class="topic-name">${esc(t.topic||"Untitled topic")}</span>
+      </label>`).join("");
+  }catch(e){
+    box.innerHTML='<div class="placeholder">Could not load topics: '+esc(e.message)+'</div>';
+  }
+}
 function show(id){
   const l=lessons.find(x=>x.id===id);
   if(!l)return;
@@ -105,6 +136,7 @@ function show(id){
   document.getElementById("subject").textContent=l.subject||"—";
   document.getElementById("when").textContent=fmt(l.start);
   document.getElementById("status").textContent=`Selected lesson: ${l.status||"Scheduled"}`;
+  loadTopics(l.studentPageId);
 }
 async function init(){
   const sel=document.getElementById("lesson");
