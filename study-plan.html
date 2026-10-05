@@ -157,16 +157,64 @@ h2{
   transform:translate(-50%,-50%);
   box-shadow:0 6px 18px rgba(0,0,0,.12);
 }
+
+.section-title{
+  margin:0 0 12px 0;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:25px;
+  line-height:1.2;
+  font-weight:600;
+  color:var(--ink);
+}
+.progress-title{margin-top:24px}
+.progress-grid{grid-template-columns:1fr 1fr}
+.progress-panel{min-height:230px}
+.focus-controls{display:flex;flex-direction:column;gap:10px}
+.focus-select,.focus-text{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#FFFFFF;
+  color:var(--ink);
+  font:inherit;
+  padding:10px 12px;
+}
+.focus-text{min-height:92px;resize:vertical}
+.focus-note,.progress-detail{font-size:12px;color:var(--muted);margin:10px 0 0}
+.progress-content{display:flex;flex-direction:column;justify-content:center;min-height:150px}
+.progress-percent{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:52px;
+  line-height:1;
+  margin-bottom:18px;
+}
+.progress-track{
+  width:100%;
+  height:10px;
+  border-radius:999px;
+  background:var(--chip2);
+  overflow:hidden;
+}
+.progress-fill{
+  width:0%;
+  height:100%;
+  border-radius:999px;
+  background:#6F6A63;
+  transition:width .25s ease;
+}
+
 @media(max-width:700px){
   .top{align-items:stretch;flex-direction:column}
   .student{width:100%}
   .grid{grid-template-columns:1fr}
+  .progress-grid{grid-template-columns:1fr}
   .panel{min-height:300px}
 }
 </style>
 </head>
 <body>
 <div class="shell">
+  <h1 class="section-title">Study Plan</h1>
   <div class="top"><select id="student" class="student"><option value="">Select student…</option></select></div>
   <p id="msg" class="msg">Select a student to load the study plan.</p>
   <div class="grid">
@@ -179,6 +227,28 @@ h2{
       <h2>Long-Term Plan</h2>
       <div id="weeks" class="weeks"></div>
       <button id="addWeek" class="btn more" disabled>+ Add Week</button>
+    </section>
+  </div>
+
+  <h1 class="section-title progress-title">Progress</h1>
+  <div class="grid progress-grid">
+    <section class="panel progress-panel">
+      <h2>Current Focus</h2>
+      <div class="focus-controls">
+        <select id="focusTopic" class="focus-select" disabled>
+          <option value="">Select a topic…</option>
+        </select>
+        <textarea id="focusText" class="focus-text" placeholder="Add a note or extra focus…" disabled></textarea>
+      </div>
+      <p class="focus-note">Choose a topic from your Study Plan and add optional text.</p>
+    </section>
+    <section class="panel progress-panel">
+      <h2>Progress</h2>
+      <div class="progress-content">
+        <div id="progressPercent" class="progress-percent">0%</div>
+        <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+        <div id="progressDetail" class="progress-detail">0 of 0 topics completed</div>
+      </div>
     </section>
   </div>
 </div>
@@ -201,6 +271,19 @@ function maxAssignedWeek(){return topics.flatMap(t=>t.weeks||[]).reduce((m,w)=>M
 function render(){
   const enabled=Boolean(studentId);
   $("topicInput").disabled=!enabled;$("addBtn").disabled=!enabled;$("addWeek").disabled=!enabled;
+  $("focusTopic").disabled=!enabled;
+  $("focusText").disabled=!enabled;
+
+  const previousFocus=$("focusTopic").value;
+  $("focusTopic").innerHTML='<option value="">Select a topic…</option>'+topics.map(t=>`<option value="${esc(t.id)}">${esc(t.topic)}</option>`).join("");
+  if(topics.some(t=>t.id===previousFocus)) $("focusTopic").value=previousFocus;
+
+  const completed=topics.filter(t=>t.completed).length;
+  const total=topics.length;
+  const pct=total?Math.round((completed/total)*100):0;
+  $("progressPercent").textContent=pct+"%";
+  $("progressFill").style.width=pct+"%";
+  $("progressDetail").textContent=`${completed} of ${total} topics completed`;
   $("topics").innerHTML=topics.length?topics.map(t=>`<div class="topic ${t.completed?"completed":""}" data-id="${t.id}" title="Drag to a week. Double-click / double-tap to complete.">${esc(t.topic)}</div>`).join(""):`<span class="empty">${enabled?"No topics yet. Add your first one.":"No student selected."}</span>`;
   weekCount=Math.max(weekCount,6,maxAssignedWeek());
   $("weeks").innerHTML=Array.from({length:weekCount},(_,i)=>{
@@ -220,7 +303,8 @@ async function loadStudents(){
 async function loadPlan(){
   if(!studentId){topics=[];render();message("Select a student to load the study plan.");return}
   message("Loading…");
-  try{const d=await api("/study-plan-embed?studentPageId="+encodeURIComponent(studentId));topics=d.topics||[];weekCount=Math.max(6,maxAssignedWeek());render();message("")}
+  try{const d=await api("/study-plan-embed?studentPageId="+encodeURIComponent(studentId));topics=d.topics||[];weekCount=Math.max(6,maxAssignedWeek());render();
+    loadFocus();message("")}
   catch(e){message(e.message)}
 }
 async function addTopic(){
@@ -270,6 +354,23 @@ $("addBtn").onclick=addTopic;$("topicInput").onkeydown=e=>{if(e.key==="Enter")ad
 $("addWeek").onclick=()=>{weekCount++;render()};
 $("weeks").onclick=e=>{const b=e.target.closest("[data-remove]");if(b)unassign(b.dataset.remove,b.dataset.week)};
 render();loadStudents();
+
+
+function focusStorageKey(){return studentId?`studyPlanFocus:${studentId}`:""}
+function loadFocus(){
+  if(!studentId){$("focusTopic").value="";$("focusText").value="";return}
+  try{
+    const v=JSON.parse(localStorage.getItem(focusStorageKey())||"{}");
+    $("focusTopic").value=topics.some(t=>t.id===v.topicId)?v.topicId:"";
+    $("focusText").value=v.text||"";
+  }catch(e){$("focusTopic").value="";$("focusText").value=""}
+}
+function saveFocus(){
+  if(!studentId)return;
+  localStorage.setItem(focusStorageKey(),JSON.stringify({topicId:$("focusTopic").value,text:$("focusText").value}));
+}
+$("focusTopic").addEventListener("change",saveFocus);
+$("focusText").addEventListener("input",saveFocus);
 </script>
 </body>
 </html>
