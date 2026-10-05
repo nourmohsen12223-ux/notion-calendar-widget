@@ -496,11 +496,15 @@ body {
 
   line-height: 1.1;
 
-  white-space: nowrap;
+  white-space: normal;
 
   overflow: hidden;
 
-  text-overflow: ellipsis;
+  text-overflow: clip;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 
@@ -1024,7 +1028,7 @@ const END_HOUR = 29;
   fits comfortably inside the iPad embed.
 */
 
-const HOUR_HEIGHT = 38;
+const HOUR_HEIGHT = 48;
 
 
 /* ==========================================
