@@ -253,7 +253,16 @@ select{
       <div class="file-list" id="homeworkWorksheetsList"></div>
       <div class="upload-note">You can select several homework/worksheet files together · up to 20 MB each</div>
     </div>
-    <div class="card"><h2>Recording & Transcription</h2><div class="placeholder">Next step</div></div>
+    <div class="card">
+      <h2>Recording & Transcription</h2>
+      <div class="file-actions">
+        <label class="upload-btn" id="recordingTranscriptionBtn">+ Upload files
+          <input class="file-input" id="recordingTranscriptionInput" type="file" multiple>
+        </label>
+      </div>
+      <div class="file-list" id="recordingTranscriptionList"></div>
+      <div class="upload-note">Upload the lesson recording, transcript, or both · up to 20 MB each</div>
+    </div>
   </div>
 </div>
 <script>
@@ -298,7 +307,8 @@ async function saveTopics(lessonId, topicIds){
 function renderResourceFiles(lesson){
   const groups={
     lectureNotes: lesson?.resources?.lectureNotes || [],
-    homeworkWorksheets: lesson?.resources?.homeworkWorksheets || []
+    homeworkWorksheets: lesson?.resources?.homeworkWorksheets || [],
+    recordingTranscription: lesson?.resources?.recordingTranscription || []
   };
   Object.entries(groups).forEach(([category,files])=>{
     const box=document.getElementById(category+"List");
@@ -348,6 +358,24 @@ async function uploadLessonFiles(category,fileList){
       lesson.resources[category]=d.files||[];
       renderResourceFiles(lesson);
     }
+
+    // Re-read the selected lesson from Notion so the uploaded filename/file
+    // is visible immediately and remains visible after reopening the lesson.
+    try{
+      const refreshRes=await fetch(API+"/tutoring-lessons?_="+Date.now(),{cache:"no-store"});
+      const refreshData=await refreshRes.json();
+      if(refreshRes.ok && refreshData.success && Array.isArray(refreshData.lessons)){
+        const fresh=refreshData.lessons.find(x=>x.id===lessonId);
+        if(fresh){
+          const index=lessons.findIndex(x=>x.id===lessonId);
+          if(index>=0) lessons[index]=fresh;
+          renderResourceFiles(fresh);
+        }
+      }
+    }catch(_refreshError){
+      // The immediate upload response above still renders the file if refresh fails.
+    }
+
     document.getElementById("status").textContent="Files uploaded ✓";
   }catch(e){
     document.getElementById("status").textContent="Could not upload: "+e.message;
@@ -358,7 +386,7 @@ async function uploadLessonFiles(category,fileList){
 }
 
 function bindResourceUploads(){
-  ["lectureNotes","homeworkWorksheets"].forEach(category=>{
+  ["lectureNotes","homeworkWorksheets","recordingTranscription"].forEach(category=>{
     document.getElementById(category+"Input")?.addEventListener("change",e=>{
       uploadLessonFiles(category,e.target.files);
     });
