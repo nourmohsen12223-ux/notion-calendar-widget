@@ -322,7 +322,7 @@ h2{
 
 .dashboard-tabs{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:repeat(3,1fr);
   gap:6px;
   width:100%;
   margin:0 0 16px 0;
@@ -359,6 +359,37 @@ h2{
 .tab-panel.active{display:block}
 .tab-panel .progress-title{margin-top:0}
 
+
+.lessons-stack{display:grid;grid-template-columns:1fr;gap:14px}
+.lessons-panel{min-height:0}
+.lesson-list{display:flex;flex-direction:column;gap:8px}
+.lesson-row{
+  display:grid;
+  grid-template-columns:86px minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  width:100%;
+  padding:11px 12px;
+  border:1px solid #E7E5E1;
+  border-radius:9px;
+  background:#FFFFFF;
+  color:var(--ink);
+  text-decoration:none;
+}
+.lesson-row:hover{background:#FAF9F7}
+.lesson-date{font-size:12px;color:var(--muted);line-height:1.35}
+.lesson-main{min-width:0}
+.lesson-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lesson-subject{font-size:12px;color:var(--muted);margin-top:3px}
+.lesson-status{
+  padding:5px 8px;
+  border-radius:999px;
+  background:#F1F0ED;
+  color:#6F6A63;
+  font-size:11px;
+  white-space:nowrap;
+}
+
 @media(max-width:700px){
   .top{align-items:stretch;flex-direction:column}
   .student{width:100%}
@@ -375,6 +406,7 @@ h2{
   <div class="dashboard-tabs" role="tablist" aria-label="Student dashboard sections">
     <button class="dashboard-tab active" type="button" data-tab="studyTab">Study Plan</button>
     <button class="dashboard-tab" type="button" data-tab="progressTab">Progress</button>
+    <button class="dashboard-tab" type="button" data-tab="lessonsTab">Lessons</button>
   </div>
   <div id="studyTab" class="tab-panel active">
   <h1 class="section-title">Study Plan</h1>
@@ -427,12 +459,26 @@ h2{
   </div>
   </div>
 
+  <div id="lessonsTab" class="tab-panel">
+    <h1 class="section-title">Lessons</h1>
+    <div class="lessons-stack">
+      <section class="panel lessons-panel">
+        <h2>Upcoming Lessons</h2>
+        <div id="upcomingLessons" class="lesson-list"><span class="empty">Select a student to load lessons.</span></div>
+      </section>
+      <section class="panel lessons-panel">
+        <h2>Lesson History</h2>
+        <div id="lessonHistory" class="lesson-list"><span class="empty">Select a student to load lesson history.</span></div>
+      </section>
+    </div>
+  </div>
+
 </div>
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
 const qs=new URLSearchParams(location.search);
 const SAVED_STUDENT_KEY="studyPlanSelectedStudent";
-let studentId=qs.get("studentId")||localStorage.getItem(SAVED_STUDENT_KEY)||"", topics=[], weekCount=6, drag=null, lastTap={id:null,time:0};
+let studentId=qs.get("studentId")||localStorage.getItem(SAVED_STUDENT_KEY)||"", topics=[], lessons=[], weekCount=6, drag=null, lastTap={id:null,time:0};
 
 const $=id=>document.getElementById(id);
 async function api(path,opt={}) {
@@ -527,6 +573,7 @@ $("student").onchange=async e=>{
   if(studentId) localStorage.setItem(SAVED_STUDENT_KEY,studentId);
   else localStorage.removeItem(SAVED_STUDENT_KEY);
   await loadPlan();
+  await loadLessons();
 };
 $("addBtn").onclick=addTopic;$("topicInput").onkeydown=e=>{if(e.key==="Enter")addTopic()};
 $("addWeek").onclick=()=>{weekCount++;render()};
@@ -547,6 +594,46 @@ document.querySelectorAll(".dashboard-tab").forEach(btn=>{
     document.querySelectorAll(".tab-panel").forEach(panel=>panel.classList.toggle("active",panel.id===btn.dataset.tab));
   });
 });
+
+
+function lessonStudentMatches(l){
+  return l.studentPageId===studentId;
+}
+function fmtLessonDate(iso){
+  if(!iso)return "";
+  const d=new Date(iso);
+  return d.toLocaleDateString(undefined,{month:"short",day:"numeric"})+"<br>"+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+}
+function lessonRow(l){
+  const href=l.notionUrl||"#";
+  return `<a class="lesson-row" href="${esc(href)}" target="_blank" rel="noopener">
+    <div class="lesson-date">${fmtLessonDate(l.start)}</div>
+    <div class="lesson-main">
+      <div class="lesson-title">${esc(l.title||"Lesson")}</div>
+      <div class="lesson-subject">${esc(l.subject||"")}</div>
+    </div>
+    <div class="lesson-status">${esc(l.status||"Scheduled")}</div>
+  </a>`;
+}
+function renderLessons(){
+  const now=Date.now();
+  const mine=lessons.filter(lessonStudentMatches);
+  const upcoming=mine.filter(l=>new Date(l.start).getTime()>=now).sort((a,b)=>new Date(a.start)-new Date(b.start));
+  const history=mine.filter(l=>new Date(l.start).getTime()<now).sort((a,b)=>new Date(b.start)-new Date(a.start));
+  $("upcomingLessons").innerHTML=studentId?(upcoming.length?upcoming.map(lessonRow).join(""):'<span class="empty">No upcoming lessons.</span>'):'<span class="empty">Select a student to load lessons.</span>';
+  $("lessonHistory").innerHTML=studentId?(history.length?history.map(lessonRow).join(""):'<span class="empty">No lesson history yet.</span>'):'<span class="empty">Select a student to load lesson history.</span>';
+}
+async function loadLessons(){
+  if(!studentId){lessons=[];renderLessons();return}
+  try{
+    const d=await api("/tutoring-lessons");
+    lessons=d.lessons||[];
+    renderLessons();
+  }catch(e){
+    $("upcomingLessons").innerHTML='<span class="empty">Could not load lessons.</span>';
+    $("lessonHistory").innerHTML='<span class="empty">Could not load lesson history.</span>';
+  }
+}
 
 function focusStorageKey(){return studentId?`studyPlanFocus:${studentId}`:""}
 function loadFocus(){
