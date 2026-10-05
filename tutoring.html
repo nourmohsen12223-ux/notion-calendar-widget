@@ -995,7 +995,7 @@ const API_URL =
   "https://notion-calendar-api.nourmohsen12223.workers.dev/tutoring-lessons";
 
 const DEADLINES_API_URL =
-  "https://notion-calendar-api.nourmohsen12223.workers.dev/upcoming-data";
+  "https://notion-calendar-api.nourmohsen12223.workers.dev/tutoring-deadlines";
 
 /*
   Calendar runs from:
@@ -2405,6 +2405,38 @@ function renderDeadlines() {
       .join(
         ""
       );
+
+  const renderedItems =
+    container.querySelectorAll(".list-item");
+
+  renderedItems.forEach((element, index) => {
+    const item = future[index];
+
+    if (!item || !item.notionUrl) {
+      return;
+    }
+
+    element.style.cursor = "pointer";
+    element.setAttribute("role", "button");
+    element.setAttribute("tabindex", "0");
+
+    const openDeadline = () => {
+      window.open(
+        item.notionUrl,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    };
+
+    element.addEventListener("click", openDeadline);
+
+    element.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openDeadline();
+      }
+    });
+  });
 }
 
 
