@@ -203,6 +203,51 @@ h2{
   transition:width .25s ease;
 }
 
+
+.focus-card{position:relative}
+.focus-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:16px;
+}
+.focus-kicker,.focus-note-label{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.11em;
+  color:var(--muted);
+}
+.focus-display{
+  margin-top:6px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:24px;
+  line-height:1.2;
+  color:var(--ink);
+}
+.change-focus{
+  flex:0 0 auto;
+  border:0;
+  background:transparent;
+  padding:3px 0;
+  color:var(--muted);
+  font:inherit;
+  font-size:12px;
+  cursor:pointer;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+.change-focus:disabled{opacity:.45;cursor:default}
+.focus-picker-wrap{margin:0 0 15px 0}
+.focus-picker-wrap.is-hidden{display:none}
+.focus-note-label{display:block;margin-bottom:7px}
+.focus-text{
+  min-height:88px;
+  resize:vertical;
+  line-height:1.45;
+  background:#FAF9F7;
+}
+
 @media(max-width:700px){
   .top{align-items:stretch;flex-direction:column}
   .student{width:100%}
@@ -232,15 +277,23 @@ h2{
 
   <h1 class="section-title progress-title">Progress</h1>
   <div class="grid progress-grid">
-    <section class="panel progress-panel">
-      <h2>Current Focus</h2>
-      <div class="focus-controls">
+    <section class="panel progress-panel focus-card">
+      <div class="focus-header">
+        <div>
+          <div class="focus-kicker">CURRENT FOCUS</div>
+          <div id="focusDisplay" class="focus-display">Choose a topic</div>
+        </div>
+        <button id="changeFocus" class="change-focus" type="button" disabled>Change topic</button>
+      </div>
+
+      <div id="focusPickerWrap" class="focus-picker-wrap">
         <select id="focusTopic" class="focus-select" disabled>
           <option value="">Select a topic…</option>
         </select>
-        <textarea id="focusText" class="focus-text" placeholder="Add a note or extra focus…" disabled></textarea>
       </div>
-      <p class="focus-note">Choose a topic from your Study Plan and add optional text.</p>
+
+      <label class="focus-note-label" for="focusText">FOCUS THIS WEEK</label>
+      <textarea id="focusText" class="focus-text" placeholder="Add a note, goal, or reminder…" disabled></textarea>
     </section>
     <section class="panel progress-panel">
       <h2>Progress</h2>
@@ -273,6 +326,7 @@ function render(){
   $("topicInput").disabled=!enabled;$("addBtn").disabled=!enabled;$("addWeek").disabled=!enabled;
   $("focusTopic").disabled=!enabled;
   $("focusText").disabled=!enabled;
+  $("changeFocus").disabled=!enabled;
 
   const previousFocus=$("focusTopic").value;
   $("focusTopic").innerHTML='<option value="">Select a topic…</option>'+topics.map(t=>`<option value="${esc(t.id)}">${esc(t.topic)}</option>`).join("");
@@ -356,6 +410,13 @@ $("weeks").onclick=e=>{const b=e.target.closest("[data-remove]");if(b)unassign(b
 render();loadStudents();
 
 
+function updateFocusDisplay(){
+  const sel=$("focusTopic");
+  const selected=sel && sel.value ? sel.options[sel.selectedIndex]?.text : "";
+  $("focusDisplay").textContent=selected||"Choose a topic";
+  $("focusPickerWrap").classList.toggle("is-hidden",Boolean(selected));
+}
+
 function focusStorageKey(){return studentId?`studyPlanFocus:${studentId}`:""}
 function loadFocus(){
   if(!studentId){$("focusTopic").value="";$("focusText").value="";return}
@@ -363,13 +424,21 @@ function loadFocus(){
     const v=JSON.parse(localStorage.getItem(focusStorageKey())||"{}");
     $("focusTopic").value=topics.some(t=>t.id===v.topicId)?v.topicId:"";
     $("focusText").value=v.text||"";
-  }catch(e){$("focusTopic").value="";$("focusText").value=""}
+    updateFocusDisplay();
+  }catch(e){$("focusTopic").value="";$("focusText").value="";updateFocusDisplay()}
 }
 function saveFocus(){
   if(!studentId)return;
   localStorage.setItem(focusStorageKey(),JSON.stringify({topicId:$("focusTopic").value,text:$("focusText").value}));
 }
-$("focusTopic").addEventListener("change",saveFocus);
+$("focusTopic").addEventListener("change",()=>{
+  saveFocus();
+  updateFocusDisplay();
+});
+$("changeFocus").addEventListener("click",()=>{
+  $("focusPickerWrap").classList.remove("is-hidden");
+  $("focusTopic").focus();
+});
 $("focusText").addEventListener("input",saveFocus);
 </script>
 </body>
