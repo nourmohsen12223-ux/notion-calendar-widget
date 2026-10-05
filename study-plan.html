@@ -423,8 +423,19 @@ h2{
 }
 .student-callout-icon{
   flex:0 0 auto;
-  font-size:20px;
+  width:21px;
+  height:21px;
   color:#5F5C56;
+}
+.student-callout-icon svg{
+  display:block;
+  width:21px;
+  height:21px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
 }
 .student-callout-content{min-width:0}
 .student-callout-label{
@@ -497,28 +508,28 @@ h2{
   <p id="msg" class="msg">Select a student to load the dashboard.</p>
   <div class="student-callouts">
     <div class="student-callout">
-      <div class="student-callout-icon">#</div>
+      <div class="student-callout-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5-9 5-9-5Z"/><path d="M7 11.2V16c2.8 2.1 7.2 2.1 10 0v-4.8"/><path d="M21 9v6"/></svg></div>
       <div class="student-callout-content">
         <div class="student-callout-label">GRADE:</div>
         <div id="studentGrade" class="student-callout-value">—</div>
       </div>
     </div>
     <div class="student-callout">
-      <div class="student-callout-icon">▣</div>
+      <div class="student-callout-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5c2.8-.8 5.5-.3 8 1.5v12c-2.5-1.8-5.2-2.3-8-1.5v-12Z"/><path d="M20 5.5c-2.8-.8-5.5-.3-8 1.5v12c2.5-1.8 5.2-2.3 8-1.5v-12Z"/></svg></div>
       <div class="student-callout-content">
         <div class="student-callout-label">SUBJECT:</div>
         <div id="studentSubject" class="student-callout-value">—</div>
       </div>
     </div>
     <div class="student-callout">
-      <div class="student-callout-icon">◌</div>
+      <div class="student-callout-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg></div>
       <div class="student-callout-content">
         <div class="student-callout-label">STATUS:</div>
         <div id="studentStatus" class="student-callout-value">—</div>
       </div>
     </div>
     <div class="student-callout">
-      <div class="student-callout-icon">↗</div>
+      <div class="student-callout-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5.5h14v10H9l-4 3v-13Z"/><path d="M8.5 9h7M8.5 12h4.5"/></svg></div>
       <div class="student-callout-content">
         <div class="student-callout-label">Google Chat:</div>
         <div class="chat-actions">
