@@ -683,6 +683,35 @@ h2{
   }
 }
 
+
+/* Final iPad Add Work fix: same one-row design, narrower controls */
+@media (min-width:621px) and (max-width:1180px){
+  .work-form{padding:9px}
+  .work-form-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.35fr) minmax(92px,.82fr) minmax(90px,.72fr) minmax(90px,.72fr) 54px;
+    gap:4px;
+    width:100%;
+    box-sizing:border-box;
+  }
+  .work-field{min-width:0;width:100%}
+  .work-field input,.work-field select{
+    display:block;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    box-sizing:border-box;
+    padding:6px 4px;
+    font-size:11px;
+  }
+  .work-save{
+    width:54px;
+    min-width:0;
+    padding:6px 4px;
+    font-size:11px;
+  }
+}
+
 </style>
 </head>
 <body>
