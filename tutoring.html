@@ -461,11 +461,15 @@ body {
 
   line-height: 1.1;
 
-  white-space: nowrap;
+  white-space: normal;
 
-  overflow: hidden;
+  overflow: visible;
 
-  text-overflow: ellipsis;
+  text-overflow: clip;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 
@@ -995,7 +999,7 @@ const API_URL =
   "https://notion-calendar-api.nourmohsen12223.workers.dev/tutoring-lessons";
 
 const DEADLINES_API_URL =
-  "https://notion-calendar-api.nourmohsen12223.workers.dev/tutoring-deadlines";
+  "https://notion-calendar-api.nourmohsen12223.workers.dev/upcoming-data";
 
 /*
   Calendar runs from:
@@ -1947,7 +1951,10 @@ function renderLessons() {
 
 
       lesson.style.height =
-        height +
+        Math.max(
+          height,
+          52
+        ) +
         "px";
 
 
@@ -2268,7 +2275,6 @@ function renderDeadlines() {
         item => {
 
           const value =
-            item.dueDate ||
             item.due ||
             item.date ||
             item.start;
@@ -2300,13 +2306,11 @@ function renderDeadlines() {
       .sort(
         (a, b) =>
           new Date(
-            a.dueDate ||
             a.due ||
             a.date ||
             a.start
           ) -
           new Date(
-            b.dueDate ||
             b.due ||
             b.date ||
             b.start
@@ -2342,8 +2346,7 @@ function renderDeadlines() {
 
           const date =
             new Date(
-              item.dueDate ||
-            item.due ||
+              item.due ||
               item.date ||
               item.start
             );
@@ -2390,7 +2393,7 @@ function renderDeadlines() {
 
 
                 <div class="list-meta">
-                  ${escapeHTML(item.student || item.studentName || "Student")}
+                  Upcoming deadline
                 </div>
 
 
@@ -2409,38 +2412,6 @@ function renderDeadlines() {
       .join(
         ""
       );
-
-  const renderedItems =
-    container.querySelectorAll(".list-item");
-
-  renderedItems.forEach((element, index) => {
-    const item = future[index];
-
-    if (!item || !item.notionUrl) {
-      return;
-    }
-
-    element.style.cursor = "pointer";
-    element.setAttribute("role", "button");
-    element.setAttribute("tabindex", "0");
-
-    const openDeadline = () => {
-      window.open(
-        item.notionUrl,
-        "_blank",
-        "noopener,noreferrer"
-      );
-    };
-
-    element.addEventListener("click", openDeadline);
-
-    element.addEventListener("keydown", event => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        openDeadline();
-      }
-    });
-  });
 }
 
 
