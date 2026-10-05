@@ -6,79 +6,163 @@
 <meta name="referrer" content="no-referrer">
 <title>Study Plan</title>
 <style>
-html{margin:0;padding:0;background:#fff;}
-:root{--ink:#37352F;--muted:#8F8B84;--line:#DDDAD5;--bg:#F8F7F4;--card:#fff;--chip:#E9E5DF;--chip2:#EEEAE4;--today:#D8D2CA}
-*{box-sizing:border-box} body{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serifmargin:0;padding:0;background:#fff;}
-.shell{width:100%;max-width:none;margin:0;padding:0;background:#fff}.top{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
-h1{font:600 26px Georgia,serif;margin:0}.student{min-width:220px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink)}
-.grid{display:grid;grid-template-columns:minmax(260px,.8fr) minmax(360px,1.2fr);gap:14px}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;min-height:420px}
-h2{font:600 18px Georgia,serif;margin:0 0 13px}.add{display:flex;gap:8px;margin-bottom:13px}.add input{flex:1;border:1px solid var(--line);border-radius:9px;padding:10px 11px;font:inherit}.btn{border:1px solid var(--line);background:var(--chip2);color:var(--ink);border-radius:9px;padding:9px 12px;font-weight:600;cursor:pointer}
-.topics{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}.topic,.week-topic{background:var(--chip);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:14px;cursor:grab;touch-action:none;user-select:none}
-.completed{text-decoration:line-through;opacity:.55}.weeks{display:grid;gap:9px}.week{border:1px solid var(--line);border-radius:11px;padding:10px;min-height:67px;background:#fff}.week-head{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px}.week-items{display:flex;flex-wrap:wrap;gap:7px;min-height:27px}.week-topic{position:relative;padding-right:26px;cursor:default}.remove{position:absolute;right:7px;top:5px;border:0;background:transparent;color:var(--muted);font-size:16px;cursor:pointer}.more{margin-top:10px;width:100%}.empty,.msg{font-size:13px;color:var(--muted)}.msg{margin:0 0 10px}.dragghost{position:fixed;z-index:9999;pointer-events:none;opacity:.88;transform:translate(-50%,-50%);box-shadow:0 6px 18px rgba(0,0,0,.12)}
-@media(max-width:700px){.shell{padding:10px}.top{align-items:stretch;flex-direction:column}.student{width:100%}.grid{grid-template-columns:1fr}.panel{min-height:300px}}
-
-/* FLUSH NOTION EMBED */
-html, body {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  background: #fff !important;
+:root{
+  --ink:#37352F;
+  --muted:#8F8B84;
+  --line:#DDDAD5;
+  --card:#FFFFFF;
+  --chip:#E9E5DF;
+  --chip2:#EEEAE4;
 }
-body {
-  overflow-x: hidden;
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+  background:#FFFFFF;
 }
-.wrap, .container, main {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  max-width: none !important;
-  background: #fff !important;
+*{box-sizing:border-box}
+body{
+  color:var(--ink);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  overflow-x:hidden;
 }
-
-
-/* FINAL EDGE-TO-EDGE NOTION EMBED LAYOUT */
-* { box-sizing: border-box; }
-html, body {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  background: #ffffff !important;
+.shell{
+  display:block;
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:0;
+  background:#FFFFFF;
 }
-body {
-  overflow-x: hidden !important;
+.top{
+  display:flex;
+  align-items:center;
+  margin:0 0 10px 0;
+  padding:0;
 }
-.wrap, .container, main {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100vw !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  background: #ffffff !important;
+.student{
+  min-width:220px;
+  padding:9px 12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#FFFFFF;
+  color:var(--ink);
 }
-.top {
-  margin: 0 0 10px 0 !important;
-  padding: 0 !important;
+.msg{
+  margin:0 0 10px 0;
+  font-size:13px;
+  color:var(--muted);
 }
-.grid {
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
+.grid{
+  display:grid;
+  grid-template-columns:minmax(260px,.8fr) minmax(360px,1.2fr);
+  gap:14px;
+  width:100%;
+  margin:0;
+  padding:0;
 }
-
-
-/* TRUE EDGE-TO-EDGE FIX */
-html,body,.shell{
-  margin:0 !important;
-  padding:0 !important;
-  width:100% !important;
-  max-width:none !important;
-  background:#fff !important;
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+  min-height:420px;
 }
-
+h2{
+  font:600 18px Georgia,serif;
+  margin:0 0 13px;
+}
+.add{
+  display:flex;
+  gap:8px;
+  margin-bottom:13px;
+}
+.add input{
+  flex:1;
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:9px;
+  padding:10px 11px;
+  font:inherit;
+}
+.btn{
+  border:1px solid var(--line);
+  background:var(--chip2);
+  color:var(--ink);
+  border-radius:9px;
+  padding:9px 12px;
+  font-weight:600;
+  cursor:pointer;
+}
+.topics{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-content:flex-start;
+}
+.topic,.week-topic{
+  background:var(--chip);
+  border:1px solid var(--line);
+  border-radius:9px;
+  padding:8px 10px;
+  font-size:14px;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+}
+.completed{text-decoration:line-through;opacity:.55}
+.weeks{display:grid;gap:9px}
+.week{
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:10px;
+  min-height:67px;
+  background:#FFFFFF;
+}
+.week-head{
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted);
+  margin-bottom:8px;
+}
+.week-items{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  min-height:27px;
+}
+.week-topic{
+  position:relative;
+  padding-right:26px;
+  cursor:default;
+}
+.remove{
+  position:absolute;
+  right:7px;
+  top:5px;
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font-size:16px;
+  cursor:pointer;
+}
+.more{margin-top:10px;width:100%}
+.empty{font-size:13px;color:var(--muted)}
+.dragghost{
+  position:fixed;
+  z-index:9999;
+  pointer-events:none;
+  opacity:.88;
+  transform:translate(-50%,-50%);
+  box-shadow:0 6px 18px rgba(0,0,0,.12);
+}
+@media(max-width:700px){
+  .top{align-items:stretch;flex-direction:column}
+  .student{width:100%}
+  .grid{grid-template-columns:1fr}
+  .panel{min-height:300px}
+}
 </style>
 </head>
 <body>
@@ -101,7 +185,8 @@ html,body,.shell{
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
 const qs=new URLSearchParams(location.search);
-let studentId=qs.get("studentId")||"", topics=[], weekCount=6, drag=null, lastTap={id:null,time:0};
+const SAVED_STUDENT_KEY="studyPlanSelectedStudent";
+let studentId=qs.get("studentId")||localStorage.getItem(SAVED_STUDENT_KEY)||"", topics=[], weekCount=6, drag=null, lastTap={id:null,time:0};
 
 const $=id=>document.getElementById(id);
 async function api(path,opt={}) {
@@ -175,7 +260,12 @@ function bindTopics(){
    };
  });
 }
-$("student").onchange=async e=>{studentId=e.target.value;await loadPlan()};
+$("student").onchange=async e=>{
+  studentId=e.target.value;
+  if(studentId) localStorage.setItem(SAVED_STUDENT_KEY,studentId);
+  else localStorage.removeItem(SAVED_STUDENT_KEY);
+  await loadPlan();
+};
 $("addBtn").onclick=addTopic;$("topicInput").onkeydown=e=>{if(e.key==="Enter")addTopic()};
 $("addWeek").onclick=()=>{weekCount++;render()};
 $("weeks").onclick=e=>{const b=e.target.closest("[data-remove]");if(b)unassign(b.dataset.remove,b.dataset.week)};
