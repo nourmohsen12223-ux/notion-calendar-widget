@@ -31,6 +31,8 @@ button,.search,input,select{font:inherit}
 .fill{height:100%;background:var(--green)}
 .next{margin-top:17px}.label{font-size:12px;font-weight:650}
 .open{display:flex;justify-content:space-between;margin-top:14px;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--ink);text-decoration:none;font-size:13px;background:#FAF9F7}
+.cardActions{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:stretch}
+.deleteBtn{margin-top:14px;border:1px solid #E7C9C6;background:#FFF9F8;color:#A24C4C;border-radius:9px;padding:10px 12px;cursor:pointer;font-size:13px}
 .groupTitle{grid-column:1/-1;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 -3px}
 
 /* modal */
@@ -127,6 +129,16 @@ let students=[],topics=[],lessons=[],filter="all";
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 async function get(p){const r=await fetch(API+p,{cache:"no-store"}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}
 async function post(p,body){const r=await fetch(API+p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}
+async function del(p,body){const r=await fetch(API+p,{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}
+document.getElementById("grid").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-delete-student]");
+  if(!b)return;
+  const id=b.dataset.deleteStudent,name=b.dataset.studentName||"this student";
+  if(!confirm(`Delete ${name}? This will archive the student in Notion.`))return;
+  b.disabled=true;
+  try{await del("/tutoring-students-create",{studentId:id});await load()}
+  catch(err){alert("Could not delete student: "+err.message);b.disabled=false}
+});
 function progress(id){const x=topics.filter(t=>t.studentPageId===id);return x.length?Math.round(x.filter(t=>t.completed).length/x.length*100):0}
 function nextLesson(id){return lessons.filter(l=>l.studentPageId===id&&new Date(l.start)>new Date()).sort((a,b)=>new Date(a.start)-new Date(b.start))[0]}
 function fmt(x){return new Date(x).toLocaleString(undefined,{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}
@@ -147,7 +159,10 @@ function card(s){
     <div class="prow"><span>Study Plan Progress</span><span>${pct}%</span></div>
     <div class="track"><div class="fill" style="width:${pct}%"></div></div>
     <div class="next"><div class="label">Next Lesson</div><div class="nexttext">${n?esc(fmt(n.start))+" · "+esc(n.subject||n.title||"Lesson"):"Not scheduled"}</div></div>
-    <a class="open" href="${esc(url)}" target="_top"><span>View Student</span><span>→</span></a>
+    <div class="cardActions">
+      <a class="open" href="${esc(url)}" target="_top"><span>View Student</span><span>→</span></a>
+      <button class="deleteBtn" type="button" data-delete-student="${esc(s.id)}" data-student-name="${esc(s.name||"Student")}">Delete</button>
+    </div>
   </div>`;
 }
 
