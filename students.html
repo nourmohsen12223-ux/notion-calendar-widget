@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Students</title>
+<style>
+:root{--ink:#37352F;--muted:#8F8B84;--line:#DDDAD5;--soft:#F7F6F3;--green:#8BAF98}
+*{box-sizing:border-box}html,body{margin:0;background:#fff;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.toolbar{display:flex;justify-content:space-between;gap:12px;margin-bottom:16px}.filters,.tools{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+button,.search{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 12px;font:inherit;color:var(--ink)}
+button{cursor:pointer}.filter.active{background:var(--soft);font-weight:650}.search{min-width:230px}.new{background:#6F786E;color:#fff;border-color:#6F786E;font-weight:650}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{border:1px solid var(--line);border-radius:13px;padding:16px;background:#fff}
+.head{display:flex;gap:12px;align-items:center}.avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#F0ECE8;font-family:Georgia,serif;font-size:22px;color:#6F6A63}
+.name{font-family:Georgia,serif;font-size:20px;font-weight:600}.meta,.nexttext,.empty{font-size:12px;color:var(--muted);margin-top:4px}
+.status{display:inline-block;margin-top:8px;padding:4px 9px;border-radius:999px;background:#E8EFE9;font-size:12px}
+.prow{display:flex;justify-content:space-between;margin-top:18px;font-size:12px}.track{height:8px;background:#EEEDEB;border-radius:99px;overflow:hidden;margin-top:7px}.fill{height:100%;background:var(--green)}
+.next{margin-top:17px}.label{font-size:12px;font-weight:650}.open{display:flex;justify-content:space-between;margin-top:14px;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--ink);text-decoration:none;font-size:13px;background:#FAF9F7}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){.toolbar{flex-direction:column}.grid{grid-template-columns:1fr}.search{min-width:0;flex:1}}
+</style></head><body>
+<div class="toolbar"><div class="filters"><button class="filter active" data-f="all">All Students</button><button class="filter" data-f="Active">Active</button><button class="filter" data-f="Inactive">Inactive</button></div><div class="tools"><input id="search" class="search" placeholder="Search students…"><button class="new" id="newStudent">+ New Student</button></div></div>
+<div id="grid" class="grid"><span class="empty">Loading students…</span></div>
+<script>
+const API="https://notion-calendar-api.nourmohsen12223.workers.dev";let students=[],topics=[],lessons=[],filter="all";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function get(p){const r=await fetch(API+p,{cache:"no-store"}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}
+function progress(id){const x=topics.filter(t=>t.studentPageId===id);return x.length?Math.round(x.filter(t=>t.completed).length/x.length*100):0}
+function nextLesson(id){return lessons.filter(l=>l.studentPageId===id&&new Date(l.start)>new Date()).sort((a,b)=>new Date(a.start)-new Date(b.start))[0]}
+function fmt(x){return new Date(x).toLocaleString(undefined,{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}
+function render(){const q=search.value.toLowerCase().trim(),list=students.filter(s=>(filter==="all"||(s.status||"").toLowerCase()===filter.toLowerCase())&&[s.name,s.grade,...(s.subjects||[])].join(" ").toLowerCase().includes(q));
+grid.innerHTML=list.length?list.map(s=>{const pct=progress(s.id),n=nextLesson(s.id),url="https://nourmohsen12223-ux.github.io/notion-calendar-widget/study-plan.html?studentId="+encodeURIComponent(s.id);return `<div class="card"><div class="head"><div class="avatar">${esc((s.name||"?")[0])}</div><div><div class="name">${esc(s.name)}</div><div class="meta">${esc(s.grade||"")}${s.grade&&(s.subjects||[]).length?" · ":""}${esc((s.subjects||[]).join(", "))}</div><span class="status">${esc(s.status||"—")}</span></div></div><div class="prow"><span>Study Plan Progress</span><span>${pct}%</span></div><div class="track"><div class="fill" style="width:${pct}%"></div></div><div class="next"><div class="label">Next Lesson</div><div class="nexttext">${n?esc(fmt(n.start))+" · "+esc(n.subject||n.title||"Lesson"):"Not scheduled"}</div></div><a class="open" href="${url}" target="_blank"><span>Open Dashboard</span><span>→</span></a></div>`}).join(""):'<span class="empty">No students found.</span>'}
+async function load(){try{const [s,l]=await Promise.all([get("/study-plan-embed-students"),get("/tutoring-lessons")]);students=s.students||[];lessons=l.lessons||[];const rs=await Promise.all(students.map(x=>get("/study-plan-embed?studentPageId="+encodeURIComponent(x.id)).catch(()=>({topics:[]}))));topics=rs.flatMap((r,i)=>(r.topics||[]).map(t=>({...t,studentPageId:students[i].id})));render()}catch(e){grid.innerHTML=`<span class="empty">${esc(e.message)}</span>`}}
+document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");filter=b.dataset.f;render()});search.oninput=render;
+newStudent.onclick=()=>alert("We will connect New Student creation next.");load();
+</script></body></html>
