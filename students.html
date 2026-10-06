@@ -134,7 +134,7 @@ function gradeLabel(g){const v=String(g||"").trim();return v?/^grade\b/i.test(v)
 
 function card(s){
   const pct=progress(s.id),n=nextLesson(s.id);
-  const url=s.notionUrl||("https://www.notion.so/"+String(s.id||"").replace(/-/g,""));
+  const url="https://www.notion.so/"+String(s.id||"").replace(/-/g,"");
   return `<div class="card">
     <div class="head">
       <div class="avatar">${esc((s.name||"?").trim().charAt(0).toUpperCase())}</div>
