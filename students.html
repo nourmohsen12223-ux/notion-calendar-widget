@@ -9,8 +9,11 @@
 *{box-sizing:border-box}
 html,body{margin:0;background:#fff;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{padding:0}
-.toolbar{display:flex;justify-content:space-between;gap:12px;margin-bottom:16px}
+.toolbar{display:flex;flex-direction:column;gap:14px;margin-bottom:16px;padding-top:4px}
 .filters,.tools{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.tools{width:100%;padding-right:4px}
+.search{flex:1}
+.new{margin-left:auto;min-width:142px}
 button,.search,input,select{font:inherit}
 .filter,.new,.modal button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 12px;color:var(--ink);cursor:pointer}
 .filter.active{background:var(--soft);font-weight:650}
