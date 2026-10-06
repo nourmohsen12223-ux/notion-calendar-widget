@@ -49,6 +49,17 @@ button,.search,input,select{font:inherit}
 .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:19px}.error{color:#A24C4C;font-size:12px;margin-top:12px;min-height:16px}button:disabled{opacity:.55;cursor:default}
 @media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.summary{grid-template-columns:1fr 1fr}.search{min-width:0;flex:1}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.lesson{grid-template-columns:58px 1fr auto}.lesson .subjectcol{display:none}.lesson .statuscol{grid-column:2}.open{grid-column:3;grid-row:1/3}}
+
+.confirmOverlay{position:fixed;inset:0;background:rgba(55,53,47,.22);display:none;align-items:center;justify-content:center;padding:18px;z-index:100}
+.confirmOverlay.show{display:flex}
+.confirmBox{width:min(390px,100%);background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 12px 40px rgba(55,53,47,.14)}
+.confirmTitle{font-family:Georgia,serif;font-size:21px;font-weight:600;margin-bottom:8px}
+.confirmText{font-size:13px;line-height:1.5;color:var(--muted)}
+.confirmActions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.confirmCancel,.confirmDelete{font:inherit;border-radius:9px;padding:9px 12px;cursor:pointer}
+.confirmCancel{border:1px solid var(--line);background:#fff;color:var(--ink)}
+.confirmDelete{border:1px solid #A24C4C;background:#A24C4C;color:#fff;font-weight:650}
+
 </style>
 </head>
 <body>
@@ -116,6 +127,18 @@ button,.search,input,select{font:inherit}
       <div id="studentFormError" class="error"></div>
       <div class="actions"><button type="button" class="secondary" id="studentCancel">Cancel</button><button class="save" id="studentSave">Add Student</button></div>
     </form>
+  </div>
+</div>
+
+
+<div class="confirmOverlay" id="deleteConfirm" aria-hidden="true">
+  <div class="confirmBox">
+    <div class="confirmTitle">Confirm deletion</div>
+    <div class="confirmText" id="deleteConfirmText"></div>
+    <div class="confirmActions">
+      <button class="confirmCancel" id="deleteCancel" type="button">Cancel</button>
+      <button class="confirmDelete" id="deleteYes" type="button">Delete</button>
+    </div>
   </div>
 </div>
 
@@ -214,19 +237,39 @@ function renderCalendar(){
 }
 window.moveMonth=n=>{month=new Date(month.getFullYear(),month.getMonth()+n,1);renderCalendar()}
 window.openLesson=u=>{if(u) window.top.location.href=u}
-document.getElementById("listPanel").addEventListener("click",async e=>{
+let pendingLessonDelete=null;
+const deleteConfirm=document.getElementById("deleteConfirm");
+const deleteConfirmText=document.getElementById("deleteConfirmText");
+document.getElementById("listPanel").addEventListener("click",e=>{
   const b=e.target.closest("[data-delete-lesson]");
   if(!b)return;
-  const id=b.dataset.deleteLesson, lesson=lessons.find(x=>x.id===id);
-  if(!confirm(`Delete ${lessonName(lesson||{})} lesson? This will archive it in Notion.`))return;
-  b.disabled=true;
+  const id=b.dataset.deleteLesson,lesson=lessons.find(x=>x.id===id);
+  pendingLessonDelete={id,button:b};
+  deleteConfirmText.textContent=`Delete ${lessonName(lesson||{})} lesson? This will archive it in Notion.`;
+  deleteConfirm.classList.add("show");
+  deleteConfirm.setAttribute("aria-hidden","false");
+});
+document.getElementById("deleteCancel").onclick=()=>{
+  pendingLessonDelete=null;deleteConfirm.classList.remove("show");deleteConfirm.setAttribute("aria-hidden","true");
+};
+document.getElementById("deleteYes").onclick=async()=>{
+  if(!pendingLessonDelete)return;
+  const item=pendingLessonDelete;
+  item.button.disabled=true;
+  document.getElementById("deleteYes").disabled=true;
   try{
-    const r=await fetch(`${API}/tutoring-lessons`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"delete",lessonId:id})});
+    const r=await fetch(`${API}/tutoring-lessons`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"delete",lessonId:item.id})});
     const d=await r.json().catch(()=>({}));
     if(!r.ok||!d.success)throw new Error(d.error||"Could not delete lesson.");
+    pendingLessonDelete=null;
+    deleteConfirm.classList.remove("show");
+    deleteConfirm.setAttribute("aria-hidden","true");
     await load();
-  }catch(err){alert("Could not delete lesson: "+err.message);b.disabled=false}
-});
+  }catch(err){
+    deleteConfirmText.textContent="Could not delete lesson: "+err.message;
+    item.button.disabled=false;
+  }finally{document.getElementById("deleteYes").disabled=false}
+};
 
 document.getElementById("filters").addEventListener("click",e=>{if(!e.target.dataset.filter)return;filter=e.target.dataset.filter;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===e.target));render()});
 document.getElementById("search").addEventListener("input",render);
