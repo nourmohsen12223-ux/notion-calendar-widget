@@ -30,8 +30,11 @@ button,.search,input,select{font:inherit}
 .datebox{text-align:center}.datebox .day{font-family:Georgia,serif;font-size:22px;font-weight:600}.datebox .mon{font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.06em}
 .name{font-family:Georgia,serif;font-size:20px;font-weight:600}
 .sub,.empty{font-size:12px;color:var(--muted);margin-top:4px}.time{font-weight:650}
-.pill{display:inline-block;padding:4px 9px;border-radius:999px;background:var(--greenSoft);font-size:12px}
-.pill.cancelled,.pill.no-show{background:#F3E9E7}
+.pill{display:inline-block;padding:4px 9px;border-radius:999px;font-size:12px}
+.pill.attended{background:#E8EFE9;color:#52705C}
+.pill.no-show{background:#E8EEF5;color:#506A86}
+.pill.cancelled{background:#F5E7E5;color:#9A4E49}
+.pill.scheduled{background:#F0ECE8;color:#6F6A63}
 .open{display:flex;justify-content:space-between;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--ink);text-decoration:none;font-size:13px;background:#FAF9F7;white-space:nowrap}
 .empty{padding:40px;text-align:center}
 .calendar{padding:16px}.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.cal-head b{font-family:Georgia,serif;font-size:20px;font-weight:600}
@@ -82,7 +85,7 @@ button,.search,input,select{font:inherit}
     <h2>New Lesson</h2>
     <form id="lessonForm">
       <div class="form">
-        <div class="field full"><label>Student</label><select id="student" required><option value="">Choose student…</option></select></div>
+        <div class="field full"><label>Student</label><select id="student" required><option value="">Choose student…</option><option value="__add_student__">+ Add Student…</option></select></div>
         <div class="field"><label>Subject</label><select id="subject" required><option value="">Choose subject…</option></select></div>
         <div class="field"><label>Status</label><select id="status"><option>Scheduled</option><option>Attended</option><option>Cancelled</option><option>No Show</option></select></div>
         <div class="field"><label>Start</label><input id="start" type="datetime-local" required></div>
@@ -91,6 +94,24 @@ button,.search,input,select{font:inherit}
       </div>
       <div id="formError" class="error"></div>
       <div class="actions"><button type="button" class="secondary" id="cancel">Cancel</button><button class="save" id="save">Add Lesson</button></div>
+    </form>
+  </div>
+</div>
+
+
+<div class="modal-back" id="studentModalBack">
+  <div class="modal">
+    <h2>Add New Student</h2>
+    <form id="studentForm">
+      <div class="form">
+        <div class="field full"><label>Student Name</label><input id="newStudentName" required autocomplete="off" placeholder="e.g. Gabriella Darby"></div>
+        <div class="field"><label>Grade</label><input id="newGrade" autocomplete="off" placeholder="e.g. 12"></div>
+        <div class="field"><label>Status</label><select id="newStudentStatus"><option value="Active" selected>Active</option><option value="Inactive">Inactive</option></select></div>
+        <div class="field full"><label>Subject</label><input id="newSubjects" autocomplete="off" placeholder="e.g. Biology"></div>
+        <div class="field full"><label>Google Chat</label><input id="newGoogleChat" type="url" autocomplete="off" placeholder="Optional URL"></div>
+      </div>
+      <div id="studentFormError" class="error"></div>
+      <div class="actions"><button type="button" class="secondary" id="studentCancel">Cancel</button><button class="save" id="studentSave">Add Student</button></div>
     </form>
   </div>
 </div>
@@ -123,10 +144,17 @@ async function load(){
 
 function fillStudents(){
   const sel=document.getElementById("student");
-  sel.innerHTML='<option value="">Choose student…</option>'+students.filter(s=>!s.status||s.status==="Active").map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
+  sel.innerHTML='<option value="">Choose student…</option><option value="__add_student__">+ Add Student…</option>'+students.filter(s=>!s.status||s.status==="Active").map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
 }
 document.getElementById("student").addEventListener("change",()=>{
-  const s=studentById(document.getElementById("student").value);
+  const value=document.getElementById("student").value;
+  if(value==="__add_student__"){
+    document.getElementById("student").value="";
+    modal.classList.remove("show");
+    openStudentModal();
+    return;
+  }
+  const s=studentById(value);
   const subjects=s?.subjects||[];
   document.getElementById("subject").innerHTML='<option value="">Choose subject…</option>'+subjects.map(x=>`<option>${esc(x)}</option>`).join("");
 });
@@ -193,6 +221,51 @@ document.getElementById("newLesson").onclick=()=>{
 };
 document.getElementById("cancel").onclick=()=>modal.classList.remove("show");
 modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show")});
+
+const studentModal=document.getElementById("studentModalBack");
+function openStudentModal(){
+  document.getElementById("studentForm").reset();
+  document.getElementById("newStudentStatus").value="Active";
+  document.getElementById("studentFormError").textContent="";
+  studentModal.classList.add("show");
+  setTimeout(()=>document.getElementById("newStudentName").focus(),50);
+}
+function closeStudentModal(returnToLesson=true){
+  studentModal.classList.remove("show");
+  if(returnToLesson) modal.classList.add("show");
+}
+document.getElementById("studentCancel").onclick=()=>closeStudentModal(true);
+studentModal.addEventListener("click",e=>{if(e.target===studentModal)closeStudentModal(true)});
+
+document.getElementById("studentForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const save=document.getElementById("studentSave");
+  const err=document.getElementById("studentFormError");
+  const name=document.getElementById("newStudentName").value.trim();
+  const grade=document.getElementById("newGrade").value.trim().replace(/^grade\s*/i,"");
+  const subjects=document.getElementById("newSubjects").value.split(",").map(x=>x.trim()).filter(Boolean);
+  const googleChat=document.getElementById("newGoogleChat").value.trim();
+  if(!name)return;
+  save.disabled=true; save.textContent="Saving…"; err.textContent="";
+  try{
+    const r=await fetch(`${API}/tutoring-students-create`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({name,grade,subjects,status:document.getElementById("newStudentStatus").value,googleChat})
+    });
+    const d=await r.json();
+    if(!r.ok||!d.success) throw new Error(d.error||"Could not create student.");
+    const created=d.student;
+    students.push(created);
+    fillStudents();
+    document.getElementById("student").value=created.id;
+    document.getElementById("subject").innerHTML='<option value="">Choose subject…</option>'+(created.subjects||[]).map(x=>`<option>${esc(x)}</option>`).join("");
+    if((created.subjects||[]).length===1) document.getElementById("subject").value=created.subjects[0];
+    closeStudentModal(true);
+  }catch(ex){err.textContent=ex.message}
+  finally{save.disabled=false;save.textContent="Add Student"}
+});
+
 document.getElementById("lessonForm").addEventListener("submit",async e=>{
   e.preventDefault(); const err=document.getElementById("formError"), save=document.getElementById("save"); err.textContent="";
   const sid=document.getElementById("student").value, s=studentById(sid), start=document.getElementById("start").value, end=document.getElementById("end").value;
