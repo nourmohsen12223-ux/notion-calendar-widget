@@ -136,6 +136,22 @@ h2{
   font-weight:700;
 }
 .topic.completed{text-decoration:line-through;opacity:.62}
+.topic-delete{
+  margin-left:auto;
+  flex:0 0 auto;
+  border:0;
+  background:transparent;
+  color:#9A9690;
+  font-size:18px;
+  line-height:1;
+  padding:2px 3px;
+  cursor:pointer;
+  border-radius:4px;
+}
+.topic-delete:hover{
+  color:#5F5A54;
+  background:#F3F1EE;
+}
 .week-topic{
   background:var(--chip);
   border:1px solid var(--line);
@@ -946,7 +962,7 @@ function render(){
   $("progressFill").style.width=pct+"%";
   $("progressRing").style.setProperty("--pct",pct);
   $("progressDetail").textContent=`${completed} of ${total} topics completed`;
-  $("topics").innerHTML=topics.length?topics.map(t=>`<div class="topic ${t.completed?"completed":""}" data-id="${t.id}" title="Drag to a week. Double-click / double-tap to complete.">${esc(t.topic)}</div>`).join(""):`<span class="empty">${enabled?"No topics yet. Add your first one.":"No student selected."}</span>`;
+  $("topics").innerHTML=topics.length?topics.map(t=>`<div class="topic ${t.completed?"completed":""}" data-id="${t.id}" title="Drag to a week. Double-click / double-tap to complete."><span>${esc(t.topic)}</span><button class="topic-delete" type="button" data-delete-topic="${t.id}" aria-label="Delete ${esc(t.topic)}">×</button></div>`).join(""):`<span class="empty">${enabled?"No topics yet. Add your first one.":"No student selected."}</span>`;
   weekCount=Math.max(weekCount,6,maxAssignedWeek());
   $("weeks").innerHTML=Array.from({length:weekCount},(_,i)=>{
     const w="Week "+(i+1), assigned=topics.filter(t=>(t.weeks||[]).includes(w));
@@ -984,11 +1000,23 @@ async function patchTopic(t,changes){
 async function assign(id,week){const t=topics.find(x=>x.id===id);if(!t||t.weeks.includes(week))return;await patchTopic(t,{weeks:[...t.weeks,week]})}
 async function unassign(id,week){const t=topics.find(x=>x.id===id);if(!t)return;await patchTopic(t,{weeks:t.weeks.filter(w=>w!==week)})}
 async function toggle(id){const t=topics.find(x=>x.id===id);if(t)await patchTopic(t,{completed:!t.completed})}
+async function deleteTopic(id){
+  const t=topics.find(x=>x.id===id); if(!t)return;
+  if(!confirm(`Delete "${t.topic}"?`))return;
+  try{
+    await api("/study-plan-embed?id="+encodeURIComponent(id),{method:"DELETE"});
+    topics=topics.filter(x=>x.id!==id);
+    render();
+    loadFocus();
+    message("");
+  }catch(e){message(e.message)}
+}
 
 function bindTopics(){
  document.querySelectorAll(".topic").forEach(el=>{
    el.ondblclick=e=>{e.preventDefault();toggle(el.dataset.id)};
    el.onpointerdown=e=>{
+     if(e.target.closest("[data-delete-topic]"))return;
      if(e.button!==undefined&&e.button!==0)return;
      const now=Date.now(),id=el.dataset.id;
      if(lastTap.id===id&&now-lastTap.time<330){lastTap={id:null,time:0};toggle(id);return}
@@ -1004,6 +1032,13 @@ function bindTopics(){
        if(active){const target=document.elementFromPoint(ev.clientX,ev.clientY)?.closest(".week");if(target)await assign(id,target.dataset.week)}
      };
      window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",up,{once:true});
+   };
+ });
+ document.querySelectorAll("[data-delete-topic]").forEach(btn=>{
+   btn.onclick=e=>{
+     e.preventDefault();
+     e.stopPropagation();
+     deleteTopic(btn.dataset.deleteTopic);
    };
  });
 }
