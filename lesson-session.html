@@ -61,7 +61,7 @@ select{
 }
 .meta{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:10px;
   margin-top:11px;
 }
@@ -201,6 +201,7 @@ select{
       <div class="meta-card"><div class="meta-label">Student</div><div id="student" class="meta-value">—</div></div>
       <div class="meta-card"><div class="meta-label">Subject</div><div id="subject" class="meta-value">—</div></div>
       <div class="meta-card"><div class="meta-label">Date & time</div><div id="when" class="meta-value">—</div></div>
+      <div class="meta-card"><div class="meta-label">Status</div><div id="lessonStatus" class="meta-value">—</div></div>
     </div>
     <div id="status" class="status"></div>
   </div>
@@ -506,6 +507,7 @@ function show(id){
   document.getElementById("student").textContent=inferStudent(l.title,l.subject);
   document.getElementById("subject").textContent=l.subject||"—";
   document.getElementById("when").textContent=fmt(l.start);
+  document.getElementById("lessonStatus").textContent=l.status||"Scheduled";
   document.getElementById("status").textContent=`Selected lesson: ${l.status||"Scheduled"}`;
   loadChecklist(l);
   renderResourceFiles(l);
