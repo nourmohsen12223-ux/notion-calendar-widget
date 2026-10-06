@@ -221,7 +221,7 @@ document.getElementById("listPanel").addEventListener("click",async e=>{
   if(!confirm(`Delete ${lessonName(lesson||{})} lesson? This will archive it in Notion.`))return;
   b.disabled=true;
   try{
-    const r=await fetch(`${API}/tutoring-lessons?lessonId=${encodeURIComponent(id)}`,{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:id})});
+    const r=await fetch(`${API}/tutoring-lessons`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"delete",lessonId:id})});
     const d=await r.json().catch(()=>({}));
     if(!r.ok||!d.success)throw new Error(d.error||"Could not delete lesson.");
     await load();
