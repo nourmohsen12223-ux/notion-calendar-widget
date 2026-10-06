@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deadlines</title>
+<style>
+:root{--ink:#37352F;--muted:#8F8B84;--line:#DDDAD5;--paper:#fff;--wash:#F8F7F4;--chip:#EEEAE4;--taupe:#D8D2CA;--dark:#6F6A63}
+*{box-sizing:border-box}html,body{margin:0;background:transparent;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{padding:2px}.wrap{max-width:1180px;margin:auto}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.filters,.tools,.view-switch{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+button,input,select{font:inherit}
+.tab,.view-toggle,.secondary{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:8px 11px;cursor:pointer}
+.tab.active,.view-toggle.active{background:var(--chip);border-color:#D4D0CA;font-weight:650}
+.search{min-width:210px;border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:#fff;color:var(--ink);outline:none}
+.search:focus,input:focus,select:focus{border-color:#A9A59E}
+.new{border:1px solid var(--dark);background:var(--dark);color:#fff;border-radius:9px;padding:9px 12px;font-weight:650;cursor:pointer}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.stat{border:1px solid var(--line);background:#fff;border-radius:13px;padding:14px 15px}
+.stat b{display:block;font:700 25px Georgia,"Times New Roman",serif}.stat span{font-size:11px;color:var(--muted)}
+.panel{border:1px solid var(--line);background:#fff;border-radius:15px;overflow:hidden}
+.deadline{display:grid;grid-template-columns:58px minmax(150px,1.5fr) minmax(110px,1fr) minmax(105px,.8fr) auto;gap:13px;align-items:center;padding:13px 15px;border-top:1px solid #EEECE8}
+.deadline:first-child{border-top:0}.datebox{background:var(--wash);border-radius:9px;text-align:center;padding:6px 2px}.day{font-size:19px;font-weight:700}.mon{font-size:9px;color:var(--muted);text-transform:uppercase}
+.name{font-size:13px;font-weight:650}.sub{font-size:10px;color:var(--muted);margin-top:3px}.subject{font-size:12px}
+.badge{display:inline-block;border-radius:8px;padding:6px 8px;font-size:10px;background:var(--wash);white-space:nowrap}
+.badge.done{background:#E8EEE9;color:#587061}.badge.overdue{background:#F3E7E5;color:#8B514B}
+.open{color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:11px;white-space:nowrap;background:#fff}
+.empty{padding:28px 18px;color:var(--muted);font-size:12px;text-align:center}
+.calendar{padding:14px}.calhead{display:grid;grid-template-columns:repeat(7,1fr);font-size:10px;color:var(--muted);text-align:center;margin-bottom:6px}.calgrid{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid #EEECE8;border-top:1px solid #EEECE8}
+.cell{min-height:95px;border-right:1px solid #EEECE8;border-bottom:1px solid #EEECE8;padding:7px;background:#fff}.cell.other{background:#FBFAF8;color:#B5B1AA}.cday{font-size:11px;font-weight:650}.event{margin-top:5px;background:var(--wash);border-radius:6px;padding:5px;font-size:9px;line-height:1.25;overflow:hidden}
+.calnav{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.caltitle{font:600 18px Georgia,serif}
+.overlay{position:fixed;inset:0;background:rgba(55,53,47,.18);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.overlay.show{display:flex}
+.modal{width:min(520px,100%);background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 12px 40px rgba(55,53,47,.12)}
+.modalHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modalTitle{font:600 23px Georgia,serif}.close{border:0;background:transparent;font-size:22px;color:var(--muted);cursor:pointer}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:650}.field input,.field select{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink);outline:none}
+.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:19px}.error{color:#A24C4C;font-size:12px;margin-top:12px;min-height:16px}.success{color:#5F806A}button:disabled{opacity:.55;cursor:default}
+@media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}.deadline{grid-template-columns:58px 1fr auto}.deadline .subjectcol{display:none}.deadline .typecol{grid-column:2}}
+@media(max-width:620px){.toolbar{flex-direction:column;align-items:stretch}.tools{width:100%}.search{min-width:0;flex:1}.summary{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.deadline{grid-template-columns:52px 1fr auto;padding:11px}.calendar{padding:8px}.cell{min-height:72px;padding:5px}.event{font-size:8px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="toolbar">
+  <div class="filters" id="filters">
+   <button class="tab active" data-filter="all">All Deadlines</button>
+   <button class="tab" data-filter="upcoming">Upcoming</button>
+   <button class="tab" data-filter="overdue">Overdue</button>
+   <button class="tab" data-filter="done">Done</button>
+   <button class="tab" data-filter="Homework">Homework</button>
+   <button class="tab" data-filter="Quiz">Quiz</button>
+   <button class="tab" data-filter="Exam">Exam</button>
+   <button class="tab" data-filter="Assignment">Assignments</button>
+  </div>
+  <div class="tools">
+   <input id="search" class="search" placeholder="Search student, subject or deadline…">
+   <div class="view-switch"><button class="view-toggle active" data-view="list">List</button><button class="view-toggle" data-view="calendar">Calendar</button></div>
+   <button class="new" id="newDeadline">+ New Deadline</button>
+  </div>
+ </div>
+
+ <div class="summary">
+  <div class="stat"><b id="sUpcoming">—</b><span>Upcoming</span></div>
+  <div class="stat"><b id="sWeek">—</b><span>Due this week</span></div>
+  <div class="stat"><b id="sOverdue">—</b><span>Overdue</span></div>
+  <div class="stat"><b id="sDone">—</b><span>Done</span></div>
+ </div>
+
+ <div id="listPanel" class="panel"><div class="empty">Loading deadlines…</div></div>
+ <div id="calendarPanel" class="panel" style="display:none"><div class="calendar"><div class="calnav"><button class="secondary" id="prevMonth">‹</button><div class="caltitle" id="calTitle"></div><button class="secondary" id="nextMonth">›</button></div><div class="calhead"><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div></div><div class="calgrid" id="calendar"></div></div></div>
+</div>
+
+<div class="overlay" id="overlay" aria-hidden="true">
+ <div class="modal">
+  <div class="modalHead"><div class="modalTitle">New Deadline</div><button class="close" id="closeModal" type="button">×</button></div>
+  <form id="deadlineForm">
+   <div class="form">
+    <div class="field full"><label>Deadline</label><input id="title" required placeholder="e.g. Cell Biology homework"></div>
+    <div class="field"><label>Student</label><select id="student" required><option value="">Choose student…</option></select></div>
+    <div class="field"><label>Subject</label><select id="subject"><option value="">Choose subject…</option></select></div>
+    <div class="field"><label>Due Date</label><input id="dueDate" type="date" required></div>
+    <div class="field"><label>Type</label><select id="type" required><option>Homework</option><option>Quiz</option><option>Exam</option><option>Assignment</option></select></div>
+   </div>
+   <div id="formMessage" class="error"></div>
+   <div class="actions"><button class="secondary" id="cancel" type="button">Cancel</button><button class="new" id="saveDeadline" type="submit">Add Deadline</button></div>
+  </form>
+ </div>
+</div>
+
+<script>
+const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
+let deadlines=[],students=[],filter="all",view="list",calDate=new Date();
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const dayStart=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+const dateOf=x=>x?new Date(x+"T00:00:00"):null;
+const isDone=x=>String(x.status||"").toLowerCase()==="done";
+const studentName=x=>x.studentName||x.student||students.find(s=>s.id===x.studentPageId)?.name||"Student";
+function statusOf(x){
+ const d=dateOf(x.dueDate),today=dayStart(new Date());
+ if(isDone(x))return "Done";
+ if(d&&d<today)return "Overdue";
+ return "Upcoming";
+}
+function fillStudents(){
+ $("student").innerHTML='<option value="">Choose student…</option>'+students.filter(s=>!s.status||s.status==="Active").map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
+}
+$("student").onchange=()=>{
+ const s=students.find(x=>x.id===$("student").value);
+ $("subject").innerHTML='<option value="">Choose subject…</option>'+(s?.subjects||[]).map(x=>`<option>${esc(x)}</option>`).join("");
+};
+function visible(){
+ const q=$("search").value.trim().toLowerCase(),today=dayStart(new Date());
+ return deadlines.filter(x=>{
+  const hay=`${x.title||""} ${studentName(x)} ${x.subject||""} ${x.type||""}`.toLowerCase();
+  if(q&&!hay.includes(q))return false;
+  const d=dateOf(x.dueDate),st=statusOf(x);
+  if(filter==="upcoming")return st==="Upcoming";
+  if(filter==="overdue")return st==="Overdue";
+  if(filter==="done")return st==="Done";
+  if(["Homework","Quiz","Exam","Assignment"].includes(filter))return x.type===filter;
+  return true;
+ });
+}
+function render(){
+ const today=dayStart(new Date()),week=new Date(today);week.setDate(week.getDate()+7);
+ $("sUpcoming").textContent=deadlines.filter(x=>statusOf(x)==="Upcoming").length;
+ $("sWeek").textContent=deadlines.filter(x=>{const d=dateOf(x.dueDate);return d&&d>=today&&d<week&&!isDone(x)}).length;
+ $("sOverdue").textContent=deadlines.filter(x=>statusOf(x)==="Overdue").length;
+ $("sDone").textContent=deadlines.filter(isDone).length;
+ renderList();renderCalendar();
+}
+function renderList(){
+ const arr=visible().sort((a,b)=>dateOf(a.dueDate)-dateOf(b.dueDate));
+ if(!arr.length){$("listPanel").innerHTML='<div class="empty">No deadlines found.</div>';return}
+ $("listPanel").innerHTML=arr.map(x=>{
+  const d=dateOf(x.dueDate),st=statusOf(x),url=x.notionUrl||("https://www.notion.so/"+String(x.id||"").replace(/-/g,""));
+  return `<div class="deadline">
+   <div class="datebox"><div class="day">${d?d.getDate():"—"}</div><div class="mon">${d?d.toLocaleString([],{month:"short"}):""}</div></div>
+   <div><div class="name">${esc(x.title||"Deadline")}</div><div class="sub">${esc(studentName(x))}</div></div>
+   <div class="subjectcol"><div class="subject">${esc(x.subject||"—")}</div><div class="sub">${d?esc(d.toLocaleDateString([],{weekday:"long"})):""}</div></div>
+   <div class="typecol"><span class="badge">${esc(x.type||"Deadline")}</span> <span class="badge ${st.toLowerCase()}">${esc(st)}</span></div>
+   <a class="open" href="${esc(url)}" target="_top">View →</a>
+  </div>`;
+ }).join("");
+}
+function renderCalendar(){
+ const y=calDate.getFullYear(),m=calDate.getMonth();
+ $("calTitle").textContent=calDate.toLocaleDateString([],{month:"long",year:"numeric"});
+ const first=new Date(y,m,1), offset=(first.getDay()+6)%7, start=new Date(y,m,1-offset);
+ let out="";
+ for(let i=0;i<42;i++){
+  const d=new Date(start);d.setDate(start.getDate()+i);
+  const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  const ev=deadlines.filter(x=>x.dueDate===iso&&!isDone(x));
+  out+=`<div class="cell ${d.getMonth()!==m?"other":""}"><div class="cday">${d.getDate()}</div>${ev.slice(0,3).map(x=>`<div class="event">${esc(x.title||"Deadline")}</div>`).join("")}${ev.length>3?`<div class="sub">+${ev.length-3} more</div>`:""}</div>`;
+ }
+ $("calendar").innerHTML=out;
+}
+async function load(){
+ try{
+  const now=new Date(),start=new Date(now);start.setFullYear(start.getFullYear()-1);const end=new Date(now);end.setFullYear(end.getFullYear()+1);
+  const [dr,sr]=await Promise.all([
+   fetch(`${API}/tutoring-deadlines?start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}`,{cache:"no-store"}).then(r=>r.json()),
+   fetch(`${API}/tutoring-students`,{cache:"no-store"}).then(r=>r.json())
+  ]);
+  if(!dr.success)throw Error(dr.error||"Could not load deadlines.");
+  if(!sr.success)throw Error(sr.error||"Could not load students.");
+  deadlines=dr.deadlines||[];students=sr.students||[];fillStudents();render();
+ }catch(e){$("listPanel").innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+}
+$("filters").onclick=e=>{const b=e.target.closest("[data-filter]");if(!b)return;filter=b.dataset.filter;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));render()};
+$("search").oninput=render;
+document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{view=b.dataset.view;document.querySelectorAll("[data-view]").forEach(x=>x.classList.toggle("active",x===b));$("listPanel").style.display=view==="list"?"block":"none";$("calendarPanel").style.display=view==="calendar"?"block":"none";render()});
+$("prevMonth").onclick=()=>{calDate=new Date(calDate.getFullYear(),calDate.getMonth()-1,1);renderCalendar()};
+$("nextMonth").onclick=()=>{calDate=new Date(calDate.getFullYear(),calDate.getMonth()+1,1);renderCalendar()};
+const overlay=$("overlay");
+function openModal(){ $("deadlineForm").reset();$("subject").innerHTML='<option value="">Choose subject…</option>';$("formMessage").textContent="";overlay.classList.add("show");overlay.setAttribute("aria-hidden","false")}
+function closeModal(){overlay.classList.remove("show");overlay.setAttribute("aria-hidden","true")}
+$("newDeadline").onclick=openModal;$("closeModal").onclick=closeModal;$("cancel").onclick=closeModal;
+overlay.onclick=e=>{if(e.target===overlay)closeModal()};
+$("deadlineForm").onsubmit=async e=>{
+ e.preventDefault();$("saveDeadline").disabled=true;$("formMessage").textContent="";
+ try{
+  const body={title:$("title").value.trim(),studentPageId:$("student").value,subject:$("subject").value,type:$("type").value,dueDate:$("dueDate").value};
+  const r=await fetch(API+"/tutoring-deadlines",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok||!d.success)throw Error(d.error||"Could not add deadline.");
+  closeModal();await load();
+ }catch(err){$("formMessage").textContent=err.message}
+ finally{$("saveDeadline").disabled=false}
+};
+load();
+</script>
+</body>
+</html>
