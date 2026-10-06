@@ -188,7 +188,7 @@ function renderList(){
   if(!arr.length){panel.innerHTML='<div class="empty">No lessons found.</div>';return}
   panel.innerHTML=arr.map(l=>{
     const d=new Date(l.start), st=(l.status||"Scheduled").toLowerCase().replace(/\s+/g,"-");
-    const url=l.notionUrl||"#";
+    const url=l.notionUrl||("https://www.notion.so/"+String(l.id||"").replace(/-/g,""));
     return `<div class="lesson">
       <div class="datebox"><div class="day">${d.getDate()}</div><div class="mon">${d.toLocaleString([],{month:"short"})}</div></div>
       <div><div class="name">${esc(lessonName(l))}</div><div class="sub">${esc(gradeOf(l) ? "Grade "+gradeOf(l) : "")}</div></div>
