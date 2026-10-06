@@ -1078,7 +1078,12 @@ function fmtLessonDate(iso){
 }
 function lessonRow(l,isHistory=false){
   const href=l.notionUrl||"#";
-  const covered=isHistory?`<div class="lesson-covered">Topic covered: ${esc(l.topicCovered||"Not recorded yet")}</div>`:"";
+  const coveredNames=(l.topicsCoveredIds||[])
+    .map(id=>topics.find(t=>t.id===id)?.topic)
+    .filter(Boolean);
+  const covered=isHistory
+    ? `<div class="lesson-covered">Topics Covered: ${esc(coveredNames.length?coveredNames.join(" · "):"Not recorded yet")}</div>`
+    : "";
   return `<a class="lesson-row" href="${esc(href)}" target="_blank" rel="noopener">
     <div class="lesson-date">${fmtLessonDate(l.start)}</div>
     <div class="lesson-main">
