@@ -78,6 +78,8 @@ select{
   letter-spacing:.11em;
   color:var(--muted);
 }
+.student-link{color:var(--ink);text-decoration:none;border-bottom:1px solid #CFCBC5;cursor:pointer}.student-link:hover{border-bottom-color:var(--ink)}
+
 .meta-value{
   margin-top:4px;
   font-size:14px;
@@ -268,7 +270,7 @@ select{
 </div>
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
-let lessons=[];
+let lessons=[],studentRecords=[];
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function fmt(d){
@@ -504,7 +506,11 @@ async function loadTopics(studentPageId){
 function show(id){
   const l=lessons.find(x=>x.id===id);
   if(!l)return;
-  document.getElementById("student").textContent=inferStudent(l.title,l.subject);
+  const studentEl=document.getElementById("student");
+  const sr=studentRecords.find(s=>s.id===l.studentPageId);
+  const studentName=sr?.name||inferStudent(l.title,l.subject);
+  const studentUrl=sr?.notionUrl||("https://www.notion.so/"+String(l.studentPageId||"").replace(/-/g,""));
+  studentEl.innerHTML=l.studentPageId?`<a class="student-link" href="${esc(studentUrl)}" target="_top">${esc(studentName)}</a>`:esc(studentName);
   document.getElementById("subject").textContent=l.subject||"—";
   document.getElementById("when").textContent=fmt(l.start);
   document.getElementById("lessonStatus").textContent=l.status||"Scheduled";
@@ -517,9 +523,11 @@ function show(id){
 async function init(){
   const sel=document.getElementById("lesson");
   try{
-    const r=await fetch(API+"/tutoring-lessons");
+    const [r,sr]=await Promise.all([fetch(API+"/tutoring-lessons"),fetch(API+"/tutoring-students")]);
     const d=await r.json();
+    const sd=await sr.json();
     if(!r.ok||!d.success)throw new Error(d.error||"Could not load lessons");
+    if(sr.ok&&sd.success)studentRecords=sd.students||[];
     lessons=d.lessons||[];
     if(!lessons.length){sel.innerHTML="<option>No lessons found</option>";return}
     lessons.sort((a,b)=>new Date(a.start)-new Date(b.start));
