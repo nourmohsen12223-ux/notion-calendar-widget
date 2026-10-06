@@ -8,11 +8,11 @@
 :root{--ink:#37352F;--muted:#8F8B84;--line:#DDDAD5;--paper:#fff;--wash:#F8F7F4;--chip:#EEEAE4;--taupe:#D8D2CA;--dark:#6F6A63}
 *{box-sizing:border-box}html,body{margin:0;background:transparent;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{padding:2px}.wrap{max-width:1180px;margin:auto}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.filters{flex:1}.tools{margin-left:auto}
 .filters,.tools,.view-switch{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 button,input,select{font:inherit}
 .tab,.view-toggle,.secondary{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:8px 11px;cursor:pointer}
-.tab.active,.view-toggle.active{background:var(--chip);border-color:#D4D0CA;font-weight:650}
+.tab.active,.view-toggle.active{background:var(--chip);border-color:#D4D0CA;font-weight:650}.tab[data-filter="overdue"].active{background:#F3E7E5;border-color:#DFC4C0;color:#9A4F49}.tab[data-filter="done"].active{background:#E7EFE9;border-color:#C8D9CD;color:#52705C}.type-filter{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:8px 30px 8px 10px;cursor:pointer;outline:none}
 .search{min-width:210px;border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:#fff;color:var(--ink);outline:none}
 .search:focus,input:focus,select:focus{border-color:#A9A59E}
 .new{border:1px solid var(--dark);background:var(--dark);color:#fff;border-radius:9px;padding:9px 12px;font-weight:650;cursor:pointer}
@@ -25,7 +25,7 @@ button,input,select{font:inherit}
 .name{font-size:13px;font-weight:650}.sub{font-size:10px;color:var(--muted);margin-top:3px}.subject{font-size:12px}
 .badge{display:inline-block;border-radius:8px;padding:6px 8px;font-size:10px;background:var(--wash);white-space:nowrap}
 .badge.done{background:#E8EEE9;color:#587061}.badge.overdue{background:#F3E7E5;color:#8B514B}
-.open{color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:11px;white-space:nowrap;background:#fff}
+.rowActions{display:flex;align-items:center;gap:6px}.open{color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:11px;white-space:nowrap;background:#fff}.deleteBtn{border:1px solid var(--line);background:#fff;color:#9A9690;border-radius:8px;padding:6px 9px;font-size:15px;line-height:1;cursor:pointer}.deleteBtn:hover{color:#A24C4C;border-color:#D8B9B9}
 .empty{padding:28px 18px;color:var(--muted);font-size:12px;text-align:center}
 .calendar{padding:14px}.calhead{display:grid;grid-template-columns:repeat(7,1fr);font-size:10px;color:var(--muted);text-align:center;margin-bottom:6px}.calgrid{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid #EEECE8;border-top:1px solid #EEECE8}
 .cell{min-height:95px;border-right:1px solid #EEECE8;border-bottom:1px solid #EEECE8;padding:7px;background:#fff}.cell.other{background:#FBFAF8;color:#B5B1AA}.cday{font-size:11px;font-weight:650}.event{margin-top:5px;background:var(--wash);border-radius:6px;padding:5px;font-size:9px;line-height:1.25;overflow:hidden}
@@ -36,21 +36,24 @@ button,input,select{font:inherit}
 .form{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:650}.field input,.field select{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink);outline:none}
 .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:19px}.error{color:#A24C4C;font-size:12px;margin-top:12px;min-height:16px}.success{color:#5F806A}button:disabled{opacity:.55;cursor:default}
 @media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}.deadline{grid-template-columns:58px 1fr auto}.deadline .subjectcol{display:none}.deadline .typecol{grid-column:2}}
-@media(max-width:620px){.toolbar{flex-direction:column;align-items:stretch}.tools{width:100%}.search{min-width:0;flex:1}.summary{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.deadline{grid-template-columns:52px 1fr auto;padding:11px}.calendar{padding:8px}.cell{min-height:72px;padding:5px}.event{font-size:8px}}
+@media(max-width:620px){.toolbar{flex-direction:column;align-items:stretch}.filters{width:100%}.tools{width:100%;margin-left:0}.search{min-width:0;flex:1}.summary{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.deadline{grid-template-columns:52px 1fr auto;padding:11px}.calendar{padding:8px}.cell{min-height:72px;padding:5px}.event{font-size:8px}}
 </style>
 </head>
 <body>
 <div class="wrap">
  <div class="toolbar">
   <div class="filters" id="filters">
-   <button class="tab active" data-filter="all">All Deadlines</button>
+   <button class="tab active" data-filter="all">All Tutoring Deadlines</button>
    <button class="tab" data-filter="upcoming">Upcoming</button>
    <button class="tab" data-filter="overdue">Overdue</button>
    <button class="tab" data-filter="done">Done</button>
-   <button class="tab" data-filter="Homework">Homework</button>
-   <button class="tab" data-filter="Quiz">Quiz</button>
-   <button class="tab" data-filter="Exam">Exam</button>
-   <button class="tab" data-filter="Assignment">Assignments</button>
+   <select id="typeFilter" class="type-filter" aria-label="Filter by type">
+    <option value="">All Types</option>
+    <option value="Homework">Homework</option>
+    <option value="Quiz">Quiz</option>
+    <option value="Exam">Exam</option>
+    <option value="Assignment">Assignment</option>
+   </select>
   </div>
   <div class="tools">
    <input id="search" class="search" placeholder="Search student, subject or deadline…">
@@ -87,9 +90,18 @@ button,input,select{font:inherit}
  </div>
 </div>
 
+<div class="overlay" id="deleteOverlay" aria-hidden="true">
+ <div class="modal">
+  <div class="modalHead"><div class="modalTitle">Delete deadline?</div><button class="close" id="deleteClose" type="button">×</button></div>
+  <div id="deleteText" style="font-size:13px;line-height:1.5;color:var(--muted)"></div>
+  <div id="deleteMessage" class="error"></div>
+  <div class="actions"><button class="secondary" id="deleteCancel" type="button">Cancel</button><button class="new" id="deleteYes" type="button" style="background:#8B514B;border-color:#8B514B">Delete</button></div>
+ </div>
+</div>
+
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
-let deadlines=[],students=[],filter="all",view="list",calDate=new Date();
+let deadlines=[],students=[],filter="all",typeFilter="",view="list",calDate=new Date(),pendingDelete=null;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const dayStart=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
@@ -114,6 +126,7 @@ function visible(){
  return deadlines.filter(x=>{
   const hay=`${x.title||""} ${studentName(x)} ${x.subject||""} ${x.type||""}`.toLowerCase();
   if(q&&!hay.includes(q))return false;
+  if(typeFilter && x.type!==typeFilter)return false;
   const d=dateOf(x.dueDate),st=statusOf(x);
   if(filter==="upcoming")return st==="Upcoming";
   if(filter==="overdue")return st==="Overdue";
@@ -140,7 +153,7 @@ function renderList(){
    <div><div class="name">${esc(x.title||"Deadline")}</div><div class="sub">${esc(studentName(x))}</div></div>
    <div class="subjectcol"><div class="subject">${esc(x.subject||"—")}</div><div class="sub">${d?esc(d.toLocaleDateString([],{weekday:"long"})):""}</div></div>
    <div class="typecol"><span class="badge">${esc(x.type||"Deadline")}</span> <span class="badge ${st.toLowerCase()}">${esc(st)}</span></div>
-   <a class="open" href="${esc(url)}" target="_top">View →</a>
+   <div class="rowActions"><a class="open" href="${esc(url)}" target="_top">View →</a><button class="deleteBtn" type="button" data-delete="${esc(x.id)}" data-title="${esc(x.title||"Deadline")}" aria-label="Delete deadline">×</button></div>
   </div>`;
  }).join("");
 }
@@ -170,6 +183,29 @@ async function load(){
  }catch(e){$("listPanel").innerHTML=`<div class="empty">${esc(e.message)}</div>`}
 }
 $("filters").onclick=e=>{const b=e.target.closest("[data-filter]");if(!b)return;filter=b.dataset.filter;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));render()};
+$("typeFilter").onchange=e=>{typeFilter=e.target.value;render()};
+$("listPanel").onclick=e=>{
+ const b=e.target.closest("[data-delete]"); if(!b)return;
+ pendingDelete={id:b.dataset.delete,title:b.dataset.title||"Deadline"};
+ $("deleteText").textContent=`Delete "${pendingDelete.title}"? This will archive it in Notion.`;
+ $("deleteMessage").textContent="";
+ $("deleteOverlay").classList.add("show");
+ $("deleteOverlay").setAttribute("aria-hidden","false");
+};
+function closeDelete(){pendingDelete=null;$("deleteOverlay").classList.remove("show");$("deleteOverlay").setAttribute("aria-hidden","true")}
+$("deleteClose").onclick=closeDelete;$("deleteCancel").onclick=closeDelete;
+$("deleteOverlay").onclick=e=>{if(e.target===$("deleteOverlay"))closeDelete()};
+$("deleteYes").onclick=async()=>{
+ if(!pendingDelete)return;
+ $("deleteYes").disabled=true;$("deleteMessage").textContent="";
+ try{
+  const r=await fetch(API+"/tutoring-deadlines",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"delete",deadlineId:pendingDelete.id})});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok||!d.success)throw Error(d.error||"Could not delete deadline.");
+  closeDelete();await load();
+ }catch(err){$("deleteMessage").textContent=err.message}
+ finally{$("deleteYes").disabled=false}
+};
 $("search").oninput=render;
 document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{view=b.dataset.view;document.querySelectorAll("[data-view]").forEach(x=>x.classList.toggle("active",x===b));$("listPanel").style.display=view==="list"?"block":"none";$("calendarPanel").style.display=view==="calendar"?"block":"none";render()});
 $("prevMonth").onclick=()=>{calDate=new Date(calDate.getFullYear(),calDate.getMonth()-1,1);renderCalendar()};
