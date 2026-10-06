@@ -728,6 +728,23 @@ h2{
   }
 }
 
+
+.topicConfirm{
+  position:fixed;inset:0;z-index:9999;display:none;
+  align-items:center;justify-content:center;padding:18px;
+  background:rgba(55,53,47,.22);
+}
+.topicConfirm.show{display:flex}
+.topicConfirmBox{
+  width:min(360px,100%);background:#fff;border:1px solid var(--line);
+  border-radius:14px;padding:18px;box-shadow:0 12px 36px rgba(55,53,47,.16)
+}
+.topicConfirmTitle{font-family:Georgia,serif;font-size:19px;font-weight:600;margin-bottom:7px}
+.topicConfirmText{font-size:13px;line-height:1.5;color:var(--muted)}
+.topicConfirmActions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.topicConfirmCancel,.topicConfirmDelete{font:inherit;border-radius:8px;padding:8px 11px;cursor:pointer}
+.topicConfirmCancel{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.topicConfirmDelete{background:#7B4E4E;border:1px solid #7B4E4E;color:#fff;font-weight:650}
 </style>
 </head>
 <body>
@@ -910,6 +927,18 @@ h2{
   </div>
 
 </div>
+
+<div class="topicConfirm" id="topicConfirm" aria-hidden="true">
+  <div class="topicConfirmBox">
+    <div class="topicConfirmTitle">Delete topic?</div>
+    <div class="topicConfirmText" id="topicConfirmText"></div>
+    <div class="topicConfirmActions">
+      <button class="topicConfirmCancel" id="topicConfirmCancel" type="button">Cancel</button>
+      <button class="topicConfirmDelete" id="topicConfirmDelete" type="button">Delete</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
 const qs=new URLSearchParams(location.search);
@@ -1000,17 +1029,38 @@ async function patchTopic(t,changes){
 async function assign(id,week){const t=topics.find(x=>x.id===id);if(!t||t.weeks.includes(week))return;await patchTopic(t,{weeks:[...t.weeks,week]})}
 async function unassign(id,week){const t=topics.find(x=>x.id===id);if(!t)return;await patchTopic(t,{weeks:t.weeks.filter(w=>w!==week)})}
 async function toggle(id){const t=topics.find(x=>x.id===id);if(t)await patchTopic(t,{completed:!t.completed})}
-async function deleteTopic(id){
+let pendingTopicDelete=null;
+function deleteTopic(id){
   const t=topics.find(x=>x.id===id); if(!t)return;
-  if(!confirm(`Delete "${t.topic}"?`))return;
+  pendingTopicDelete={id,topic:t.topic};
+  $("topicConfirmText").textContent=`Delete "${t.topic}"? This will remove it from the Study Plan.`;
+  $("topicConfirm").classList.add("show");
+  $("topicConfirm").setAttribute("aria-hidden","false");
+}
+$("topicConfirmCancel").onclick=()=>{
+  pendingTopicDelete=null;
+  $("topicConfirm").classList.remove("show");
+  $("topicConfirm").setAttribute("aria-hidden","true");
+};
+$("topicConfirmDelete").onclick=async()=>{
+  if(!pendingTopicDelete)return;
+  const item=pendingTopicDelete;
+  $("topicConfirmDelete").disabled=true;
   try{
-    await api("/study-plan-embed?id="+encodeURIComponent(id),{method:"DELETE"});
-    topics=topics.filter(x=>x.id!==id);
+    await api("/study-plan-embed?id="+encodeURIComponent(item.id),{method:"DELETE"});
+    topics=topics.filter(x=>x.id!==item.id);
+    pendingTopicDelete=null;
+    $("topicConfirm").classList.remove("show");
+    $("topicConfirm").setAttribute("aria-hidden","true");
     render();
     loadFocus();
     message("");
-  }catch(e){message(e.message)}
-}
+  }catch(e){
+    $("topicConfirmText").textContent="Could not delete topic: "+e.message;
+  }finally{
+    $("topicConfirmDelete").disabled=false;
+  }
+};
 
 function bindTopics(){
  document.querySelectorAll(".topic").forEach(el=>{
