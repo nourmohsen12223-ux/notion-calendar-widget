@@ -38,6 +38,31 @@ button,input,select{font:inherit}
 @media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}.deadline{grid-template-columns:58px 1fr auto}.deadline .subjectcol{display:none}.deadline .typecol{grid-column:2}}
 @media(max-width:620px){.toolbar{flex-direction:column;align-items:stretch}.filters{width:100%}.tools{width:100%;margin-left:0}.search{min-width:0;flex:1}.summary{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.deadline{grid-template-columns:52px 1fr auto;padding:11px}.calendar{padding:8px}.cell{min-height:72px;padding:5px}.event{font-size:8px}}
 </style>
+
+<style id="true-edge-to-edge">
+html, body {
+  width:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:#fff !important;
+  overflow-x:hidden !important;
+}
+body > .wrap, .wrap, .container, .page, main {
+  width:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+  padding-left:0 !important;
+  padding-right:0 !important;
+  box-sizing:border-box !important;
+}
+.toolbar, .summary, #listPanel, #calendarPanel {
+  width:100% !important;
+  max-width:none !important;
+  box-sizing:border-box !important;
+}
+</style>
+
 </head>
 <body>
 <div class="wrap">
