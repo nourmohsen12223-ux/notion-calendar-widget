@@ -166,6 +166,7 @@ function visible(){
     const matches=!q || `${lessonName(l)} ${l.subject||""} ${gradeOf(l)}`.toLowerCase().includes(q);
     if(!matches)return false;
     if(filter==="upcoming")return l.start && new Date(l.start).getTime()>=now && !["Cancelled","No Show"].includes(l.status);
+    if(filter==="history")return l.start && new Date(l.start).getTime()<now;
     if(filter!=="all")return l.status===filter;
     return true;
   });
@@ -179,7 +180,10 @@ function render(){
   renderList(); renderCalendar();
 }
 function renderList(){
-  const arr=visible().sort((a,b)=>new Date(a.start||0)-new Date(b.start||0));
+  const arr=visible().sort((a,b)=>{
+    const ta=new Date(a.start||0).getTime(), tb=new Date(b.start||0).getTime();
+    return filter==="history" ? tb-ta : ta-tb;
+  });
   const panel=document.getElementById("listPanel");
   if(!arr.length){panel.innerHTML='<div class="empty">No lessons found.</div>';return}
   panel.innerHTML=arr.map(l=>{
