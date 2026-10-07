@@ -1389,29 +1389,21 @@ function parseLesson(item) {
 
 function getVisualPosition(date) {
 
-  let visualDate =
+  const visualDate =
     new Date(date);
-
 
   let hour =
     date.getHours() +
     date.getMinutes() / 60;
 
-
-  if (
-    hour < 5
-  ) {
-
-    visualDate =
-      addDays(
-        visualDate,
-        -1
-      );
-
-
+  /*
+    Keep 12 AM–4:59 AM inside the existing
+    5 PM–5 AM vertical time scale, but do NOT
+    move the lesson to the previous date.
+  */
+  if (hour < 5) {
     hour += 24;
   }
-
 
   return {
     visualDate,
@@ -2640,4 +2632,3 @@ setInterval(
 /* Compact calendar: subject intentionally hidden from lesson cards */
 .lesson-subject { display: none !important; }
 </style>
-
