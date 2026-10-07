@@ -164,6 +164,7 @@ body {
 .control:hover {
   background: #F6F4F1;
 }
+.control:disabled { opacity: .65; cursor: default; }
 
 
 .arrow {
@@ -871,7 +872,7 @@ body {
           id="todayButton"
         >
           Today
-        </button>
+        </button><button class="control" id="syncCalendarButton" type="button" title="Sync Solomon Calendar">↻ Sync</button>
 
 
         <button
@@ -1023,6 +1024,7 @@ const DEADLINES_API_URL =
   29 = 5 AM next day
 */
 
+const SYNC_CALENDAR_URL = "https://notion-calendar-api.nourmohsen12223.workers.dev/sync-solomon-now";
 const START_HOUR = 17;
 
 const END_HOUR = 29;
@@ -2598,6 +2600,23 @@ document
   );
 
 
+/* MANUAL SOLOMON SYNC */
+document.getElementById("syncCalendarButton").addEventListener("click", async () => {
+  const button = document.getElementById("syncCalendarButton");
+  if (button.disabled) return;
+  button.disabled = true; button.textContent = "Syncing…";
+  try {
+    const response = await fetch(SYNC_CALENDAR_URL, {cache:"no-store"});
+    if (!response.ok) throw new Error("Calendar sync failed.");
+    button.textContent = "✓ Synced";
+    await loadData();
+    setTimeout(() => { button.textContent = "↻ Sync"; button.disabled = false; }, 1600);
+  } catch (error) {
+    console.error(error); button.textContent = "Try again";
+    setTimeout(() => { button.textContent = "↻ Sync"; button.disabled = false; }, 1800);
+  }
+});
+
 /* ==========================================
    START
 ========================================== */
@@ -2621,3 +2640,4 @@ setInterval(
 /* Compact calendar: subject intentionally hidden from lesson cards */
 .lesson-subject { display: none !important; }
 </style>
+
