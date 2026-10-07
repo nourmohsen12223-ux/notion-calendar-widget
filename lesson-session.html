@@ -160,6 +160,20 @@ select{
   font-size:12px;
   line-height:1.55;
 }
+.status-select{
+  width:100%;
+  margin-top:4px;
+  padding:5px 7px;
+  border:0;
+  border-radius:7px;
+  background:#F7F6F3;
+  color:var(--ink);
+  font-size:13px;
+  font-weight:650;
+  cursor:pointer;
+}
+.status-select:disabled{opacity:.6;cursor:default}
+
 .status{
   margin-top:9px;
   color:var(--muted);
@@ -203,7 +217,15 @@ select{
       <div class="meta-card"><div class="meta-label">Student</div><div id="student" class="meta-value">—</div></div>
       <div class="meta-card"><div class="meta-label">Subject</div><div id="subject" class="meta-value">—</div></div>
       <div class="meta-card"><div class="meta-label">Date & time</div><div id="when" class="meta-value">—</div></div>
-      <div class="meta-card"><div class="meta-label">Status</div><div id="lessonStatus" class="meta-value">—</div></div>
+      <div class="meta-card">
+  <div class="meta-label">Status / Attendance</div>
+  <select id="lessonStatus" class="status-select" aria-label="Lesson status">
+    <option value="Scheduled">Scheduled</option>
+    <option value="Attended">Attended</option>
+    <option value="Cancelled">Cancelled</option>
+    <option value="No Show">No Show</option>
+  </select>
+</div>
     </div>
     <div id="status" class="status"></div>
   </div>
@@ -513,13 +535,49 @@ function show(id){
   studentEl.innerHTML=l.studentPageId?`<a class="student-link" href="${esc(studentUrl)}" target="_top">${esc(studentName)}</a>`:esc(studentName);
   document.getElementById("subject").textContent=l.subject||"—";
   document.getElementById("when").textContent=fmt(l.start);
-  document.getElementById("lessonStatus").textContent=l.status||"Scheduled";
+  document.getElementById("lessonStatus").value=l.status||"Scheduled";
   document.getElementById("status").textContent=`Selected lesson: ${l.status||"Scheduled"}`;
   loadChecklist(l);
   renderResourceFiles(l);
   loadLessonResources(l);
   loadTopics(l.studentPageId);
 }
+
+async function saveLessonStatus(){
+  const lessonId=document.getElementById("lesson").value;
+  const select=document.getElementById("lessonStatus");
+  const lesson=lessons.find(x=>x.id===lessonId);
+  if(!lesson)return;
+
+  const previous=lesson.status||"Scheduled";
+  const next=select.value;
+  if(next===previous)return;
+
+  select.disabled=true;
+  document.getElementById("status").textContent="Saving attendance…";
+
+  try{
+    const r=await fetch(API+"/tutoring-lessons",{
+      method:"PATCH",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({lessonId,status:next})
+    });
+    const d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.error||"Could not update attendance");
+    lesson.status=next;
+    document.getElementById("status").textContent="Attendance saved ✓";
+  }catch(e){
+    select.value=previous;
+    document.getElementById("status").textContent="Could not save attendance: "+e.message;
+  }finally{
+    select.disabled=false;
+  }
+}
+
+function bindLessonStatus(){
+  document.getElementById("lessonStatus").addEventListener("change",saveLessonStatus);
+}
+
 async function init(){
   const sel=document.getElementById("lesson");
   try{
@@ -543,6 +601,7 @@ async function init(){
 }
 bindChecklist();
 bindResourceUploads();
+bindLessonStatus();
 init();
 </script>
 </body>
