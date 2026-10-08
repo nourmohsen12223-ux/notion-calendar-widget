@@ -1309,6 +1309,14 @@ function escapeHTML(value) {
    PARSE SOLOMON
 ========================================== */
 
+function statusColor(status) {
+  const s = String(status || "").toLowerCase().replace(/\s+/g, " ").trim();
+  return ({"cancelled":"#FCE8E8", "canceled":"#FCE8E8", "no show":"#E3EFFF", "attended":"#E3F3E7"})[s] || "";
+}
+function statusBorder(status) {
+  const s = String(status || "").toLowerCase().replace(/\s+/g, " ").trim();
+  return ({"cancelled":"#D9534F", "canceled":"#D9534F", "no show":"#4B84D6", "attended":"#459B64"})[s] || "#AAA";
+}
 function parseLesson(item) {
 
   const rawTitle =
@@ -1963,9 +1971,8 @@ function renderLessons() {
 
 
       lesson.style.background =
-        colorForStudent(
-          info.student
-        );
+        statusColor(item.status) || colorForStudent(info.student);
+      lesson.style.borderLeft = item.status && statusColor(item.status) ? "4px solid " + statusBorder(item.status) : "";
 
 
       if (
