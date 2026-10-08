@@ -60,6 +60,17 @@ button,.search,input,select{font:inherit}
 .confirmCancel{border:1px solid var(--line);background:#fff;color:var(--ink)}
 .confirmDelete{border:1px solid #A24C4C;background:#A24C4C;color:#fff;font-weight:650}
 
+/* Color each individual lesson in both list and calendar views. */
+.lesson.attended,.event.attended{--status-bg:#E8F5EC;--status-ink:#245C38;--status-accent:#398650}
+.lesson.no-show,.event.no-show{--status-bg:#E8F0FC;--status-ink:#244F87;--status-accent:#3978C6}
+.lesson.cancelled,.event.cancelled{--status-bg:#FDECEB;--status-ink:#922D2A;--status-accent:#C54640}
+.lesson.attended,.lesson.no-show,.lesson.cancelled{background:var(--status-bg);box-shadow:inset 4px 0 0 var(--status-accent)}
+.lesson.attended .name,.lesson.no-show .name,.lesson.cancelled .name{color:var(--status-ink)}
+.lesson.attended .sub,.lesson.no-show .sub,.lesson.cancelled .sub,
+.lesson.attended .datebox .mon,.lesson.no-show .datebox .mon,.lesson.cancelled .datebox .mon{color:var(--status-ink)}
+.event{color:var(--ink)}
+.event.attended,.event.no-show,.event.cancelled{background:var(--status-bg);color:var(--status-ink);border-left:3px solid var(--status-accent)}
+
 </style>
 </head>
 <body>
@@ -147,6 +158,10 @@ const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
 let lessons=[],students=[],filter="all",view="list",month=new Date(); month.setDate(1);
 
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const lessonStatusClass=status=>{
+  const key=String(status||"Scheduled").trim().toLowerCase().replace(/[\s_-]+/g,"-");
+  return ({attended:"attended","no-show":"no-show",cancelled:"cancelled",canceled:"cancelled"})[key]||"scheduled";
+};
 const studentById=id=>students.find(s=>s.id===id);
 const lessonName=l=>studentById(l.studentPageId)?.name || l.title?.split(" — ")[0] || "Student";
 const gradeOf=l=>studentById(l.studentPageId)?.grade || "";
@@ -212,9 +227,9 @@ function renderList(){
   const panel=document.getElementById("listPanel");
   if(!arr.length){panel.innerHTML='<div class="empty">No lessons found.</div>';return}
   panel.innerHTML=arr.map(l=>{
-    const d=new Date(l.start), st=(l.status||"Scheduled").toLowerCase().replace(/\s+/g,"-");
+    const d=new Date(l.start), st=lessonStatusClass(l.status);
     const url=l.notionUrl||("https://www.notion.so/"+String(l.id||"").replace(/-/g,""));
-    return `<div class="lesson">
+    return `<div class="lesson ${st}">
       <div class="datebox"><div class="day">${d.getDate()}</div><div class="mon">${d.toLocaleString([],{month:"short"})}</div></div>
       <div><div class="name">${esc(lessonName(l))}</div><div class="sub">${esc(gradeOf(l) ? "Grade "+gradeOf(l) : "")}</div></div>
       <div class="subjectcol"><div>${esc(l.subject||"—")}</div><div class="sub">${esc(d.toLocaleDateString([],{weekday:"long"}))}</div></div>
@@ -231,7 +246,7 @@ function renderCalendar(){
   for(let i=0;i<42;i++){
     const d=new Date(start); d.setDate(start.getDate()+i);
     const events=visible().filter(l=>l.start&&sameDay(new Date(l.start),d));
-    cells+=`<div class="cell ${d.getMonth()!==m?"dim":""}"><div class="num">${d.getDate()}</div>${events.slice(0,4).map(l=>`<div class="event" onclick="openLesson('${esc(l.notionUrl||"")}')">${esc(fmtTime(l.start))} · ${esc(lessonName(l))}</div>`).join("")}${events.length>4?`<div class="sub">+${events.length-4} more</div>`:""}</div>`;
+    cells+=`<div class="cell ${d.getMonth()!==m?"dim":""}"><div class="num">${d.getDate()}</div>${events.slice(0,4).map(l=>`<div class="event ${lessonStatusClass(l.status)}" title="${esc((l.status||'Scheduled')+' · '+lessonName(l))}" onclick="openLesson('${esc(l.notionUrl||"")}')">${esc(fmtTime(l.start))} · ${esc(lessonName(l))}</div>`).join("")}${events.length>4?`<div class="sub">+${events.length-4} more</div>`:""}</div>`;
   }
   root.innerHTML=`<div class="cal-head"><button class="cal-nav" onclick="moveMonth(-1)">‹</button><b>${month.toLocaleDateString([],{month:"long",year:"numeric"})}</b><button class="cal-nav" onclick="moveMonth(1)">›</button></div><div class="weekdays">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(x=>`<div>${x}</div>`).join("")}</div><div class="grid">${cells}</div>`;
 }
