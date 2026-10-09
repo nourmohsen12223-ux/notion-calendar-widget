@@ -272,12 +272,15 @@ select{
   <div class="section-title">Deadlines</div>
   <section class="card" style="margin-bottom:16px">
     <h2>Student Deadlines</h2>
-    <div class="upload-note" style="margin-bottom:10px">Deadlines are shared across this student's lessons.</div>
+    <div class="upload-note" style="margin-bottom:10px">Synced with your existing Notion Tutoring Deadlines database.</div>
     <div class="deadline-form">
       <input type="text" id="deadlineTitle" maxlength="200" placeholder="Task or assignment" aria-label="Deadline task">
       <input type="date" id="deadlineDate" aria-label="Deadline date">
+      <select id="deadlineType" aria-label="Deadline type" style="flex:1 1 140px"><option value="">Type (optional)</option></select>
+      <select id="deadlineSubject" aria-label="Deadline subject" style="flex:1 1 140px"><option value="">Subject (optional)</option></select>
       <button type="button" class="upload-btn" id="addDeadline">+ Add deadline</button>
     </div>
+    <textarea id="deadlineNotes" rows="2" maxlength="2000" placeholder="Deadline notes (optional)" style="width:100%;margin-top:9px;border:1px solid var(--line);border-radius:8px;padding:9px;font:inherit"></textarea>
     <div id="deadlineMessage" class="deadline-message" aria-live="polite"></div>
     <div id="deadlineList" class="deadline-list"></div>
   </section>
@@ -637,34 +640,42 @@ async function loadTopics(studentPageId){
   }
 }
 
-let deadlineStudentId=null,deadlineItems=[],deadlineBusy=false,deadlineGeneration=0;
+let deadlineStudentId=null,deadlineLessonId=null,deadlineItems=[],deadlineBusy=false,deadlineGeneration=0;
 function deadlineStudentForLesson(lesson){return String(lesson?.studentPageId||"").trim();}
+function renderDeadlineOptions(options){
+ for(const [id,values,label] of [["deadlineType",options?.types||[],"Type (optional)"],["deadlineSubject",options?.subjects||[],"Subject (optional)"]]){
+  const el=document.getElementById(id),previous=el.value;
+  el.innerHTML='<option value="">'+label+'</option>'+values.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');
+  if(values.includes(previous))el.value=previous;
+ }
+}
 function renderDeadlines(){
  const list=document.getElementById("deadlineList");
  if(!deadlineStudentId){list.innerHTML='<div class="placeholder">This lesson has no linked student record.</div>';return;}
  if(!deadlineItems.length){list.innerHTML='<div class="placeholder">No deadlines for this student yet.</div>';return;}
  const today=new Date().toLocaleDateString('en-CA');
- list.innerHTML=[...deadlineItems].sort((a,b)=>Number(a.done)-Number(b.done)||a.date.localeCompare(b.date)).map(d=>{
-   const overdue=!d.done&&d.date<today;
-   return `<div class="deadline-row ${d.done?'deadline-done':''} ${overdue?'deadline-overdue':''}">
-    <input type="checkbox" data-deadline-check="${esc(d.id)}" ${d.done?'checked':''} ${deadlineBusy?'disabled':''} aria-label="Mark deadline complete">
-    <div class="deadline-detail"><strong>${esc(d.title)}</strong><small>Due ${esc(d.date)}${overdue?' · Overdue':''}</small></div>
-    <button type="button" class="deadline-delete" data-deadline-delete="${esc(d.id)}" ${deadlineBusy?'disabled':''} aria-label="Delete deadline">×</button>
-   </div>`;
+ list.innerHTML=[...deadlineItems].sort((a,b)=>Number(a.status==='Done')-Number(b.status==='Done')||a.date.localeCompare(b.date)).map(d=>{
+  const done=d.status==='Done',overdue=!done&&d.date<today;
+  return `<div class="deadline-row ${done?'deadline-done':''} ${overdue?'deadline-overdue':''}">
+   <input type="checkbox" data-deadline-check="${esc(d.id)}" ${done?'checked':''} ${deadlineBusy?'disabled':''} aria-label="Mark deadline complete">
+   <div class="deadline-detail"><strong>${esc(d.title)}</strong><small>Due ${esc(d.date)}${d.type?' · '+esc(d.type):''}${d.subject?' · '+esc(d.subject):''}${overdue?' · Overdue':''}</small>${d.notes?'<small>'+esc(d.notes)+'</small>':''}</div>
+   ${d.notionUrl?'<a href="'+esc(d.notionUrl)+'" target="_blank" rel="noopener" style="font-size:12px">Notion ↗</a>':''}
+   <button type="button" class="deadline-delete" data-deadline-delete="${esc(d.id)}" ${deadlineBusy?'disabled':''} aria-label="Delete deadline">×</button>
+  </div>`;
  }).join('');
  list.querySelectorAll('[data-deadline-check]').forEach(el=>el.addEventListener('change',()=>changeDeadline(el.dataset.deadlineCheck,'toggle')));
- list.querySelectorAll('[data-deadline-delete]').forEach(el=>el.addEventListener('click',()=>changeDeadline(el.dataset.deadlineDelete,'delete')));
+ list.querySelectorAll('[data-deadline-delete]').forEach(el=>el.addEventListener('click',()=>{if(confirm('Delete this deadline from Notion?'))changeDeadline(el.dataset.deadlineDelete,'delete');}));
 }
 async function loadStudentDeadlines(lesson){
  const studentId=deadlineStudentForLesson(lesson),generation=++deadlineGeneration;
- deadlineStudentId=studentId;deadlineItems=[];
+ deadlineStudentId=studentId;deadlineLessonId=lesson?.id||null;deadlineItems=[];
  const msg=document.getElementById('deadlineMessage');msg.textContent=studentId?'Loading deadlines…':'Select a lesson linked to a student.';
  renderDeadlines();if(!studentId)return;
  try{
   const r=await fetch(API+'/tutoring-student-deadlines?studentId='+encodeURIComponent(studentId),{cache:'no-store'});
   const d=await r.json();if(!r.ok||!d.success)throw Error(d.error||'Could not load deadlines');
   if(generation!==deadlineGeneration)return;
-  deadlineItems=d.deadlines||[];msg.textContent='';renderDeadlines();
+  deadlineItems=d.deadlines||[];renderDeadlineOptions(d.options);msg.textContent='';renderDeadlines();
  }catch(e){if(generation===deadlineGeneration)msg.textContent='Could not load deadlines: '+e.message;}
 }
 async function changeDeadline(id,action){
@@ -676,14 +687,16 @@ async function changeDeadline(id,action){
   const payload={studentId,action,id};
   if(action==='add'){
    payload.title=document.getElementById('deadlineTitle').value.trim();payload.date=document.getElementById('deadlineDate').value;
+   payload.type=document.getElementById('deadlineType').value;payload.subject=document.getElementById('deadlineSubject').value;
+   payload.notes=document.getElementById('deadlineNotes').value;payload.lessonId=deadlineLessonId;
    if(!payload.title||!/^\d{4}-\d{2}-\d{2}$/.test(payload.date))throw Error('Enter a task and due date.');
   }
   const r=await fetch(API+'/tutoring-student-deadlines',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
   const d=await r.json();if(!r.ok||!d.success)throw Error(d.error||'Could not save deadline');
   if(generation!==deadlineGeneration)return;
-  deadlineItems=d.deadlines||[];
-  if(action==='add')document.getElementById('deadlineTitle').value='';
-  msg.textContent='Saved ✓';
+  deadlineItems=d.deadlines||[];renderDeadlineOptions(d.options);
+  if(action==='add'){document.getElementById('deadlineTitle').value='';document.getElementById('deadlineNotes').value='';}
+  msg.textContent='Saved in Tutoring Deadlines ✓';renderDeadlines();
  }catch(e){if(generation===deadlineGeneration)msg.textContent=e.message;}
  finally{deadlineBusy=false;document.getElementById('addDeadline').disabled=false;if(generation===deadlineGeneration)renderDeadlines();}
 }
