@@ -206,6 +206,7 @@ select{
 .file-link:hover{background:var(--soft)}
 .upload-note{margin-top:7px;color:var(--muted);font-size:10px;line-height:1.4}
 
+.file-row{display:flex;align-items:center;gap:6px}.file-row .file-link{flex:1;min-width:0}.file-remove{border:0;background:transparent;color:#9A4E49;font-size:20px;width:26px;height:26px;cursor:pointer;border-radius:5px;flex-shrink:0}.file-remove:hover{background:#F5E7E5}.file-remove:disabled{opacity:.4;cursor:wait}
 </style>
 </head>
 <body>
@@ -261,7 +262,7 @@ select{
     <div class="card">
       <h2>Lecture Notes</h2>
       <div class="file-actions">
-        <label class="upload-btn" id="lectureNotesBtn">+ Upload file
+        <label class="upload-btn" id="lectureNotesBtn">+ Upload files
           <input class="file-input" id="lectureNotesInput" type="file" multiple>
         </label>
       </div>
@@ -357,7 +358,14 @@ function escapeHTML(value){
     .replace(/'/g,"&#039;");
 }
 
+let resourceBusy=false;
+function setResourceBusy(busy){
+  resourceBusy=busy;
+  document.querySelectorAll('.file-input,.file-remove').forEach(el=>el.disabled=busy);
+  document.getElementById("lesson").disabled=busy;
+}
 function renderResourceFiles(lesson){
+  if(lesson?.id!==document.getElementById("lesson").value)return;
   const groups={
     lectureNotes: lesson?.resources?.lectureNotes || [],
     homeworkWorksheets: lesson?.resources?.homeworkWorksheets || [],
@@ -370,18 +378,18 @@ function renderResourceFiles(lesson){
       box.innerHTML='<div class="placeholder">No files uploaded yet.</div>';
       return;
     }
-    box.innerHTML=files.map(f=>{
+    box.innerHTML=files.map((f,index)=>{
       const safeName=escapeHTML(f.name||"File");
-      return f.url
-        ? `<a class="file-link" href="${escapeHTML(f.url)}" target="_blank" rel="noopener">📎 <span>${safeName}</span></a>`
-        : `<div class="file-link">📎 <span>${safeName}</span></div>`;
+      const link=f.url?`<a class="file-link" href="${escapeHTML(f.url)}" target="_blank" rel="noopener">📎 <span>${safeName}</span></a>`:`<div class="file-link">📎 <span>${safeName}</span></div>`;
+      return `<div class="file-row">${link}<button type="button" class="file-remove" data-category="${category}" data-index="${index}" aria-label="Remove ${safeName}" title="Remove file" ${resourceBusy?'disabled':''}>×</button></div>`;
     }).join("");
+    box.querySelectorAll('.file-remove').forEach(button=>button.addEventListener('click',()=>removeLessonFile(category,Number(button.dataset.index))));
   });
 }
 
 async function uploadLessonFiles(category,fileList){
   const lessonId=document.getElementById("lesson").value;
-  if(!lessonId || !fileList?.length)return;
+  if(resourceBusy || !lessonId || !fileList?.length)return;
 
   const files=[...fileList];
   const oversized=files.find(f=>f.size>20*1024*1024);
@@ -392,8 +400,9 @@ async function uploadLessonFiles(category,fileList){
 
   const btn=document.getElementById(category+"Btn");
   const input=document.getElementById(category+"Input");
+  setResourceBusy(true);
   btn.classList.add("busy");
-  document.getElementById("status").textContent="Uploading file…";
+  document.getElementById("status").textContent=`Uploading ${files.length} file(s)…`;
 
   try{
     const form=new FormData();
@@ -419,9 +428,25 @@ async function uploadLessonFiles(category,fileList){
   }catch(e){
     document.getElementById("status").textContent="Could not upload: "+e.message;
   }finally{
+    setResourceBusy(false);
     btn.classList.remove("busy");
     input.value="";
   }
+}
+
+async function removeLessonFile(category,index){
+  if(resourceBusy)return;
+  const lessonId=document.getElementById("lesson").value;
+  const lesson=lessons.find(l=>l.id===lessonId),file=lesson?.resources?.[category]?.[index];
+  if(!file)return;
+  setResourceBusy(true);
+  const status=document.getElementById("status");status.textContent="Removing file…";
+  try{
+    const r=await fetch(API+"/tutoring-lesson-files",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"remove",lessonId,category,fileIndex:index,fileKey:file.key})});
+    const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Could not remove file.");
+    lesson.resources[category]=d.files||[];renderResourceFiles(lesson);status.textContent="File removed ✓";
+  }catch(e){await loadLessonResources(lesson);status.textContent="Could not remove file: "+e.message;}
+  finally{setResourceBusy(false);}
 }
 
 function bindResourceUploads(){
