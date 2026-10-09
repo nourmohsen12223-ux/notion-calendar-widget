@@ -194,7 +194,7 @@ select{
 }
 .upload-btn:hover{background:var(--soft)}
 .upload-btn.busy{opacity:.55;pointer-events:none}
-.file-input{display:none}
+.file-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}.upload-btn:has(.file-input){position:relative;overflow:hidden;touch-action:manipulation}
 .file-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
 .file-link{
   display:flex;align-items:center;gap:7px;width:100%;
@@ -399,7 +399,7 @@ function renderResourceFiles(lesson){
 
 async function uploadLessonFiles(category,fileList){
   const lessonId=document.getElementById("lesson").value;
-  if(resourceBusy || !lessonId || !fileList?.length)return;
+  if(resourceBusy || !lessonId || !fileList?.length){document.getElementById("status").textContent="No lesson or files selected, or another operation is in progress.";return;}
 
   const files=[...fileList];
   const oversized=files.find(f=>f.size>20*1024*1024);
@@ -420,8 +420,15 @@ async function uploadLessonFiles(category,fileList){
     form.append("category",category);
     files.forEach(file=>form.append("files",file,file.name));
 
-    const r=await fetch(API+"/tutoring-lesson-files",{method:"POST",body:form});
-    const d=await r.json();
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),90000);
+    let r,d;
+    try {
+      r=await fetch(API+"/tutoring-lesson-files",{method:"POST",body:form,signal:controller.signal});
+      const responseText=await r.text();
+      try { d=JSON.parse(responseText); }
+      catch { throw new Error("Server returned a non-JSON response (HTTP "+r.status+")."); }
+    } finally { clearTimeout(timeout); }
     if(!r.ok||!d.success)throw new Error(d.error||"Upload failed.");
 
     const lesson=lessons.find(x=>x.id===lessonId);
@@ -436,7 +443,7 @@ async function uploadLessonFiles(category,fileList){
 
     document.getElementById("status").textContent="Files uploaded ✓";
   }catch(e){
-    document.getElementById("status").textContent="Could not upload: "+e.message;
+    document.getElementById("status").textContent="Could not upload: "+(e.name==="AbortError"?"Request timed out after 90 seconds.":e.message);
   }finally{
     setResourceBusy(false);
     btn.classList.remove("busy");
@@ -502,7 +509,11 @@ document.getElementById("addHomeworkLink").addEventListener("click",addHomeworkL
 function bindResourceUploads(){
   ["lectureNotes","homeworkWorksheets","recordingTranscription"].forEach(category=>{
     document.getElementById(category+"Input")?.addEventListener("change",e=>{
-      uploadLessonFiles(category,e.target.files);
+      const files=Array.from(e.currentTarget.files||[]);
+      document.getElementById("status").textContent=files.length
+        ? "Selected "+files.length+" file(s); starting upload…"
+        : "No files selected.";
+      if(files.length) uploadLessonFiles(category,files);
     });
   });
 }
