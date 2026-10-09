@@ -207,6 +207,7 @@ select{
 .upload-note{margin-top:7px;color:var(--muted);font-size:10px;line-height:1.4}
 
 .file-row{display:flex;align-items:center;gap:6px}.file-row .file-link{flex:1;min-width:0}.file-remove{border:0;background:transparent;color:#9A4E49;font-size:20px;width:26px;height:26px;cursor:pointer;border-radius:5px;flex-shrink:0}.file-remove:hover{background:#F5E7E5}.file-remove:disabled{opacity:.4;cursor:wait}
+#additionalNotes{width:100%;resize:vertical;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit;margin-bottom:8px;min-height:110px}.link-form{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.link-form input{min-width:100px;flex:1;border:1px solid var(--line);border-radius:7px;padding:8px;font:inherit}
 </style>
 </head>
 <body>
@@ -240,12 +241,20 @@ select{
       <div class="placeholder" style="margin-top:9px">The controls will be connected to the Lesson record after lesson identity is confirmed.</div>
     </section>
 
+    <div>
+    <section class="card" style="margin-bottom:12px">
+      <h2>Additional Topics Covered</h2>
+      <textarea id="additionalNotes" maxlength="20000" rows="5" placeholder="Write anything else you covered during this lesson…" aria-label="Additional topics covered"></textarea>
+      <button type="button" class="upload-btn" id="saveAdditionalNotes">Save notes</button>
+      <div id="notesStatus" class="upload-note" aria-live="polite"></div>
+    </section>
     <section class="card">
       <h2>During Lesson</h2>
       <div class="placeholder"><strong>Topics Covered</strong></div>
       <div id="topics" style="margin-top:7px"><div class="placeholder">Select a lesson to load this student's Study Plan.</div></div>
     </section>
 
+    </div>
     <section class="card">
       <h2>After Lesson</h2>
       <label class="check"><input id="attendance" data-checklist="attendance" type="checkbox">Attendance recorded</label>
@@ -276,6 +285,7 @@ select{
           <input class="file-input" id="homeworkWorksheetsInput" type="file" multiple>
         </label>
       </div>
+      <div class="link-form"><input id="homeworkLinkName" placeholder="Link title (optional)" aria-label="Homework link title"><input type="url" id="homeworkLinkURL" placeholder="https://…" aria-label="Homework web link"><button type="button" class="upload-btn" id="addHomeworkLink">+ Add link</button></div>
       <div class="file-list" id="homeworkWorksheetsList"></div>
       <div class="upload-note">You can select several homework/worksheet files together · up to 20 MB each</div>
     </div>
@@ -361,7 +371,7 @@ function escapeHTML(value){
 let resourceBusy=false;
 function setResourceBusy(busy){
   resourceBusy=busy;
-  document.querySelectorAll('.file-input,.file-remove').forEach(el=>el.disabled=busy);
+  document.querySelectorAll('.file-input,.file-remove,#addHomeworkLink,#saveAdditionalNotes').forEach(el=>el.disabled=busy);
   document.getElementById("lesson").disabled=busy;
 }
 function renderResourceFiles(lesson){
@@ -448,6 +458,46 @@ async function removeLessonFile(category,index){
   }catch(e){await loadLessonResources(lesson);status.textContent="Could not remove file: "+e.message;}
   finally{setResourceBusy(false);}
 }
+
+async function addHomeworkLink(){
+  if(resourceBusy)return;
+  const lessonId=document.getElementById("lesson").value,lesson=lessons.find(x=>x.id===lessonId);
+  if(!lesson)return;
+  const input=document.getElementById("homeworkLinkURL"),title=document.getElementById("homeworkLinkName");
+  if(!input.value.trim())return;
+  setResourceBusy(true);
+  try{
+    const r=await fetch(API+"/tutoring-lesson-files",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"add-link",lessonId,category:"homeworkWorksheets",url:input.value.trim(),name:title.value.trim()})});
+    const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Could not add link.");
+    lesson.resources=lesson.resources||{};lesson.resources.homeworkWorksheets=d.files;renderResourceFiles(lesson);
+    input.value="";title.value="";document.getElementById("status").textContent="Link saved ✓";
+  }catch(e){document.getElementById("status").textContent=e.message;}finally{setResourceBusy(false);}
+}
+const noteDrafts=new Map();
+let notesLessonId="";
+async function loadAdditionalNotes(id){
+  notesLessonId=id;
+  const input=document.getElementById("additionalNotes"),status=document.getElementById("notesStatus");
+  input.value=noteDrafts.get(id)||"";status.textContent=noteDrafts.has(id)?"Unsaved notes":"Loading notes…";
+  try{
+    const r=await fetch(API+"/tutoring-lesson-notes?lessonId="+encodeURIComponent(id),{cache:"no-store"});const d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.error||"Could not load notes.");
+    if(notesLessonId===id&&!noteDrafts.has(id)){input.value=d.notes||"";status.textContent="";}
+  }catch(e){if(notesLessonId===id)status.textContent=e.message;}
+}
+async function saveAdditionalNotes(){
+  if(resourceBusy||!notesLessonId)return;
+  const id=notesLessonId,input=document.getElementById("additionalNotes"),notes=input.value,status=document.getElementById("notesStatus");
+  noteDrafts.set(id,notes);setResourceBusy(true);input.disabled=true;status.textContent="Saving…";
+  try{
+    const r=await fetch(API+"/tutoring-lesson-notes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:id,notes})});const d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.error||"Could not save notes.");
+    noteDrafts.delete(id);status.textContent="Notes saved ✓";
+  }catch(e){status.textContent=e.message;}finally{input.disabled=false;setResourceBusy(false);}
+}
+document.getElementById("additionalNotes").addEventListener("input",e=>{if(notesLessonId)noteDrafts.set(notesLessonId,e.target.value);document.getElementById("notesStatus").textContent="Unsaved notes";});
+document.getElementById("saveAdditionalNotes").addEventListener("click",saveAdditionalNotes);
+document.getElementById("addHomeworkLink").addEventListener("click",addHomeworkLink);
 
 function bindResourceUploads(){
   ["lectureNotes","homeworkWorksheets","recordingTranscription"].forEach(category=>{
@@ -562,6 +612,7 @@ function show(id){
   document.getElementById("when").textContent=fmt(l.start);
   document.getElementById("lessonStatus").value=l.status||"Scheduled";
   document.getElementById("status").textContent=`Selected lesson: ${l.status||"Scheduled"}`;
+  loadAdditionalNotes(l.id);
   loadChecklist(l);
   renderResourceFiles(l);
   loadLessonResources(l);
