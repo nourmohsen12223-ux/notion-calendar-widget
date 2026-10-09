@@ -194,7 +194,7 @@ select{
 }
 .upload-btn:hover{background:var(--soft)}
 .upload-btn.busy{opacity:.55;pointer-events:none}
-.file-input{display:none}
+.file-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}.upload-btn:has(.file-input){position:relative;overflow:hidden;touch-action:manipulation}
 .file-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
 .file-link{
   display:flex;align-items:center;gap:7px;width:100%;
@@ -276,7 +276,7 @@ select{
         </label>
       </div>
       <div class="file-list" id="lectureNotesList"></div>
-      <div class="upload-note">PDF, Word, PowerPoint, images and other Notion-supported files · up to 20 MB each</div>
+      <div class="upload-note">PDF, Word, PowerPoint, images and other Notion-supported files · up to 100 MB each</div>
     </div>
     <div class="card">
       <h2>Homework & Worksheets</h2>
@@ -287,7 +287,7 @@ select{
       </div>
       <div class="link-form"><input id="homeworkLinkName" placeholder="Link title (optional)" aria-label="Homework link title"><input type="url" id="homeworkLinkURL" placeholder="https://…" aria-label="Homework web link"><button type="button" class="upload-btn" id="addHomeworkLink">+ Add link</button></div>
       <div class="file-list" id="homeworkWorksheetsList"></div>
-      <div class="upload-note">You can select several homework/worksheet files together · up to 20 MB each</div>
+      <div class="upload-note">You can select several homework/worksheet files together · up to 100 MB each</div>
     </div>
     <div class="card">
       <h2>Recording & Transcription</h2>
@@ -297,7 +297,7 @@ select{
         </label>
       </div>
       <div class="file-list" id="recordingTranscriptionList"></div>
-      <div class="upload-note">Upload the lesson recording, transcript, or both · up to 20 MB each</div>
+      <div class="upload-note">Upload the lesson recording, transcript, or both · up to 100 MB each</div>
     </div>
   </div>
 </div>
@@ -402,9 +402,9 @@ async function uploadLessonFiles(category,fileList){
   if(resourceBusy || !lessonId || !fileList?.length)return;
 
   const files=[...fileList];
-  const oversized=files.find(f=>f.size>20*1024*1024);
+  const oversized=files.find(f=>f.size>100*1024*1024);
   if(oversized){
-    document.getElementById("status").textContent=`${oversized.name} is larger than 20 MB.`;
+    document.getElementById("status").textContent=`${oversized.name} is larger than 100 MB.`;
     return;
   }
 
@@ -415,14 +415,26 @@ async function uploadLessonFiles(category,fileList){
   document.getElementById("status").textContent=`Uploading ${files.length} file(s)…`;
 
   try{
-    const form=new FormData();
-    form.append("lessonId",lessonId);
-    form.append("category",category);
-    files.forEach(file=>form.append("files",file,file.name));
-
-    const r=await fetch(API+"/tutoring-lesson-files",{method:"POST",body:form});
-    const d=await r.json();
-    if(!r.ok||!d.success)throw new Error(d.error||"Upload failed.");
+    async function postChunk(body){
+      const r=await fetch(API+"/tutoring-lesson-chunks",{method:"POST",body:body instanceof FormData?body:JSON.stringify(body),...(body instanceof FormData?{}:{headers:{"Content-Type":"application/json"}})});
+      const raw=await r.text();let d;try{d=JSON.parse(raw)}catch{throw new Error("Upload service returned HTTP "+r.status)}
+      if(!r.ok||!d.success)throw new Error(d.error||"Upload request failed");return d;
+    }
+    let d;
+    const CHUNK=4*1024*1024;
+    for(let fileIndex=0;fileIndex<files.length;fileIndex++){
+      const file=files[fileIndex];
+      const init=await postChunk({action:"init",lessonId,category,name:file.name,size:file.size,contentType:file.type});
+      for(let part=1;part<=init.parts;part++){
+        const blob=file.slice((part-1)*CHUNK,Math.min(part*CHUNK,file.size));
+        const form=new FormData();form.append("action","part");form.append("lessonId",lessonId);form.append("category",category);
+        form.append("uploadId",init.uploadId);form.append("partNumber",String(part));form.append("filename",file.name);
+        form.append("file",blob,file.name);
+        await postChunk(form);
+        document.getElementById("status").textContent=`Uploading ${fileIndex+1}/${files.length}: ${file.name} — ${Math.round(part/init.parts*100)}%`;
+      }
+      d=await postChunk({action:"finish",lessonId,category,uploadId:init.uploadId,name:file.name});
+    }
 
     const lesson=lessons.find(x=>x.id===lessonId);
     if(lesson){
