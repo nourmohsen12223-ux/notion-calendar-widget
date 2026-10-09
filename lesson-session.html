@@ -415,25 +415,33 @@ async function uploadLessonFiles(category,fileList){
   document.getElementById("status").textContent=`Uploading ${files.length} file(s)…`;
 
   try{
-    async function postChunk(body){
-      const r=await fetch(API+"/tutoring-lesson-chunks",{method:"POST",body:body instanceof FormData?body:JSON.stringify(body),...(body instanceof FormData?{}:{headers:{"Content-Type":"application/json"}})});
-      const raw=await r.text();let d;try{d=JSON.parse(raw)}catch{throw new Error("Upload service returned HTTP "+r.status)}
+    async function postR2(body){
+      const isForm=body instanceof FormData;
+      const r=await fetch(API+"/tutoring-r2-upload",{method:"POST",body:isForm?body:JSON.stringify(body),...(isForm?{}:{headers:{"Content-Type":"application/json"}})});
+      const raw=await r.text();let d;try{d=JSON.parse(raw)}catch{throw new Error("Upload server returned HTTP "+r.status)}
       if(!r.ok||!d.success)throw new Error(d.error||"Upload request failed");return d;
     }
     let d;
-    const CHUNK=4*1024*1024;
     for(let fileIndex=0;fileIndex<files.length;fileIndex++){
       const file=files[fileIndex];
-      const init=await postChunk({action:"init",lessonId,category,name:file.name,size:file.size,contentType:file.type});
-      for(let part=1;part<=init.parts;part++){
-        const blob=file.slice((part-1)*CHUNK,Math.min(part*CHUNK,file.size));
-        const form=new FormData();form.append("action","part");form.append("lessonId",lessonId);form.append("category",category);
-        form.append("uploadId",init.uploadId);form.append("partNumber",String(part));form.append("filename",file.name);
-        form.append("file",blob,file.name);
-        await postChunk(form);
-        document.getElementById("status").textContent=`Uploading ${fileIndex+1}/${files.length}: ${file.name} — ${Math.round(part/init.parts*100)}%`;
+      if(file.size<=5*1024*1024){
+        const form=new FormData();form.append("lessonId",lessonId);form.append("category",category);form.append("files",file,file.name);
+        const r=await fetch(API+"/tutoring-lesson-files",{method:"POST",body:form});
+        d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Notion upload failed");
+      }else{
+        const init=await postR2({action:"init",lessonId,category,name:file.name,size:file.size,contentType:file.type});
+        const CHUNK=8*1024*1024,parts=[];
+        try{
+          for(let part=1;part<=init.parts;part++){
+            const blob=file.slice((part-1)*CHUNK,Math.min(part*CHUNK,file.size));
+            const form=new FormData();form.append("action","part");form.append("lessonId",lessonId);form.append("category",category);
+            form.append("key",init.key);form.append("uploadId",init.uploadId);form.append("partNumber",String(part));form.append("file",blob,file.name);
+            const result=await postR2(form);parts.push({partNumber:result.partNumber,etag:result.etag});
+            document.getElementById("status").textContent=`Uploading ${fileIndex+1}/${files.length}: ${file.name} — ${Math.round(part/init.parts*100)}%`;
+          }
+          d=await postR2({action:"finish",lessonId,category,key:init.key,uploadId:init.uploadId,parts,name:file.name});
+        }catch(error){try{await postR2({action:"abort",lessonId,category,key:init.key,uploadId:init.uploadId})}catch{}throw error;}
       }
-      d=await postChunk({action:"finish",lessonId,category,uploadId:init.uploadId,name:file.name});
     }
 
     const lesson=lessons.find(x=>x.id===lessonId);
