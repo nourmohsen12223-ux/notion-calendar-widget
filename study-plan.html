@@ -1190,7 +1190,7 @@ function lessonRow(l,isHistory=false){
   const covered=isHistory
     ? `<div class="lesson-covered">Topics Covered: ${esc(coveredNames.length?coveredNames.join(" · "):"Not recorded yet")}</div>`
     : "";
-  return `<a class="lesson-row" href="${esc(href)}" target="_blank" rel="noopener">
+  return `<a class="lesson-row" href="${esc(href)}" target="_top">
     <div class="lesson-date">${fmtLessonDate(l.start)}</div>
     <div class="lesson-main">
       <div class="lesson-title">${esc(l.title||"Lesson")}</div>
@@ -1210,7 +1210,7 @@ function renderLessons(){
 }
 function deadlineRow(d){
   const href=d.notionUrl||"#";
-  return `<a class="lesson-row" href="${esc(href)}" target="_blank" rel="noopener">
+  return `<a class="lesson-row" href="${esc(href)}" target="_top">
     <div class="lesson-date">${fmtLessonDate(d.dueDate||d.dueEnd||"")}</div>
     <div class="lesson-main">
       <div class="lesson-title">${esc(d.title||"Deadline")}</div>
@@ -1257,7 +1257,7 @@ function renderSubjectOptions(){
     : '<option value="">—</option>';
 }
 function workChip(d){
-  return `<a class="work-chip" href="${esc(d.notionUrl||"#")}" target="_blank" rel="noopener">
+  return `<a class="work-chip" href="${esc(d.notionUrl||"#")}" target="_top">
     <strong>${esc(d.title||"Work")}</strong>
     <span>${esc(d.type||"")}${d.subject?` · ${esc(d.subject)}`:""}</span>
   </a>`;
@@ -1313,7 +1313,7 @@ function renderWork(){
   $("workHistory").innerHTML=history.length?history.map(d=>{
     const dd=localDateFromDateOnly(d.dueDate);
     const label=dd?dd.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}):"";
-    return `<a class="work-history-row" href="${esc(d.notionUrl||"#")}" target="_blank" rel="noopener">
+    return `<a class="work-history-row" href="${esc(d.notionUrl||"#")}" target="_top">
       <div class="work-history-date">${esc(label)}</div>
       <div><div class="work-history-title">${esc(d.title||"Work")}</div><div class="work-history-meta">${esc(d.subject||"")}${d.status?` · ${esc(d.status)}`:""}</div></div>
       <div class="work-history-type">${esc(d.type||"")}</div>
@@ -1463,7 +1463,7 @@ function renderResources(){
   const mine=studentResources.filter(r=>r.general||(r.studentIds||[]).includes(studentId));
   $("resourceList").innerHTML=mine.length?mine.map(r=>{
     const links=[...(r.link?[{url:r.link,name:"Open link"}]:[]),...(r.files||[])].filter(x=>/^https?:\/\//i.test(x.url||""));
-    return `<div class="resource-item"><div class="resource-item-main"><div class="resource-item-title">${esc(r.name)}</div><div class="resource-item-meta">${esc([r.general?"General":"Student",r.subject,r.type].filter(Boolean).join(" · "))}</div>${r.description?`<div class="resource-item-meta">${esc(r.description)}</div>`:""}<div class="resource-item-links">${links.map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.name||"Open file")} ↗</a>`).join("")}${r.notionUrl?`<a href="${esc(r.notionUrl)}" target="_blank" rel="noopener noreferrer">Notion ↗</a>`:""}</div></div><button type="button" class="resource-delete" data-resource-delete="${esc(r.id)}" aria-label="Delete resource">×</button></div>`;
+    return `<div class="resource-item"><div class="resource-item-main"><div class="resource-item-title">${esc(r.name)}</div><div class="resource-item-meta">${esc([r.general?"General":"Student",r.subject,r.type].filter(Boolean).join(" · "))}</div>${r.description?`<div class="resource-item-meta">${esc(r.description)}</div>`:""}<div class="resource-item-links">${links.map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.name||"Open file")} ↗</a>`).join("")}${r.notionUrl?`<a href="${esc(r.notionUrl)}" target="_top">Notion ↗</a>`:""}</div></div><button type="button" class="resource-delete" data-resource-delete="${esc(r.id)}" aria-label="Delete resource">×</button></div>`;
   }).join(""):'<span class="empty">No resources yet. Add a file or link above.</span>';
 }
 $("resourceAddToggle").onclick=()=>{if(!studentId)return;$("resourceForm").hidden=!$("resourceForm").hidden;renderResourceOptions()};
