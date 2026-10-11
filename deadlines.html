@@ -78,6 +78,7 @@ body > .wrap, .wrap, .container, .page, main {
     <option value="Quiz">Quiz</option>
     <option value="Exam">Exam</option>
     <option value="Assignment">Assignment</option>
+     <option value="Prepare Lesson">Prepare Lesson</option>
    </select>
   </div>
   <div class="tools">
@@ -107,7 +108,7 @@ body > .wrap, .wrap, .container, .page, main {
     <div class="field"><label>Student</label><select id="student" required><option value="">Choose student…</option></select></div>
     <div class="field"><label>Subject</label><select id="subject"><option value="">Choose subject…</option></select></div>
     <div class="field"><label>Due Date</label><input id="dueDate" type="date" required></div>
-    <div class="field"><label>Type</label><select id="type" required><option>Homework</option><option>Quiz</option><option>Exam</option><option>Assignment</option></select></div>
+    <div class="field"><label>Type</label><select id="type" required><option>Homework</option><option>Quiz</option><option>Exam</option><option>Assignment</option><option>Prepare Lesson</option></select></div>
    </div>
    <div id="formMessage" class="error"></div>
    <div class="actions"><button class="secondary" id="cancel" type="button">Cancel</button><button class="new" id="saveDeadline" type="submit">Add Deadline</button></div>
@@ -156,7 +157,7 @@ function visible(){
   if(filter==="upcoming")return st==="Upcoming";
   if(filter==="overdue")return st==="Overdue";
   if(filter==="done")return st==="Done";
-  if(["Homework","Quiz","Exam","Assignment"].includes(filter))return x.type===filter;
+  if(["Homework","Quiz","Exam","Assignment","Prepare Lesson"].includes(filter))return x.type===filter;
   return true;
  });
 }
