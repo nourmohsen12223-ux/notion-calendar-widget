@@ -1,16 +1,253 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tutoring Resources</title><style>
-:root{--ink:#37352f;--muted:#8f8b84;--line:#dddAD5;--soft:#f7f6f3}*{box-sizing:border-box}html,body{width:100%;min-height:100%;padding:0}body{margin:0;background:white;color:var(--ink);font:14px Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}.wrap{width:100%;max-width:none;margin:0;padding:0}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;background:#F7F6F3;border-radius:12px;padding:16px 20px}h1{font:650 20px Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0}.filters{display:grid;grid-template-columns:2fr repeat(3,minmax(120px,1fr));gap:9px;margin:12px 0}input,select,textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:9px;background:#fff;padding:10px;color:var(--ink);font:inherit}button{border:1px solid var(--line);border-radius:9px;padding:10px 13px;background:var(--soft);color:var(--ink);cursor:pointer;font:inherit}button:disabled{opacity:.55;cursor:wait}.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:12px}.card{border:1px solid var(--line);border-radius:13px;padding:16px;min-width:0}.cardhead{display:flex;align-items:start;justify-content:space-between;gap:8px}.card h2{font:600 18px Georgia,serif;margin:0}.meta{font-size:12px;color:var(--muted);margin:8px 0}.desc{font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}.links{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.links a{font-size:12px;color:#5f5a54;overflow-wrap:anywhere}.delete{background:white;border:0;padding:4px 7px;font-size:18px;color:var(--muted)}.edit{background:white;border:1px solid var(--line);padding:5px 10px;font-size:12px}.cardactions{display:flex;gap:5px;align-items:center;flex-shrink:0}.card h2{overflow-wrap:anywhere}.status{color:var(--muted);font-size:12px;margin:9px 0}.form{display:none;background:#faf9f7;border:1px solid var(--line);border-radius:12px;padding:15px;margin:12px 0}.form.open{display:block}.fields{display:grid;grid-template-columns:1fr 1fr;gap:11px}.fields label{font-size:12px;color:var(--muted);display:grid;gap:5px}.wide{grid-column:1/-1}.check{display:flex!important;flex-direction:row;align-items:center;color:var(--ink)!important}.check input{width:auto}.buttons{display:flex;gap:8px;margin-top:12px}.empty{color:var(--muted);padding:20px 0}@media(max-width:750px){.filters{grid-template-columns:1fr 1fr}.fields{grid-template-columns:1fr}.wide{grid-column:auto}}@media(max-width:450px){.filters{grid-template-columns:1fr}}
-</style></head><body><main class="wrap"><div class="top"><h1>Resources Library</h1><button id="toggle" type="button">+ Add Resource</button></div><div id="status" class="status">Loading resources…</div><form id="form" class="form"><div id="formTitle" style="font-weight:650;margin-bottom:12px">Add Resource</div><div class="fields"><label>Resource name<input id="name" required maxlength="200" placeholder="e.g. Fractions practice"></label><label>Resource type<select id="type"></select></label><label>Student<select id="student"></select></label><label>Subject<select id="subject"></select></label><label class="check wide"><input type="checkbox" id="general"> General resource — available to every student</label><label>Web link<input type="url" id="link" placeholder="https://..."></label><label id="fileLabel">Files (up to 10 files, 5 MB each)<input type="file" id="files" multiple></label><label class="wide">Description<textarea id="description" maxlength="2000" rows="2"></textarea></label></div><div id="filenames" class="status"></div><div class="buttons"><button id="save" type="submit">Save Resource</button><button id="cancel" type="button">Cancel</button></div></form><div class="filters"><input id="search" placeholder="Search resources…" aria-label="Search resources"><select id="filterStudent" aria-label="Filter student"></select><select id="filterSubject" aria-label="Filter subject"></select><select id="filterType" aria-label="Filter resource type"></select></div><div id="count" class="status"></div><div id="list" class="list"></div></main><script>
+
+:root{
+  --ink:#37352F; --muted:#8F8B84; --line:#DDDAD5; --line-soft:#EBE8E4;
+  --soft:#F7F6F3; --surface:#FAF9F7; --subtle:#F1EFEC; --accent:#625D57;
+}
+*{box-sizing:border-box}
+html,body{width:100%;min-height:100%;margin:0;padding:0}
+body{background:#FFF;color:var(--ink);font:14px/1.45 Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.wrap{width:100%;max-width:none;margin:0;padding:0 0 14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:var(--soft);border-radius:13px;padding:18px 20px}
+.heading{min-width:0}
+h1{font:650 20px/1.2 Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;letter-spacing:-.025em}
+.subtitle{font-size:12px;color:#817C76;margin:6px 0 0}
+.add-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;border:1px solid var(--accent);border-radius:9px;background:var(--accent);color:white;padding:8px 13px;font-size:12px;font-weight:650;white-space:nowrap}
+.add-btn:hover{background:#4F4A45}
+.add-btn svg{width:15px;height:15px}
+button:disabled{opacity:.55;cursor:wait}
+.status{color:var(--muted);font-size:12px;margin:9px 0}
+.status:empty{display:none}
+.form{display:none;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:18px;margin:12px 0}
+.form.open{display:block}
+.form-title{font:600 18px Georgia,serif;margin:0 0 15px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fields label{font-size:12px;color:#7C7770;display:grid;gap:6px;font-weight:550}
+input,select,textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:9px;background:#FFF;padding:10px 11px;color:var(--ink);outline:none;transition:border-color .16s,box-shadow .16s}
+input:focus,select:focus,textarea:focus{border-color:#A9A29B;box-shadow:0 0 0 3px rgba(98,93,87,.10)}
+textarea{resize:vertical;min-height:68px}
+input::placeholder{color:#A5A19B}
+.wide{grid-column:1/-1}
+.check{display:flex!important;flex-direction:row;align-items:center;gap:9px;color:var(--ink)!important;font-weight:450!important}
+.check input{width:auto;accent-color:var(--accent)}
+.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+.buttons button{border:1px solid var(--line);border-radius:9px;padding:9px 13px;background:white;color:var(--ink);font-weight:600}
+.buttons #save{background:var(--accent);color:#FFF;border-color:var(--accent)}
+.filter-row{display:grid;grid-template-columns:minmax(215px,1.6fr) repeat(3,minmax(120px,1fr));gap:9px;margin:15px 0 11px}
+.search-field{position:relative;display:block}
+.search-field svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:#8F8B84;pointer-events:none}
+.search-field input{padding-left:37px}
+.filter-row select{padding-right:29px;cursor:pointer}
+.results-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:3px 1px 11px}
+.results-bar .status{margin:0;font-size:12px}
+.results-help{font-size:11px;color:#A09B95}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:13px}
+.card{border:1px solid var(--line);background:white;border-radius:13px;padding:16px;min-width:0;position:relative;display:flex;flex-direction:column;min-height:197px;transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+.card.is-openable{cursor:pointer}
+.card.is-openable:hover{border-color:#BDB9B3;box-shadow:0 6px 18px rgba(55,53,47,.065);transform:translateY(-2px)}
+.card.is-openable:focus-within{border-color:#ADA69F}
+.card-primary-link{position:absolute;inset:0;z-index:1;border-radius:13px}
+.card-primary-link:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.card.menu-active{z-index:9}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:13px}
+.file-mark{width:39px;height:39px;display:grid;place-items:center;flex-shrink:0;border-radius:10px;background:var(--soft);border:1px solid #EFECE8;color:#746F69}
+.file-mark svg{height:19px;width:19px;stroke-width:1.6}
+.file-type{display:inline-flex;align-items:center;justify-content:center;font:650 10px/1 Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:.035em;color:#8A857F;border:1px solid var(--line-soft);border-radius:6px;padding:5px 7px;margin-left:auto;align-self:center}
+.card h2{font:600 18px/1.28 Georgia,'Times New Roman',serif;letter-spacing:-.015em;margin:0 0 7px;overflow-wrap:anywhere}
+.meta{font-size:12px;color:#86817B;margin:0 0 7px;line-height:1.4;overflow-wrap:anywhere}
+.desc{font-size:12.5px;line-height:1.5;color:#5F5A54;white-space:pre-wrap;overflow-wrap:anywhere;margin:3px 0 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card-footer{margin-top:auto;padding-top:14px}
+.card-line{height:1px;background:var(--line-soft);margin-bottom:10px}
+.card-foot-row{display:flex;align-items:center;gap:10px;justify-content:space-between;color:#817C75;font-size:11px}
+.asset-count{display:flex;align-items:center;gap:5px;min-width:0}
+.asset-count svg{height:14px;width:14px}
+.open-hint{display:inline-flex;align-items:center;gap:3px;color:#6B645D;font-size:11px;font-weight:650;white-space:nowrap}
+.open-hint svg{height:14px;width:14px}
+.links{position:relative;z-index:2;display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.links a{max-width:100%;font-size:11px;text-decoration:none;padding:5px 7px;border:1px solid var(--line-soft);border-radius:6px;color:#68635D;background:#FAF9F7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.links a:hover{border-color:#CAC4BC;background:var(--soft)}
+.card-menu-wrap{position:relative;z-index:4;flex-shrink:0}
+.more-button{height:32px;width:32px;display:grid;place-items:center;border:1px solid transparent;border-radius:8px;background:transparent;color:#827D77;padding:0}
+.more-button svg{height:18px;width:18px}
+.more-button:hover,.more-button[aria-expanded="true"]{background:var(--soft);border-color:var(--line-soft)}
+.card-menu{position:absolute;right:0;top:37px;z-index:10;min-width:148px;background:#FFF;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 26px rgba(55,53,47,.12);padding:5px}
+.card-menu[hidden]{display:none}
+.menu-item{display:flex;align-items:center;gap:10px;width:100%;min-height:37px;border:0;background:transparent;color:var(--ink);border-radius:7px;padding:8px 9px;text-align:left;font-size:12px}
+.menu-item:hover,.menu-item:focus-visible{background:var(--soft)}
+.menu-item svg{width:15px;height:15px;flex-shrink:0}
+.menu-item.delete{color:#655E58}
+.menu-item.delete:hover{background:#F7F6F3}
+.empty{padding:34px 15px;text-align:center;border:1px dashed var(--line);border-radius:13px;color:var(--muted);grid-column:1/-1;font-size:13px}
+@media(max-width:810px){.filter-row{grid-template-columns:1fr 1fr}.search-field{grid-column:1/-1}.list{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}}
+@media(max-width:490px){.top{padding:15px}.subtitle{max-width:200px}.filter-row{grid-template-columns:1fr 1fr}.filter-row select:last-child{grid-column:1/-1}.list{grid-template-columns:1fr}.fields{grid-template-columns:1fr}.wide{grid-column:auto}.results-help{display:none}.card{min-height:170px}}
+@media(prefers-reduced-motion:reduce){.card,input,select,textarea{transition:none}.card.is-openable:hover{transform:none}}
+
+</style></head><body>
+<main class="wrap">
+  <header class="top">
+    <div class="heading"><h1>Resources Library</h1><p class="subtitle">Teaching materials, all in one place.</p></div>
+    <button class="add-btn" id="toggle" type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add Resource</button>
+  </header>
+  <div id="status" class="status" role="status" aria-live="polite">Loading resources…</div>
+  <form id="form" class="form">
+    <h2 id="formTitle" class="form-title">Add Resource</h2>
+    <div class="fields">
+      <label>Resource name<input id="name" required maxlength="200" placeholder="e.g. Fractions practice"></label>
+      <label>Resource type<select id="type"></select></label>
+      <label>Student<select id="student"></select></label>
+      <label>Subject<select id="subject"></select></label>
+      <label class="check wide"><input type="checkbox" id="general"> General resource — available to every student</label>
+      <label>Web link<input type="url" id="link" placeholder="https://..."></label>
+      <label id="fileLabel">Files (up to 10 files, 5 MB each)<input type="file" id="files" multiple></label>
+      <label class="wide">Description<textarea id="description" maxlength="2000" rows="2"></textarea></label>
+    </div>
+    <div id="filenames" class="status"></div>
+    <div class="buttons"><button id="save" type="submit">Save Resource</button><button id="cancel" type="button">Cancel</button></div>
+  </form>
+  <div class="filter-row" role="group" aria-label="Resource filters">
+    <label class="search-field">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input id="search" placeholder="Search your library…" aria-label="Search resources">
+    </label>
+    <select id="filterStudent" aria-label="Filter student"></select>
+    <select id="filterSubject" aria-label="Filter subject"></select>
+    <select id="filterType" aria-label="Filter resource type"></select>
+  </div>
+  <div class="results-bar"><div id="count" class="status" aria-live="polite"></div><span class="results-help">Select a card to open its resource</span></div>
+  <div id="list" class="list"></div>
+</main>
+<script>
 const API='https://notion-calendar-api.nourmohsen12223.workers.dev';const $=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let students=[],resources=[],types=[],editingId=null;
 async function call(path,options){const r=await fetch(API+path,{cache:'no-store',...options});const d=await r.json().catch(()=>({}));if(!r.ok||d.success===false)throw Error(d.error||'Request failed');return d}
 function options(el,items,first,selected=''){el.innerHTML='<option value="">'+esc(first)+'</option>'+items.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');if(items.includes(selected))el.value=selected}
 function subjects(){return [...new Set(students.flatMap(s=>s.subjects||[]).concat(resources.map(r=>r.subject).filter(Boolean)))].sort()}
 function fill(){const prior={student:$('student').value,subject:$('subject').value,type:$('type').value,fs:$('filterStudent').value,ft:$('filterType').value,fsub:$('filterSubject').value};options($('student'),students.map(s=>s.id),'Select student…',prior.student);for(const o of $('student').options){const s=students.find(s=>s.id===o.value);if(s)o.textContent=s.name}options($('type'),types,'Select type…',prior.type);options($('filterStudent'),['__general',...students.map(s=>s.id)],'All students',prior.fs);for(const o of $('filterStudent').options){if(o.value==='__general')o.textContent='General resources only';else{const s=students.find(s=>s.id===o.value);if(s)o.textContent=s.name}}options($('filterType'),types,'All types',prior.ft);options($('filterSubject'),subjects(),'All subjects',prior.fsub);updateSubject(prior.subject)}
 function updateSubject(previous=''){const student=students.find(s=>s.id===$('student').value);const allowed=$('general').checked?subjects():(student?.subjects||[]);options($('subject'),allowed,'No subject / All subjects',previous);$('student').disabled=$('general').checked}
-function render(){const q=$('search').value.trim().toLowerCase(),st=$('filterStudent').value,su=$('filterSubject').value,ty=$('filterType').value;const mine=resources.filter(r=>{if(st==='__general'&&!r.general)return false;if(st&&st!=='__general'&&!r.general&&!(r.studentIds||[]).includes(st))return false;if(su&&r.subject!==su)return false;if(ty&&r.type!==ty)return false;const studentNames=(r.studentIds||[]).map(id=>students.find(s=>s.id===id)?.name||'').join(' ');return [r.name,r.description,r.subject,r.type,studentNames].join(' ').toLowerCase().includes(q)});$('count').textContent=`${mine.length} resource${mine.length===1?'':'s'}`;$('list').innerHTML=mine.length?mine.map(r=>{const names=r.general?'General resource':(r.studentIds||[]).map(id=>students.find(s=>s.id===id)?.name||'Student').join(', ');const links=[...(r.link?[{url:r.link,name:'Open link'}]:[]),...(r.files||[])];return `<article class="card"><div class="cardhead"><h2>${esc(r.name)}</h2><div class="cardactions"><button type="button" class="edit" data-edit="${esc(r.id)}" aria-label="Edit ${esc(r.name)}">Edit</button><button type="button" class="delete" data-delete="${esc(r.id)}" title="Delete resource" aria-label="Delete ${esc(r.name)}">×</button></div></div><div class="meta">${esc([names,r.subject,r.type].filter(Boolean).join(' · '))}</div>${r.description?`<div class="desc">${esc(r.description)}</div>`:''}<div class="links">${links.filter(l=>/^https?:\/\//i.test(l.url||'')).map(l=>`<a target="_blank" rel="noopener noreferrer" href="${esc(l.url)}">${esc(l.name||'Open file')} ↗</a>`).join('')}${r.notionUrl?`<a target="_blank" rel="noopener noreferrer" href="${esc(r.notionUrl)}">View in Notion ↗</a>`:''}</div></article>`}).join(''):'<div class="empty">No matching resources.</div>'}
+function iconSvg(kind){
+  const shapes={
+    website:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>',
+    pdf:'<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7M7.5 16h9M7.5 19h7"/>',
+    document:'<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7M8 13h8M8 17h8"/>',
+    spreadsheet:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M10 3v18"/>',
+    presentation:'<rect x="3" y="3" width="18" height="13" rx="2"/><path d="M12 16v5M8 21h8M7 12l3-3 2 2 4-4"/>',
+    video:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/>',
+    audio:'<path d="M9 18V5l12-2v13M9 9l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+    image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="2"/><path d="m21 16-5-5-9 10"/>',
+    file:'<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7"/>',
+    ellipsis:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+    edit:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L9 17l-4 1 1-4z"/>',
+    trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3"/>',
+    attachment:'<path d="m21 11.5-8.3 8.3a6 6 0 0 1-8.5-8.5l9-9a4 4 0 0 1 5.7 5.7l-9 9a2 2 0 0 1-2.8-2.8l8-8"/>',
+    arrow:'<path d="M7 17 17 7M8 7h9v9"/>'
+  };
+  return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${shapes[kind]||shapes.file}</svg>`;
+}
+function resourceKind(r){
+  const firstFile=(r.files||[])[0];
+  const value=String(firstFile?.name||r.link||'').split('?')[0].toLowerCase();
+  if(r.link)return {icon:'website',label:'LINK'};
+  if(/\.pdf$/.test(value))return {icon:'pdf',label:'PDF'};
+  if(/\.(doc|docx|txt|rtf)$/.test(value))return {icon:'document',label:'DOCUMENT'};
+  if(/\.(xls|xlsx|csv)$/.test(value))return {icon:'spreadsheet',label:'SHEET'};
+  if(/\.(ppt|pptx|key)$/.test(value))return {icon:'presentation',label:'SLIDES'};
+  if(/\.(mp4|mov|avi|webm|mkv)$/.test(value))return {icon:'video',label:'VIDEO'};
+  if(/\.(mp3|wav|m4a|aac)$/.test(value))return {icon:'audio',label:'AUDIO'};
+  if(/\.(jpg|jpeg|png|webp|gif|svg)$/.test(value))return {icon:'image',label:'IMAGE'};
+  if(firstFile)return {icon:'file',label:'FILE'};
+  return {icon:'file',label:'NOTION'};
+}
+function closeMenus(){document.querySelectorAll('.card.menu-active').forEach(card=>{
+  card.classList.remove('menu-active');
+  const menu=card.querySelector('.card-menu'),toggle=card.querySelector('[data-menu]');
+  if(menu)menu.hidden=true;
+  if(toggle)toggle.setAttribute('aria-expanded','false');
+})}
+function render(){
+  const q=$('search').value.trim().toLowerCase(),st=$('filterStudent').value,su=$('filterSubject').value,ty=$('filterType').value;
+  const mine=resources.filter(r=>{
+    if(st==='__general'&&!r.general)return false;
+    if(st&&st!=='__general'&&!r.general&&!(r.studentIds||[]).includes(st))return false;
+    if(su&&r.subject!==su)return false;
+    if(ty&&r.type!==ty)return false;
+    const studentNames=(r.studentIds||[]).map(id=>students.find(s=>s.id===id)?.name||'').join(' ');
+    return [r.name,r.description,r.subject,r.type,studentNames].join(' ').toLowerCase().includes(q);
+  });
+  $('count').textContent=`${mine.length} resource${mine.length===1?'':'s'}`;
+  $('list').innerHTML=mine.length?mine.map(r=>{
+    const names=r.general?'General resource':(r.studentIds||[]).map(id=>students.find(s=>s.id===id)?.name||'Student').join(', ');
+    const links=[...(r.link?[{url:r.link,name:'Open link'}]:[]),...(r.files||[])];
+    const validLinks=links.filter(l=>/^https?:\/\//i.test(l.url||''));
+    const primaryUrl=validLinks[0]?.url||(/^https?:\/\//i.test(r.notionUrl||'')?r.notionUrl:'');
+    const kind=resourceKind(r);
+    const fileCount=(r.files||[]).length;
+    const amount=fileCount?`${fileCount} file${fileCount===1?'':'s'}`:(r.link?'Web link':'Notion page');
+    return `<article class="card ${primaryUrl?'is-openable':''}">
+      ${primaryUrl?`<a class="card-primary-link" href="${esc(primaryUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${esc(r.name)}${validLinks.length>1?' (primary link or file)':''}"></a>`:''}
+      <div class="card-top">
+        <span class="file-mark">${iconSvg(kind.icon)}</span>
+        <span class="file-type">${esc(kind.label)}</span>
+        <div class="card-menu-wrap">
+          <button type="button" class="more-button" data-menu="${esc(r.id)}" aria-label="More options for ${esc(r.name)}" aria-expanded="false" aria-haspopup="true">${iconSvg('ellipsis')}</button>
+          <div class="card-menu" hidden>
+            <button type="button" class="menu-item" data-edit="${esc(r.id)}">${iconSvg('edit')} Edit resource</button>
+            <button type="button" class="menu-item delete" data-delete="${esc(r.id)}">${iconSvg('trash')} Delete resource</button>
+          </div>
+        </div>
+      </div>
+      <h2>${esc(r.name)}</h2>
+      <p class="meta">${esc([names,r.subject,r.type].filter(Boolean).join(' · '))}</p>
+      ${r.description?`<p class="desc">${esc(r.description)}</p>`:''}
+      <div class="card-footer">
+        <div class="card-line"></div>
+        <div class="card-foot-row"><span class="asset-count">${iconSvg('attachment')} ${esc(amount)}</span>${primaryUrl?`<span class="open-hint" aria-hidden="true">Open ${iconSvg('arrow')}</span>`:''}</div>
+        <div class="links">
+          ${validLinks.map(l=>`<a target="_blank" rel="noopener noreferrer" href="${esc(l.url)}" title="${esc(l.name||'Open file')}">${esc(l.name||'Open file')} ↗</a>`).join('')}
+          ${r.notionUrl?`<a target="_blank" rel="noopener noreferrer" href="${esc(r.notionUrl)}">View in Notion ↗</a>`:''}
+        </div>
+      </div>
+    </article>`;
+  }).join(''):'<div class="empty">No matching resources. Try clearing a filter or adding a new resource.</div>';
+}
+
 async function load(){try{const [s,r]=await Promise.all([call('/study-plan-embed-students'),call('/tutoring-resources')]);students=s.students||[];resources=r.resources||[];types=r.options?.types||[];fill();render();$('status').textContent=''}catch(e){$('status').textContent='Could not load resources: '+e.message}}
 function closeForm(){$('form').classList.remove('open');$('form').reset();editingId=null;$('formTitle').textContent='Add Resource';$('save').textContent='Save Resource';$('fileLabel').style.display='';$('filenames').textContent='';updateSubject()}
 $('toggle').onclick=()=>{if($('form').classList.contains('open'))closeForm();else{closeForm();$('form').classList.add('open')}};$('cancel').onclick=closeForm;$('student').onchange=()=>updateSubject();$('general').onchange=()=>updateSubject();$('files').onchange=()=>{$('filenames').textContent=[...$('files').files].map(f=>f.name).join(' · ')};['search','filterStudent','filterSubject','filterType'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
 $('form').onsubmit=async e=>{e.preventDefault();const f=[...$('files').files];if(!editingId&&!f.length&&!$('link').value.trim()){$('status').textContent='Add a file or web link.';return}if(f.length>10||f.some(x=>x.size>5*1024*1024)){$('status').textContent='Maximum 10 files, 5 MB each. Use a cloud link for larger files.';return}if(!$('general').checked&&!$('student').value){$('status').textContent='Choose a student or mark this as a general resource.';return}const fd=new FormData();for(const [key,value] of Object.entries({action:editingId?'edit':'add',id:editingId||'',name:$('name').value.trim(),studentId:$('student').value,general:String($('general').checked),subject:$('subject').value,type:$('type').value,link:$('link').value.trim(),description:$('description').value}))fd.append(key,value);f.forEach(file=>fd.append('files',file));$('save').disabled=true;$('status').textContent='Saving…';try{await call('/tutoring-resources',{method:'POST',body:fd});closeForm();await load();$('status').textContent='Resource saved.'}catch(err){$('status').textContent='Could not save: '+err.message}finally{$('save').disabled=false}};
-$('list').onclick=async e=>{const edit=e.target.closest('[data-edit]');if(edit){const r=resources.find(x=>x.id===edit.dataset.edit);if(!r)return;closeForm();editingId=r.id;$('formTitle').textContent='Edit Resource';$('save').textContent='Save Changes';$('name').value=r.name||'';$('general').checked=!!r.general;$('student').value=r.studentIds?.[0]||'';$('type').value=r.type||'';updateSubject(r.subject||'');$('link').value=r.link||'';$('description').value=r.description||'';$('fileLabel').style.display='none';$('filenames').textContent='Existing attachments are preserved. To change files, use Notion.';$('form').classList.add('open');$('form').scrollIntoView({behavior:'smooth',block:'nearest'});return}const btn=e.target.closest('[data-delete]');if(!btn||!confirm('Delete this resource from Notion?'))return;btn.disabled=true;try{await call('/tutoring-resources',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',id:btn.dataset.delete})});await load();$('status').textContent='Resource deleted.'}catch(err){$('status').textContent='Could not delete: '+err.message;btn.disabled=false}};load();
+$('list').onclick=async e=>{
+  const menuButton=e.target.closest('[data-menu]');
+  if(menuButton){
+    const card=menuButton.closest('.card');
+    const wasOpen=menuButton.getAttribute('aria-expanded')==='true';
+    closeMenus();
+    if(!wasOpen){card.classList.add('menu-active');card.querySelector('.card-menu').hidden=false;menuButton.setAttribute('aria-expanded','true')}
+    return;
+  }
+  const edit=e.target.closest('[data-edit]');
+  if(edit){
+    closeMenus();
+    const r=resources.find(x=>x.id===edit.dataset.edit);if(!r)return;
+    closeForm();editingId=r.id;$('formTitle').textContent='Edit Resource';$('save').textContent='Save Changes';
+    $('name').value=r.name||'';$('general').checked=!!r.general;$('student').value=r.studentIds?.[0]||'';
+    $('type').value=r.type||'';updateSubject(r.subject||'');$('link').value=r.link||'';$('description').value=r.description||'';
+    $('fileLabel').style.display='none';$('filenames').textContent='Existing attachments are preserved. To change files, use Notion.';
+    $('form').classList.add('open');$('form').scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
+  const btn=e.target.closest('[data-delete]');
+  if(!btn)return;
+  closeMenus();
+  if(!confirm('Delete this resource from Notion?'))return;
+  btn.disabled=true;
+  try{
+    await call('/tutoring-resources',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',id:btn.dataset.delete})});
+    await load();$('status').textContent='Resource deleted.';
+  }catch(err){$('status').textContent='Could not delete: '+err.message;btn.disabled=false}
+};
+document.addEventListener('click',e=>{if(!e.target.closest('.card-menu-wrap'))closeMenus()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenus()});
+load();
+
 </script></body></html>
