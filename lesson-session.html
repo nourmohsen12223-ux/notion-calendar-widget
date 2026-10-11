@@ -185,7 +185,14 @@ select{
   .section-title{padding:14px 16px}
 }
 
-.file-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+ .zoom-panel{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}
+ .zoom-status{margin-top:6px;color:var(--muted);font-size:13px}
+ .zoom-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:9px;min-width:0}
+ .zoom-actions[hidden]{display:none}
+ .zoom-join{display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;min-height:36px;border-radius:9px;background:#E5EFE9;color:#2C5F42;text-decoration:none;font-size:13px;font-weight:700}
+ .zoom-join:hover{background:#D8E9DE}
+ .zoom-address{color:var(--ink);font-size:12px;overflow-wrap:anywhere;word-break:break-word;text-decoration:underline;text-decoration-color:#C7C3BD;text-underline-offset:2px}
+ .file-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
 .upload-btn{
   display:inline-flex;align-items:center;justify-content:center;
   min-height:34px;padding:7px 11px;border:1px solid var(--line);
@@ -215,8 +222,8 @@ select{
 <body>
 <div class="wrap">
   <div class="top">
-    <div class="eyebrow">Lesson</div>
-    <select id="lesson"><option>Loading lessons…</option></select>
+    <!-- Kept in the DOM for existing save/upload logic, but no longer shown. -->
+    <select id="lesson" hidden aria-hidden="true" tabindex="-1"><option>Loading lessons…</option></select>
     <div class="meta">
       <div class="meta-card"><div class="meta-label">Student</div><div id="student" class="meta-value">—</div></div>
       <div class="meta-card"><div class="meta-label">Subject</div><div id="subject" class="meta-value">—</div></div>
@@ -230,6 +237,14 @@ select{
     <option value="No Show">No Show</option>
   </select>
 </div>
+    </div>
+    <div class="zoom-panel" aria-live="polite">
+      <div class="meta-label">Zoom meeting</div>
+      <div id="zoomStatus" class="zoom-status">Loading meeting link…</div>
+      <div id="zoomActions" class="zoom-actions" hidden>
+        <a id="zoomJoin" class="zoom-join" href="#" target="_blank" rel="noopener noreferrer">Join Zoom meeting ↗</a>
+        <a id="zoomLink" class="zoom-address" href="#" target="_blank" rel="noopener noreferrer"></a>
+      </div>
     </div>
     <div id="status" class="status"></div>
   </div>
@@ -701,6 +716,35 @@ async function changeDeadline(id,action){
 }
 document.getElementById('addDeadline').addEventListener('click',()=>changeDeadline(null,'add'));
 
+async function loadZoomLink(lesson){
+  const status=document.getElementById("zoomStatus");
+  const actions=document.getElementById("zoomActions");
+  const address=document.getElementById("zoomLink");
+  const join=document.getElementById("zoomJoin");
+  const lessonId=lesson?.id;
+  actions.hidden=true;
+  address.removeAttribute("href");
+  join.removeAttribute("href");
+  status.textContent="Loading Zoom link…";
+  if(!lessonId){status.textContent="No lesson selected.";return;}
+  try{
+    const r=await fetch(API+"/lesson-session-zoom?lessonId="+encodeURIComponent(lessonId),{cache:"no-store"});
+    const d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.error||"Could not load Zoom link");
+    if(document.getElementById("lesson").value!==lessonId)return;
+    if(!d.zoomLink){status.textContent="No Zoom link saved in this lesson's Notion record.";return;}
+    const parsed=new URL(d.zoomLink);
+    if(parsed.protocol!=="https:")throw new Error("The saved Zoom link must begin with https://");
+    address.href=parsed.href;
+    address.textContent=parsed.href;
+    join.href=parsed.href;
+    status.textContent="";
+    actions.hidden=false;
+  }catch(e){
+    if(document.getElementById("lesson").value===lessonId)status.textContent="Could not load Zoom link: "+e.message;
+  }
+}
+
 function show(id){
   const l=lessons.find(x=>x.id===id);
   if(!l)return;
@@ -713,6 +757,7 @@ function show(id){
   document.getElementById("when").textContent=fmt(l.start);
   document.getElementById("lessonStatus").value=l.status||"Scheduled";
   document.getElementById("status").textContent=`Selected lesson: ${l.status||"Scheduled"}`;
+  loadZoomLink(l);
   loadStudentDeadlines(l);
   loadAdditionalNotes(l.id);
   loadChecklist(l);
@@ -769,9 +814,19 @@ async function init(){
     lessons.sort((a,b)=>new Date(a.start)-new Date(b.start));
     sel.innerHTML=lessons.map(l=>`<option value="${esc(l.id)}">${esc(inferStudent(l.title,l.subject))} · ${esc(l.subject||"Lesson")} · ${esc(fmt(l.start))}</option>`).join("");
     const q=new URLSearchParams(location.search).get("lessonId");
-    const chosen=lessons.find(x=>x.id===q)||nearestLesson(lessons);
+    if(!q){
+      document.getElementById("status").textContent="This lesson embed is missing lessonId. Please check its Notion embed URL.";
+      document.getElementById("zoomStatus").textContent="Waiting for the lesson ID in this page's embed URL.";
+      sel.selectedIndex=-1;
+      return;
+    }
+    const chosen=lessons.find(x=>x.id.replace(/-/g,"").toLowerCase()===q.replace(/-/g,"").toLowerCase());
     if(chosen){sel.value=chosen.id;show(chosen.id)}
-    sel.onchange=()=>show(sel.value);
+    else{
+      sel.selectedIndex=-1;
+      document.getElementById("status").textContent="Lesson ID not found in Notion. Check this page's embed URL.";
+      document.getElementById("zoomStatus").textContent="Lesson not found.";
+    }
   }catch(e){
     sel.innerHTML="<option>Could not load lessons</option>";
     document.getElementById("status").textContent=e.message;
