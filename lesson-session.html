@@ -643,7 +643,7 @@ async function loadTopics(studentPageId){
 let deadlineStudentId=null,deadlineLessonId=null,deadlineItems=[],deadlineBusy=false,deadlineGeneration=0;
 function deadlineStudentForLesson(lesson){return String(lesson?.studentPageId||"").trim();}
 function renderDeadlineOptions(options){
- for(const [id,values,label] of [["deadlineType",options?.types||[],"Type (optional)"],["deadlineSubject",options?.subjects||[],"Subject (optional)"]]){
+ for(const [id,values,label] of [["deadlineType",[...new Set([...(options?.types||[]),"Prepare Lesson"])],"Type (optional)"],["deadlineSubject",options?.subjects||[],"Subject (optional)"]]){
   const el=document.getElementById(id),previous=el.value;
   el.innerHTML='<option value="">'+label+'</option>'+values.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');
   if(values.includes(previous))el.value=previous;
