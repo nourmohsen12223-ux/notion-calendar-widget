@@ -188,19 +188,9 @@ function nextLesson(id){return lessons.filter(l=>l.studentPageId===id&&new Date(
 function fmt(x){return new Date(x).toLocaleString(undefined,{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}
 function gradeLabel(g){const v=String(g||"").trim();return v?/^grade\b/i.test(v)?v:"Grade "+v:""}
 
-function studentNotionUrl(s){
-  // Prefer a clean Notion page URL, avoiding embed/query parameters that
-  // can cause iPadOS to treat the link as an ordinary web navigation.
-  const id=String(s.id||"").replace(/-/g,"");
-  if(/^[0-9a-fA-F]{32}$/.test(id)) return "https://www.notion.so/"+id;
-  return s.notionUrl||"#";
-}
-
 function card(s){
   const pct=progress(s.id),n=nextLesson(s.id);
-  const url=studentNotionUrl(s);
-  const ipad=/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  const openUrl=ipad && url.startsWith("https://www.notion.so/") ? "notion://www.notion.so/"+url.split("/").pop() : url;
+  const url=s.notionUrl||("https://www.notion.so/"+String(s.id||"").replace(/-/g,""));
   return `<div class="card">
     <div class="head">
       <div class="avatar">${esc((s.name||"?").trim().charAt(0).toUpperCase())}</div>
@@ -214,7 +204,7 @@ function card(s){
     <div class="track"><div class="fill" style="width:${pct}%"></div></div>
     <div class="next"><div class="label">Next Lesson</div><div class="nexttext">${n?esc(fmt(n.start))+" · "+esc(n.subject||n.title||"Lesson"):"Not scheduled"}</div></div>
     <div class="cardActions">
-      <a class="open" href="${esc(openUrl)}" target="_top"><span>View Student</span><span>→</span></a>
+      <a class="open" href="${esc(url)}" target="_top"><span>View Student</span><span>→</span></a>
       <button class="deleteBtn" type="button" data-delete-student="${esc(s.id)}" data-student-name="${esc(s.name||"Student")}">Delete</button>
     </div>
   </div>`;
