@@ -1449,11 +1449,12 @@ function normalizeLessonStatus(status) {
   return s === "canceled" ? "cancelled" : s.replace(/\s+/g, "-");
 }
 function statusBorder(status) {
+  // Keep student-specific neutral card backgrounds; status uses the original colors.
   return ({
-    "cancelled": "#81766C", // deeper taupe
-    "no-show": "#A49B90",   // muted stone gray
-    "attended": "#6A665F"   // charcoal gray
-  })[normalizeLessonStatus(status)] || "#9B9791";
+    "cancelled": "#D9534F", // red
+    "no-show": "#4B84D6",   // blue
+    "attended": "#459B64"   // green
+  })[normalizeLessonStatus(status)] || "#AAA";
 }
 function parseLesson(item) {
 
