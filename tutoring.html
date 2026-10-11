@@ -25,11 +25,7 @@
 
   --time-width: 54px;
 
-  --lesson1: #E8E4DE;
-  --lesson2: #E2DFDA;
-  --lesson3: #DDD8D1;
-  --lesson4: #EEEAE4;
-  --lesson5: #E7E7E3;
+  /* Warm-neutral colors throughout, including each student’s calendar events. */
 }
 
 html,
@@ -179,6 +175,60 @@ body {
   font-size: 17px;
 }
 
+
+/* ==========================================
+   STUDENT COLOR KEY
+   Warm neutral palette only: ivory, greige, gray and taupe.
+========================================== */
+
+.student-legend {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+.student-legend:empty { display: none; }
+.student-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 29px;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #FBFAF8;
+  color: #514E49;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  max-width: 100%;
+}
+.student-swatch,
+.upcoming-student-dot {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(55, 53, 47, .17);
+  border-radius: 4px;
+}
+.upcoming-student-dot {
+  display: inline-block;
+  vertical-align: -1px;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  border-radius: 3px;
+}
+.lesson[data-status="cancelled"] {
+  outline: 1px dashed rgba(94, 85, 77, .72);
+  outline-offset: -2px;
+  opacity: .77;
+}
+.lesson[data-status="no-show"] {
+  outline: 1px dashed rgba(141, 131, 120, .78);
+  outline-offset: -2px;
+}
 
 /* ==========================================
    CALENDAR WRAPPER
@@ -896,6 +946,7 @@ body {
 
     </div>
 
+    <div id="studentLegend" class="student-legend" role="list" aria-label="Calendar colors by student"></div>
 
     <div class="calendar-shell">
 
@@ -1064,52 +1115,129 @@ let deadlines = [];
 
 
 /* ==========================================
-   COLORS
+   STUDENT COLORS
+   The same student always gets the same color on every week.
+   Saved allocations stay consistent on this device as students are added.
+   A deterministic name/ID sort makes the initial set consistent everywhere.
 ========================================== */
 
-const NEUTRAL_COLORS = [
-  "#E8E4DE",
-  "#E2DFDA",
-  "#DDD8D1",
-  "#EEEAE4",
-  "#E7E7E3"
+const STUDENT_PALETTE = [
+  "#EEE9E2", // warm ivory
+  "#D9D2C9", // soft stone
+  "#E9E4DE", // porcelain greige
+  "#CDC6BD", // light taupe
+  "#F1EBE4", // pale linen
+  "#DFD8CF", // oatmeal
+  "#E1DEDA", // pearl gray
+  "#D4CCC3", // sandstone
+  "#EAE1D7", // warm putty
+  "#D2D0CB", // silver taupe
+  "#EBE8E3", // misty chalk
+  "#D8CFC5", // mushroom
+  "#E5DCD2", // biscuit gray
+  "#D7D7D3", // pale slate gray
+  "#E8E4DF", // soft dove
+  "#CFCBC7", // muted pebble
+  "#EFE7DC", // light sand
+  "#DCD5CE"  // gentle greige
 ];
 
+const studentColors = new Map();
+const STUDENT_COLOR_STORAGE_KEY = "noury-tutoring-calendar-student-colors-neutral-v2";
+const LEGACY_STUDENT_COLOR_STORAGE_KEY = "noury-tutoring-calendar-student-colors-v1";
+// Migrate old student's color SLOT to neutral color: identity stays consistent.
+const LEGACY_STUDENT_PALETTE = [
+  "#E5E1FA", "#DCE9FF", "#FFE3D4", "#F8DCE8", "#FFF0C6", "#E0E3F7",
+  "#F8DAD4", "#EDDDF7", "#D9E9F8", "#F6E0CD", "#E2DDF2", "#F8DAEA",
+  "#E0E6F3", "#FFE9CB", "#EEDCE9", "#DCE5FB", "#F7DCD9", "#F3E2FC"
+];
 
-const studentColors =
-  new Map();
+function studentKey(item) {
+  const id = String(item?.studentPageId || "").trim().replace(/-/g, "").toLowerCase();
+  if (id) return "id:" + id;
+  return "name:" + parseLesson(item).student.trim().toLowerCase();
+}
 
+function studentColorForLesson(item) {
+  return studentColors.get(studentKey(item)) || STUDENT_PALETTE[0];
+}
 
-function colorForStudent(name) {
-
-  const key =
-    String(
-      name || "Student"
-    );
-
-
-  if (
-    studentColors.has(key)
-  ) {
-
-    return studentColors.get(key);
+function assignStudentColors() {
+  const distinct = new Map();
+  tutoringLessons.forEach(item => {
+    const key = studentKey(item);
+    if (!distinct.has(key)) distinct.set(key, parseLesson(item).student);
+  });
+  const keys = [...distinct.keys()].sort();
+  const assigned = {};
+  try {
+    const saved = JSON.parse(localStorage.getItem(STUDENT_COLOR_STORAGE_KEY) || "{}");
+    if (saved && typeof saved === "object" && !Array.isArray(saved)) Object.assign(assigned, saved);
+    // Existing colors were pastels. Retain each student's original palette position
+    // when upgrading, without ever displaying an old non-neutral color.
+    const legacy = JSON.parse(localStorage.getItem(LEGACY_STUDENT_COLOR_STORAGE_KEY) || "{}");
+    if (legacy && typeof legacy === "object" && !Array.isArray(legacy)) {
+      for (const [key, color] of Object.entries(legacy)) {
+        if (assigned[key]) continue;
+        const slot = LEGACY_STUDENT_PALETTE.indexOf(color);
+        if (slot >= 0) assigned[key] = STUDENT_PALETTE[slot];
+      }
+    }
+  } catch (error) {
+    // Storage can be blocked in some Notion embeds. Color assignment still works.
   }
 
+  studentColors.clear();
+  const occupied = new Set();
 
-  const color =
-    NEUTRAL_COLORS[
-      studentColors.size %
-      NEUTRAL_COLORS.length
-    ];
+  // Reserve previously assigned colors first; adding students won't change old ones.
+  keys.forEach(key => {
+    const saved = assigned[key];
+    if (STUDENT_PALETTE.includes(saved) && !occupied.has(saved)) {
+      studentColors.set(key, saved);
+      occupied.add(saved);
+    }
+  });
 
+  keys.forEach(key => {
+    if (studentColors.has(key)) return;
+    const color = STUDENT_PALETTE.find(value => !occupied.has(value)) ||
+      STUDENT_PALETTE[stableStudentHash(key) % STUDENT_PALETTE.length];
+    studentColors.set(key, color);
+    occupied.add(color);
+    assigned[key] = color;
+  });
+  try {
+    localStorage.setItem(STUDENT_COLOR_STORAGE_KEY, JSON.stringify(assigned));
+  } catch (error) {
+    // Safe fallback when storage is unavailable.
+  }
+}
 
-  studentColors.set(
-    key,
-    color
-  );
+function stableStudentHash(text) {
+  let hash = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    hash = Math.imul(hash ^ text.charCodeAt(i), 16777619);
+  }
+  return hash >>> 0;
+}
 
-
-  return color;
+function renderStudentLegend() {
+  const legend = document.getElementById("studentLegend");
+  if (!legend) return;
+  const seen = new Map();
+  tutoringLessons.forEach(item => {
+    const key = studentKey(item);
+    if (!seen.has(key)) seen.set(key, parseLesson(item).student);
+  });
+  legend.innerHTML = [...seen.entries()]
+    .sort((a, b) => a[1].localeCompare(b[1]))
+    .map(([key, name]) => `
+      <span class="student-chip" role="listitem">
+        <span class="student-swatch" aria-hidden="true" style="background:${studentColors.get(key) || STUDENT_PALETTE[0]}"></span>
+        ${escapeHTML(name)}
+      </span>
+    `).join("");
 }
 
 
@@ -1316,13 +1444,16 @@ function escapeHTML(value) {
    PARSE SOLOMON
 ========================================== */
 
-function statusColor(status) {
+function normalizeLessonStatus(status) {
   const s = String(status || "").toLowerCase().replace(/\s+/g, " ").trim();
-  return ({"cancelled":"#FCE8E8", "canceled":"#FCE8E8", "no show":"#E3EFFF", "attended":"#E3F3E7"})[s] || "";
+  return s === "canceled" ? "cancelled" : s.replace(/\s+/g, "-");
 }
 function statusBorder(status) {
-  const s = String(status || "").toLowerCase().replace(/\s+/g, " ").trim();
-  return ({"cancelled":"#D9534F", "canceled":"#D9534F", "no show":"#4B84D6", "attended":"#459B64"})[s] || "#AAA";
+  return ({
+    "cancelled": "#81766C", // deeper taupe
+    "no-show": "#A49B90",   // muted stone gray
+    "attended": "#6A665F"   // charcoal gray
+  })[normalizeLessonStatus(status)] || "#9B9791";
 }
 function parseLesson(item) {
 
@@ -1985,9 +2116,13 @@ function renderLessons() {
         "px";
 
 
-      lesson.style.background =
-        statusColor(item.status) || colorForStudent(info.student);
-      lesson.style.borderLeft = item.status && statusColor(item.status) ? "4px solid " + statusBorder(item.status) : "";
+      // Status must NOT overwrite the student's unique calendar color.
+      lesson.style.background = studentColorForLesson(item);
+      lesson.style.borderLeft = "4px solid " + statusBorder(item.status);
+      lesson.dataset.status = normalizeLessonStatus(item.status);
+      lesson.title = [info.student, info.subject, item.status, formatTime(start) + " – " + formatTime(end)]
+        .filter(Boolean).join(" · ");
+      if (pageUrl) lesson.setAttribute("aria-label", "Open " + lesson.title + " in Notion");
 
 
       lesson.innerHTML =
@@ -2167,7 +2302,7 @@ function renderUpcoming() {
 
 
                 <div class="list-title">
-                  ${escapeHTML(
+                  <span class="upcoming-student-dot" aria-hidden="true" style="background:${studentColorForLesson(item)}"></span>${escapeHTML(
                     info.student
                   )}
                 </div>
@@ -2411,6 +2546,8 @@ function renderCalendar() {
 
   renderWeekHeader();
 
+  renderStudentLegend();
+
   renderGrid();
 }
 
@@ -2463,6 +2600,8 @@ async function loadData() {
       )
         ? lessonsData.lessons
         : [];
+
+    assignStudentColors();
 
     if (
       deadlinesResponse.ok
