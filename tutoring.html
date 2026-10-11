@@ -885,6 +885,157 @@ body {
   }
 }
 
+
+/* ===========================================
+   REFINEMENTS — same neutral dashboard style
+   Student swatches remain warm neutral; attendance
+   borders use the original red, green and blue.
+=========================================== */
+.month-label, .sidebar-title {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 650;
+}
+.month-label { font-size: 22px; line-height: 1.25; }
+.sidebar-title { font-size: 19px; }
+.control { min-height: 39px; height: 39px; font-size: 12px; padding: 0 12px; }
+.control.arrow { min-width: 37px; font-size: 22px; }
+.calendar-header { min-height: 44px; }
+.day-header { height: 58px; }
+.day-name { font-size: 10px; letter-spacing: .55px; }
+.day-number { font-size: 14px; width: 29px; height: 29px; }
+.time-label { font-size: 10px; }
+.lesson { padding: 5px 5px 4px 6px; border-left-width: 4px; }
+.lesson-name { font-size: 11.2px; line-height: 1.15; font-weight: 650; }
+.lesson-time { font-size: 9.2px; margin-top: 3px; line-height: 1.16; white-space: normal; }
+/* Extra-small collision lanes prioritize student identity; the full time is
+   preserved in the accessible card title and opens the original Notion page. */
+.lesson[data-overlap] { padding: 5px 3px 4px 5px; }
+.lesson[data-overlap] .lesson-name { font-size: 10px; -webkit-line-clamp: 2; }
+.lesson[data-overlap] .lesson-time { display: none; }
+.list-title { font-size: 12px; }
+.list-meta { font-size: 10.5px; }
+.date-month { font-size: 9px; }
+.date-day { font-size: 16px; }
+.sidebar-note { font-size: 10px; }
+.empty, .loading { font-size: 11.5px; }
+.student-legend {
+  gap: 8px; margin: 0 0 12px;
+  flex-wrap: nowrap; overflow-x: auto; padding: 1px 0 6px;
+  scrollbar-width: thin;
+}
+.student-chip {
+  appearance: none; cursor: pointer; font: inherit;
+  font-size: 11.5px; line-height: 1.2;
+  font-weight: 550; white-space: nowrap;
+  min-height: 36px; flex: 0 0 auto;
+  padding: 7px 11px; transition: background .14s ease, border-color .14s ease;
+}
+.student-chip:hover { background: #F2F0EC; border-color: #BFB8AF; }
+.student-chip[aria-pressed="true"] {
+  background: #EEEAE4; border-color: #9C968F;
+  color: #302D29; font-weight: 700;
+}
+.student-chip:focus-visible, .control:focus-visible, .lesson:focus-visible {
+  outline: 2px solid #716B65; outline-offset: 2px;
+}
+.status-legend {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 9px 16px; margin: 0 0 12px;
+  color: #77726B; font-size: 11px;
+}
+.status-legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.status-mark { height: 15px; width: 4px; border-radius: 2px; flex-shrink: 0; }
+.current-time-line {
+  position: absolute; left: 0; right: 0; height: 0;
+  border-top: 2px solid #6D6861; z-index: 4;
+  pointer-events: none;
+}
+.current-time-line::before {
+  content: ""; position: absolute; left: -4px; top: -5px;
+  height: 9px; width: 9px; border-radius: 50%; background: #6D6861;
+}
+.current-time-line::after {
+  content: "NOW"; position: absolute; right: 2px; top: 2px;
+  padding: 1px 3px; color: #6D6861; background: rgba(255,255,255,.94);
+  font-size: 8px; font-weight: 700; letter-spacing: .25px;
+}
+@media(max-width:820px){
+  .month-label {font-size:20px;}
+  .student-chip {font-size:11px; min-height:34px;}
+  .sidebar-title {font-size:17px;}
+  .control {font-size:11px; min-height:36px; height:36px; padding:0 9px;}
+}
+@media (prefers-reduced-motion:reduce) {
+  .lesson, .student-chip { transition: none; }
+}
+
+/* ==========================================================
+   IPAD / NOTION EMBED RESPONSIVENESS
+   Below 1120px, give all seven days the full widget width.
+   Upcoming Lessons and Deadlines move below the calendar.
+   A narrow phone/Notion column can swipe the entire grid.
+   These rules override earlier iPad layout breakpoints.
+========================================================== */
+.dashboard, .calendar-panel, .calendar-shell, .calendar-scroll,
+.calendar-inner, .sidebar, .sidebar-panel { max-width: 100%; }
+.calendar-scroll { -webkit-overflow-scrolling: touch; }
+.student-legend { -webkit-overflow-scrolling: touch; }
+
+@media (max-width: 1120px) {
+  :root { --time-width: 52px; }
+  .dashboard {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    align-items: stretch;
+  }
+  .calendar-panel { min-width: 0; padding: 14px; }
+  .calendar-shell, .calendar-scroll { min-width: 0; }
+  .calendar-inner { width: 100%; min-width: 0; }
+  .week-header, .calendar-grid {
+    grid-template-columns: var(--time-width) repeat(7, minmax(0, 1fr));
+  }
+  .sidebar {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    align-items: stretch;
+  }
+  .sidebar-panel { min-width: 0; padding: 16px; min-height: 160px; }
+  .sidebar-title { font-size: 18px; }
+  .month-label { font-size: 21px; }
+  .lesson-name { font-size: 11px; }
+  .day-name { font-size: 10px; }
+  .time-label { font-size: 10px; }
+}
+
+/* Even if Notion allocates a narrower column, avoid shrinking
+   the calendar through a two-column dashboard layout. */
+@media (max-width: 660px) {
+  :root { --time-width: 47px; }
+  .calendar-panel { padding: 10px; }
+  .sidebar { grid-template-columns: minmax(0, 1fr); }
+  .sidebar-panel { min-height: 130px; padding: 14px; }
+  .lesson { padding-left: 4px; padding-right: 3px; }
+  .lesson-name { font-size: 10px; }
+  .lesson-time { font-size: 8.5px; }
+  .day-header { padding-left: 1px; padding-right: 1px; }
+  .day-number { font-size: 13px; }
+  .student-chip { min-height: 36px; }
+}
+
+/* On extremely narrow phone-sized embeds, protect event readability
+   by allowing an obvious horizontal swipe, not clipping days. */
+.calendar-swipe-hint { display:none; margin:0 0 7px; color:#8F8B84; font-size:11px; }
+@media (max-width: 520px) {
+  .calendar-inner { min-width: 590px; }
+  .calendar-swipe-hint { display:block; }
+  .calendar-header { gap:9px; }
+  .controls { gap:2px; }
+  .control { padding:0 8px; }
+}
+
 </style>
 </head>
 
@@ -946,8 +1097,15 @@ body {
 
     </div>
 
-    <div id="studentLegend" class="student-legend" role="list" aria-label="Calendar colors by student"></div>
+    <div id="studentLegend" class="student-legend" role="group" aria-label="Filter calendar by student"></div>
+    <div class="status-legend" aria-label="Lesson status colors">
+      <span class="status-legend-item"><span class="status-mark" style="background:#459B64"></span>Attended</span>
+      <span class="status-legend-item"><span class="status-mark" style="background:#D9534F"></span>Cancelled</span>
+      <span class="status-legend-item"><span class="status-mark" style="background:#4B84D6"></span>No Show</span>
+      <span class="status-legend-item"><span class="status-mark" style="background:#AAA"></span>Scheduled</span>
+    </div>
 
+    <p class="calendar-swipe-hint">Swipe sideways to see all seven days →</p>
     <div class="calendar-shell">
 
 
@@ -1112,6 +1270,7 @@ let currentWeekStart =
 let tutoringLessons = [];
 
 let deadlines = [];
+let selectedStudentKey = null; // null means All Students
 
 
 /* ==========================================
@@ -1230,15 +1389,26 @@ function renderStudentLegend() {
     const key = studentKey(item);
     if (!seen.has(key)) seen.set(key, parseLesson(item).student);
   });
-  legend.innerHTML = [...seen.entries()]
-    .sort((a, b) => a[1].localeCompare(b[1]))
-    .map(([key, name]) => `
-      <span class="student-chip" role="listitem">
-        <span class="student-swatch" aria-hidden="true" style="background:${studentColors.get(key) || STUDENT_PALETTE[0]}"></span>
-        ${escapeHTML(name)}
-      </span>
-    `).join("");
+  if (selectedStudentKey && !seen.has(selectedStudentKey)) selectedStudentKey = null;
+  const button = (key, label, color, isAll = false) => `
+    <button type="button" class="student-chip" data-filter-student="${escapeHTML(key)}"
+      aria-pressed="${isAll ? selectedStudentKey === null : selectedStudentKey === key}">
+      ${isAll ? "" : `<span class="student-swatch" aria-hidden="true" style="background:${color}"></span>`}
+      ${escapeHTML(label)}
+    </button>`;
+  legend.innerHTML = button("__all__", "All Students", "", true) +
+    [...seen.entries()].sort((a, b) => a[1].localeCompare(b[1]))
+      .map(([key, name]) => button(key, name, studentColors.get(key) || STUDENT_PALETTE[0])).join("");
 }
+
+document.getElementById("studentLegend").addEventListener("click", event => {
+  const button = event.target.closest("[data-filter-student]");
+  if (!button) return;
+  selectedStudentKey = button.dataset.filterStudent === "__all__" ? null : button.dataset.filterStudent;
+  renderStudentLegend();
+  renderCalendar();
+  renderUpcoming();
+});
 
 
 /* ==========================================
@@ -1916,8 +2086,82 @@ function renderGrid() {
 
 
   renderLessons();
+  updateCurrentTimeIndicator();
 }
 
+
+/* ==========================================
+   SIDE-BY-SIDE LESSON LAYOUT
+   Partition overlapping events into collision groups;
+   place each event in an available lane without hiding peers.
+========================================== */
+function computeOverlapLayout(lessons) {
+  const byDay = new Map();
+  for (const item of lessons) {
+    const start = new Date(item.start);
+    if (!Number.isFinite(start.getTime())) continue;
+    const visual = getVisualPosition(start);
+    if (visual.hour < START_HOUR || visual.hour >= END_HOUR) continue;
+    const end = item.end ? new Date(item.end) : new Date(start.getTime() + 3600000);
+    let endHour = Number.isFinite(end.getTime()) ? getVisualPosition(end).hour : visual.hour + 1;
+    if (end <= start) endHour = visual.hour + 1;
+    if (endHour < visual.hour) endHour += 24;
+    const beginning = visual.hour;
+    const finish = Math.min(END_HOUR, Math.max(beginning + .25, endHour));
+    const dayKey = `${visual.visualDate.getFullYear()}-${visual.visualDate.getMonth()}-${visual.visualDate.getDate()}`;
+    if (!byDay.has(dayKey)) byDay.set(dayKey, []);
+    byDay.get(dayKey).push({ item, beginning, finish });
+  }
+
+  const positions = new Map();
+  for (const daily of byDay.values()) {
+    daily.sort((a,b) => a.beginning - b.beginning || b.finish - a.finish);
+    let group = [], groupEnd = -Infinity;
+    const finalize = () => {
+      if (!group.length) return;
+      const laneEnds = [];
+      for (const event of group) {
+        let lane = laneEnds.findIndex(end => end <= event.beginning);
+        if (lane === -1) lane = laneEnds.length;
+        laneEnds[lane] = event.finish;
+        event.lane = lane;
+      }
+      const count = laneEnds.length;
+      for (const event of group) positions.set(event.item, {lane:event.lane, count});
+      group = [];
+    };
+    for (const event of daily) {
+      if (group.length && event.beginning >= groupEnd) {
+        finalize(); groupEnd = -Infinity;
+      }
+      group.push(event);
+      groupEnd = Math.max(groupEnd, event.finish);
+    }
+    finalize();
+  }
+  return positions;
+}
+
+function updateCurrentTimeIndicator() {
+  document.querySelectorAll(".current-time-line").forEach(el => el.remove());
+  const now = new Date();
+  let hour = now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600;
+  if (hour < 5) hour += 24;
+  if (hour < START_HOUR || hour >= END_HOUR) return;
+  // Match by calendar day, including weeks spanning daylight-saving changes.
+  let columnIndex = -1;
+  for (let i=0; i<7; i++) {
+    if (sameDay(addDays(currentWeekStart,i), now)) { columnIndex=i; break; }
+  }
+  if (columnIndex < 0) return;
+  const column = document.querySelectorAll(".day-column")[columnIndex];
+  if (!column) return;
+  const marker = document.createElement("div");
+  marker.className = "current-time-line";
+  marker.style.top = ((hour - START_HOUR) * HOUR_HEIGHT) + "px";
+  marker.title = "Current time: " + formatTime(now);
+  column.appendChild(marker);
+}
 
 /* ==========================================
    LESSONS
@@ -1931,9 +2175,12 @@ function renderLessons() {
     );
 
 
-  const lessons =
-    currentWeekLessons();
+  const lessons = currentWeekLessons().filter(item =>
+    !selectedStudentKey || studentKey(item) === selectedStudentKey
+  );
 
+
+  const overlapLayout = computeOverlapLayout(lessons);
 
   lessons.forEach(
     item => {
@@ -2105,6 +2352,13 @@ function renderLessons() {
         "lesson";
 
 
+      const layout = overlapLayout.get(item) || {lane:0, count:1};
+      if (layout.count > 1) {
+        lesson.style.left = `calc(${(layout.lane / layout.count * 100).toFixed(4)}% + 3px)`;
+        lesson.style.right = `calc(${((layout.count - layout.lane - 1) / layout.count * 100).toFixed(4)}% + 3px)`;
+        lesson.dataset.overlap = String(layout.count);
+      }
+
       lesson.style.top =
         (
           top + 2
@@ -2205,11 +2459,13 @@ function renderUpcoming() {
             );
 
 
+          const status = normalizeLessonStatus(item.status);
           return (
-            !Number.isNaN(
-              date.getTime()
-            ) &&
-            date >= now
+            !Number.isNaN(date.getTime()) &&
+            date >= now &&
+            status !== "cancelled" &&
+            status !== "no-show" &&
+            (!selectedStudentKey || studentKey(item) === selectedStudentKey)
           );
         }
       )
@@ -2603,6 +2859,7 @@ async function loadData() {
         : [];
 
     assignStudentColors();
+    renderStudentLegend();
 
     if (
       deadlinesResponse.ok
@@ -2736,6 +2993,8 @@ document.getElementById("syncCalendarButton").addEventListener("click", async ()
 renderCalendar();
 
 loadData();
+setInterval(updateCurrentTimeIndicator, 60 * 1000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) updateCurrentTimeIndicator(); });
 
 
 setInterval(
