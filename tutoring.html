@@ -437,6 +437,7 @@ body {
     3px solid rgba(65, 61, 56, 0.16);
 
   cursor: pointer;
+  text-decoration: none;
 
   transition:
     transform 0.12s ease,
@@ -582,6 +583,12 @@ body {
 
 .list-item:last-child {
   border-bottom: none;
+}
+
+.list-item.notion-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 
@@ -1948,10 +1955,18 @@ function renderLessons() {
         );
 
 
+      const pageUrl = item.notionUrl || (item.id
+        ? "https://www.notion.so/" + String(item.id).replace(/-/g, "")
+        : "");
+
       const lesson =
-        document.createElement(
-          "div"
-        );
+        document.createElement(pageUrl ? "a" : "div");
+
+      if (pageUrl) {
+        lesson.href = pageUrl;
+        lesson.target = "_top";
+        lesson.title = "Open lesson in Notion";
+      }
 
 
       lesson.className =
@@ -1973,27 +1988,6 @@ function renderLessons() {
       lesson.style.background =
         statusColor(item.status) || colorForStudent(info.student);
       lesson.style.borderLeft = item.status && statusColor(item.status) ? "4px solid " + statusBorder(item.status) : "";
-
-
-      if (
-        item.notionUrl
-      ) {
-
-        lesson.title =
-          "Open lesson in Notion";
-
-        lesson.addEventListener(
-          "click",
-          () => {
-
-            window.open(
-              item.notionUrl,
-              "_blank",
-              "noopener,noreferrer"
-            );
-          }
-        );
-      }
 
 
       lesson.innerHTML =
@@ -2137,8 +2131,16 @@ function renderUpcoming() {
             );
 
 
+          const pageUrl = item.notionUrl || (item.id
+            ? "https://www.notion.so/" + String(item.id).replace(/-/g, "")
+            : "");
+          const rowOpen = pageUrl
+            ? `<a class="list-item notion-link" href="${escapeHTML(pageUrl)}" target="_top">`
+            : `<div class="list-item">`;
+          const rowClose = pageUrl ? "</a>" : "</div>";
+
           return `
-            <div class="list-item">
+            ${rowOpen}
 
 
               <div class="date-box">
@@ -2197,7 +2199,7 @@ function renderUpcoming() {
               </div>
 
 
-            </div>
+            ${rowClose}
           `;
         }
       )
@@ -2206,44 +2208,7 @@ function renderUpcoming() {
       );
 
 
-  container
-    .querySelectorAll(
-      "[data-notion-url]"
-    )
-    .forEach(
-      element => {
 
-        const openLesson =
-          () => {
-
-            window.open(
-              element.dataset.notionUrl,
-              "_blank",
-              "noopener,noreferrer"
-            );
-          };
-
-        element.addEventListener(
-          "click",
-          openLesson
-        );
-
-        element.addEventListener(
-          "keydown",
-          event => {
-
-            if (
-              event.key === "Enter" ||
-              event.key === " "
-            ) {
-
-              event.preventDefault();
-              openLesson();
-            }
-          }
-        );
-      }
-    );
 }
 
 
@@ -2373,8 +2338,16 @@ function renderDeadlines() {
             "Deadline";
 
 
+          const pageUrl = item.notionUrl || (item.id
+            ? "https://www.notion.so/" + String(item.id).replace(/-/g, "")
+            : "");
+          const rowOpen = pageUrl
+            ? `<a class="list-item notion-link" href="${escapeHTML(pageUrl)}" target="_top">`
+            : `<div class="list-item">`;
+          const rowClose = pageUrl ? "</a>" : "</div>";
+
           return `
-            <div class="list-item">
+            ${rowOpen}
 
 
               <div class="date-box">
@@ -2420,7 +2393,7 @@ function renderDeadlines() {
               </div>
 
 
-            </div>
+            ${rowClose}
           `;
         }
       )
