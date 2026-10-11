@@ -745,6 +745,8 @@ h2{
 .topicConfirmCancel,.topicConfirmDelete{font:inherit;border-radius:8px;padding:8px 11px;cursor:pointer}
 .topicConfirmCancel{background:#fff;border:1px solid var(--line);color:var(--ink)}
 .topicConfirmDelete{background:#7B4E4E;border:1px solid #7B4E4E;color:#fff;font-weight:650}
+
+.resources-panel{min-height:0;margin-top:14px}.resources-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.resources-head h2{margin:0}.resource-form{padding:14px;margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#FAF9F7}.resource-form[hidden]{display:none}.resource-fields{display:grid;grid-template-columns:1fr 1fr;gap:11px}.resource-fields label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}.resource-fields input,.resource-fields select,.resource-fields textarea{width:100%;min-width:0;padding:10px;border:1px solid var(--line);border-radius:8px;background:white;color:var(--ink);font:inherit;font-size:13px}.resource-fields .resource-check{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}.resource-check input{width:auto}.resource-wide{grid-column:1/-1}.resource-actions{display:flex;gap:8px;margin-top:12px}.resource-list{display:grid;gap:8px;margin-top:12px}.resource-item{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px;border:1px solid #E7E5E1;border-radius:9px}.resource-item-main{min-width:0}.resource-item-title{font-size:14px;font-weight:650}.resource-item-meta{font-size:12px;color:var(--muted);margin-top:4px}.resource-item-links{display:flex;gap:9px;flex-wrap:wrap;margin-top:8px}.resource-item-links a{font-size:12px;color:#5F5A54;overflow-wrap:anywhere}.resource-delete{border:0;background:transparent;color:#8F8B84;cursor:pointer;font-size:18px}@media(max-width:700px){.resource-fields{grid-template-columns:1fr}.resource-wide{grid-column:auto}}
 </style>
 </head>
 <body>
@@ -794,7 +796,7 @@ h2{
     <button class="dashboard-tab" type="button" data-tab="progressTab">Progress</button>
     <button class="dashboard-tab" type="button" data-tab="lessonsTab">Lessons</button>
     <button class="dashboard-tab" type="button" data-tab="workTab">Work</button>
-    <button class="dashboard-tab" type="button" data-tab="notesTab">Notes</button>
+    <button class="dashboard-tab" type="button" data-tab="notesTab">Notes &amp; Resources</button>
   </div>
   <div id="studyTab" class="tab-panel active">
   <h1 class="section-title">Study Plan</h1>
@@ -918,11 +920,29 @@ h2{
   </div>
 
   <div id="notesTab" class="tab-panel">
-    <h1 class="section-title">Student Notes</h1>
+    <h1 class="section-title">Notes &amp; Resources</h1>
     <section class="panel notes-panel">
       <h2>Notes</h2>
       <textarea id="studentNotes" class="notes-area" placeholder="Select a student to view or add notes…" disabled></textarea>
       <div id="notesSaveStatus" class="notes-save-status"></div>
+    </section>
+    <section class="panel resources-panel">
+      <div class="resources-head"><h2>Resources</h2><button id="resourceAddToggle" class="btn" type="button">+ Add Resource</button></div>
+      <div id="resourceStatus" class="notes-save-status"></div>
+      <form id="resourceForm" class="resource-form" hidden>
+        <div class="resource-fields">
+          <label>Name<input id="resourceName" maxlength="200" required placeholder="Resource name"></label>
+          <label>Type<select id="resourceType"><option value="">Select type…</option></select></label>
+          <label>Subject<select id="resourceSubject"><option value="">Select subject…</option></select></label>
+          <label class="resource-check"><input id="resourceGeneral" type="checkbox"> General resource (available to every student)</label>
+          <label>Web link (optional)<input id="resourceLink" type="url" placeholder="https://..."></label>
+          <label>Files (up to 10, 5 MB each)<input id="resourceFiles" type="file" multiple></label>
+          <label class="resource-wide">Description (optional)<textarea id="resourceDescription" rows="2" maxlength="2000"></textarea></label>
+        </div>
+        <div id="resourceFileNames" class="notes-save-status"></div>
+        <div class="resource-actions"><button class="btn" id="resourceSave" type="submit">Save Resource</button><button class="btn" id="resourceCancel" type="button">Cancel</button></div>
+      </form>
+      <div id="resourceList" class="resource-list"><span class="empty">Select a student to view resources.</span></div>
     </section>
   </div>
 
@@ -1004,7 +1024,7 @@ async function loadStudents(){
     const d=await api("/study-plan-embed-students");
     students=d.students||[];
     $("student").innerHTML='<option value="">Select student…</option>'+students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
-    if(studentId && students.some(s=>s.id===studentId)){$("student").value=studentId;renderStudentCallouts();loadStudentNotes();await loadPlan();await loadLessons();await loadDeadlines()}
+    if(studentId && students.some(s=>s.id===studentId)){$("student").value=studentId;renderStudentCallouts();loadStudentNotes();loadResources();await loadPlan();await loadLessons();await loadDeadlines()}
     else {studentId="";renderStudentCallouts();message("Select a student to load the study plan.");}
   }catch(e){message(e.message)}
 }
@@ -1096,6 +1116,7 @@ $("student").onchange=async e=>{
   studentId=e.target.value;
   renderStudentCallouts();
   loadStudentNotes();
+  loadResources();
   await loadPlan();
   await loadLessons();
   await loadDeadlines();
@@ -1414,6 +1435,61 @@ $("saveGoogleChat").addEventListener("click",async()=>{
     $("saveGoogleChat").disabled=false;
   }
 });
+
+
+// Resources are stored in the shared Tutoring Resources Notion database.
+let studentResources=[], resourceTypes=[], resourcesLoaded=false;
+async function loadResources(){
+  const el=$("resourceList");
+  if(!studentId){el.innerHTML='<span class="empty">Select a student to view resources.</span>';return;}
+  el.innerHTML='<span class="empty">Loading resources…</span>';
+  try{
+    const d=await api("/tutoring-resources");
+    if(!d.success)throw Error(d.error||"Could not load resources");
+    studentResources=d.resources||[];resourceTypes=d.options?.types||[];resourcesLoaded=true;
+    renderResourceOptions();renderResources();$("resourceStatus").textContent="";
+  }catch(e){el.textContent="Could not load resources: "+e.message;$("resourceStatus").textContent=e.message;}
+}
+function renderResourceOptions(){
+  const previous=$("resourceSubject").value;
+  const subjects=(selectedStudent()?.subjects||[]).filter(Boolean);
+  const allSubjects=[...new Set(students.flatMap(s=>s.subjects||[]).filter(Boolean))].sort();
+  const available=$("resourceGeneral").checked?allSubjects:subjects;
+  $("resourceSubject").innerHTML='<option value="">No subject / All subjects</option>'+available.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  if(available.includes(previous))$("resourceSubject").value=previous;
+  $("resourceType").innerHTML='<option value="">Select type…</option>'+resourceTypes.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+}
+function renderResources(){
+  const mine=studentResources.filter(r=>r.general||(r.studentIds||[]).includes(studentId));
+  $("resourceList").innerHTML=mine.length?mine.map(r=>{
+    const links=[...(r.link?[{url:r.link,name:"Open link"}]:[]),...(r.files||[])].filter(x=>/^https?:\/\//i.test(x.url||""));
+    return `<div class="resource-item"><div class="resource-item-main"><div class="resource-item-title">${esc(r.name)}</div><div class="resource-item-meta">${esc([r.general?"General":"Student",r.subject,r.type].filter(Boolean).join(" · "))}</div>${r.description?`<div class="resource-item-meta">${esc(r.description)}</div>`:""}<div class="resource-item-links">${links.map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.name||"Open file")} ↗</a>`).join("")}${r.notionUrl?`<a href="${esc(r.notionUrl)}" target="_blank" rel="noopener noreferrer">Notion ↗</a>`:""}</div></div><button type="button" class="resource-delete" data-resource-delete="${esc(r.id)}" aria-label="Delete resource">×</button></div>`;
+  }).join(""):'<span class="empty">No resources yet. Add a file or link above.</span>';
+}
+$("resourceAddToggle").onclick=()=>{if(!studentId)return;$("resourceForm").hidden=!$("resourceForm").hidden;renderResourceOptions()};
+$("resourceCancel").onclick=()=>{$("resourceForm").hidden=true};
+$("resourceGeneral").onchange=renderResourceOptions;
+$("resourceFiles").onchange=()=>{$("resourceFileNames").textContent=Array.from($("resourceFiles").files||[]).map(f=>f.name).join(" · ")};
+$("resourceForm").onsubmit=async e=>{
+  e.preventDefault();if(!studentId)return;
+  const files=Array.from($("resourceFiles").files||[]);
+  if(!files.length&&!$("resourceLink").value.trim()){$("resourceStatus").textContent="Add a link or at least one file.";return;}
+  if(files.length>10||files.some(f=>f.size>5*1024*1024)){$("resourceStatus").textContent="Maximum 10 files, 5 MB each. Use a cloud link for larger files.";return;}
+  const fd=new FormData();fd.append("action","add");fd.append("name",$("resourceName").value.trim());fd.append("studentId",studentId);fd.append("general",String($("resourceGeneral").checked));fd.append("type",$("resourceType").value);fd.append("subject",$("resourceSubject").value);fd.append("link",$("resourceLink").value.trim());fd.append("description",$("resourceDescription").value);
+  files.forEach(f=>fd.append("files",f,f.name));
+  $("resourceSave").disabled=true;$("resourceStatus").textContent="Saving resource…";
+  try{
+    const r=await fetch(API+"/tutoring-resources",{method:"POST",body:fd});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw Error(d.error||"Save failed");
+    $("resourceForm").reset();$("resourceForm").hidden=true;$("resourceFileNames").textContent="";await loadResources();$("resourceStatus").textContent="Resource saved.";
+  }catch(err){$("resourceStatus").textContent="Could not save: "+err.message}finally{$("resourceSave").disabled=false}
+};
+$("resourceList").onclick=async e=>{
+  const btn=e.target.closest("[data-resource-delete]");if(!btn)return;
+  if(!confirm("Delete this resource from Notion?"))return;
+  btn.disabled=true;
+  try{const d=await api("/tutoring-resources",{method:"POST",body:JSON.stringify({action:"delete",id:btn.dataset.resourceDelete})});if(!d.success)throw Error(d.error||"Delete failed");await loadResources()}
+  catch(err){$("resourceStatus").textContent=err.message;btn.disabled=false}
+};
 
 </script>
 </body>
