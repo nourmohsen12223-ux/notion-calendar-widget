@@ -2,266 +2,164 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Deadlines</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tutoring Deadlines</title>
 <style>
-:root{--ink:#37352F;--muted:#8F8B84;--line:#DDDAD5;--paper:#fff;--wash:#F8F7F4;--chip:#EEEAE4;--taupe:#D8D2CA;--dark:#6F6A63}
-*{box-sizing:border-box}html,body{margin:0;background:transparent;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{padding:2px}.wrap{max-width:1180px;margin:auto}
-.toolbar{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-bottom:12px}.filters{width:100%;display:flex;align-items:center;gap:7px;flex-wrap:wrap}.tools{width:100%;margin-left:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.filters,.tools,.view-switch{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-button,input,select{font:inherit}
-.tab,.view-toggle,.secondary{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:8px 11px;cursor:pointer}
-.tab.active,.view-toggle.active{background:var(--chip);border-color:#D4D0CA;font-weight:650}.tab[data-filter="overdue"].active{background:#F3E7E5;border-color:#DFC4C0;color:#9A4F49}.tab[data-filter="done"].active{background:#E7EFE9;border-color:#C8D9CD;color:#52705C}.type-filter{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:8px 30px 8px 10px;cursor:pointer;outline:none}
-.search{min-width:210px;border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:#fff;color:var(--ink);outline:none}
-.search:focus,input:focus,select:focus{border-color:#A9A59E}
-.new{border:1px solid var(--dark);background:var(--dark);color:#fff;border-radius:9px;padding:9px 12px;font-weight:650;cursor:pointer}
-.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
-.stat{border:1px solid var(--line);background:#fff;border-radius:13px;padding:14px 15px}
-.stat b{display:block;font:700 25px Georgia,"Times New Roman",serif}.stat span{font-size:11px;color:var(--muted)}
-.panel{border:1px solid var(--line);background:#fff;border-radius:15px;overflow:hidden}
-.deadline{display:grid;grid-template-columns:58px minmax(150px,1.5fr) minmax(110px,1fr) minmax(105px,.8fr) auto;gap:13px;align-items:center;padding:13px 15px;border-top:1px solid #EEECE8}
-.deadline:first-child{border-top:0}.datebox{background:var(--wash);border-radius:9px;text-align:center;padding:6px 2px}.day{font-size:19px;font-weight:700}.mon{font-size:9px;color:var(--muted);text-transform:uppercase}
-.name{font-size:13px;font-weight:650}.sub{font-size:10px;color:var(--muted);margin-top:3px}.subject{font-size:12px}
-.badge{display:inline-block;border-radius:8px;padding:6px 8px;font-size:10px;background:var(--wash);white-space:nowrap}
-.badge.done{background:#E8EEE9;color:#587061}.badge.overdue{background:#F3E7E5;color:#8B514B}
-.rowActions{display:flex;align-items:center;gap:6px}.open{color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:11px;white-space:nowrap;background:#fff}.deleteBtn{border:1px solid var(--line);background:#fff;color:#9A9690;border-radius:8px;padding:6px 9px;font-size:15px;line-height:1;cursor:pointer}.deleteBtn:hover{color:#A24C4C;border-color:#D8B9B9}
-.empty{padding:28px 18px;color:var(--muted);font-size:12px;text-align:center}
-.calendar{padding:14px}.calhead{display:grid;grid-template-columns:repeat(7,1fr);font-size:10px;color:var(--muted);text-align:center;margin-bottom:6px}.calgrid{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid #EEECE8;border-top:1px solid #EEECE8}
-.cell{min-height:95px;border-right:1px solid #EEECE8;border-bottom:1px solid #EEECE8;padding:7px;background:#fff}.cell.other{background:#FBFAF8;color:#B5B1AA}.cday{font-size:11px;font-weight:650}.event{margin-top:5px;background:var(--wash);border-radius:6px;padding:5px;font-size:9px;line-height:1.25;overflow:hidden}
-.calnav{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.caltitle{font:600 18px Georgia,serif}
-.overlay{position:fixed;inset:0;background:rgba(55,53,47,.18);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.overlay.show{display:flex}
-.modal{width:min(520px,100%);background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 12px 40px rgba(55,53,47,.12)}
-.modalHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modalTitle{font:600 23px Georgia,serif}.close{border:0;background:transparent;font-size:22px;color:var(--muted);cursor:pointer}
-.form{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:650}.field input,.field select{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink);outline:none}
-.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:19px}.error{color:#A24C4C;font-size:12px;margin-top:12px;min-height:16px}.success{color:#5F806A}button:disabled{opacity:.55;cursor:default}
-@media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}.deadline{grid-template-columns:58px 1fr auto}.deadline .subjectcol{display:none}.deadline .typecol{grid-column:2}}
-@media(max-width:620px){.toolbar{flex-direction:column;align-items:stretch}.filters{width:100%}.tools{width:100%;margin-left:0}.search{min-width:0;flex:1}.summary{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.deadline{grid-template-columns:52px 1fr auto;padding:11px}.calendar{padding:8px}.cell{min-height:72px;padding:5px}.event{font-size:8px}}
+:root{--ink:#37352F;--muted:#827E78;--line:#DDDAD5;--soft:#F7F6F3;--green:#6F786E;--rose:#C3524C;--ok:#459B64;--radius:13px}
+*{box-sizing:border-box}html,body{margin:0;padding:0;width:100%;background:#fff;color:var(--ink);font:15px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{overflow-x:hidden}.wrap{padding:2px 1px 22px;max-width:100%;min-width:0}button,input,select,textarea{font:inherit}button,summary{cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}
+.toolbar{display:flex;flex-direction:column;gap:11px;margin-bottom:14px}.filters,.tools,.field-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.filters{padding-bottom:2px}.tab,.toggle,.secondary,.new,.filter-select,.date-input,.clear-dates,.today-btn,.navbtn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;min-height:43px;padding:9px 12px;font-size:13px}.tab.active,.toggle.active,.date-preset.active{background:var(--soft);font-weight:700}.tab{white-space:nowrap}.tab:hover,.toggle:hover,.secondary:hover,.navbtn:hover,.clear-dates:hover{background:var(--soft)}.new,.primary{background:var(--green)!important;border-color:var(--green)!important;color:white!important;font-weight:650}.new{margin-left:auto;white-space:nowrap}.tools{width:100%}.search{flex:1 1 240px;min-width:160px;border:1px solid var(--line);border-radius:9px;padding:10px 12px;min-height:43px}.view-switch{display:flex;gap:5px}.field-bar{align-items:end}.filter-field{display:flex;flex-direction:column;gap:4px;min-width:0}.filter-field label{font-size:12px;color:var(--muted);font-weight:650}.filter-select{min-width:160px;max-width:260px}.date-input{width:148px}.date-presets{display:flex;gap:6px;flex-wrap:wrap}.date-preset{border:1px solid var(--line);border-radius:8px;background:#fff;font-size:12px;min-height:40px;padding:8px 10px}.refresh{border:1px solid var(--line);background:#fff;border-radius:9px;min-height:43px;padding:9px 12px;color:var(--ink)}
+.stats-caption{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin:7px 0 9px;flex-wrap:wrap}.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:15px}.stat{border:1px solid var(--line);border-radius:13px;background:#fff;padding:14px 16px;min-width:0}.stat b{display:block;font:600 27px Georgia,"Times New Roman",serif;line-height:1.1}.stat span{display:block;font-size:12px;color:var(--muted);margin-top:4px}.stat.overdue b{color:#AC4C47}.stat.done b{color:#47855B}.panel{border:1px solid var(--line);border-radius:13px;min-width:0;background:#fff}.list-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:13px}.deadline-card{position:relative;min-width:0;border:1px solid #E5E2DD;border-radius:12px;background:#fff;padding:14px 15px 12px;display:grid;grid-template-columns:59px minmax(0,1fr) auto;column-gap:12px;row-gap:8px;align-items:start;box-shadow:inset 4px 0 0 #CEC9C2;cursor:pointer}.deadline-card.overdue{box-shadow:inset 4px 0 0 #D9534F}.deadline-card.done{box-shadow:inset 4px 0 0 #459B64}.deadline-card:hover{background:#FCFBF9;border-color:#C9C3BA}.deadline-card:focus-visible{outline:2px solid var(--green);outline-offset:2px}.datebox{border-radius:9px;background:var(--soft);text-align:center;padding:8px 3px;min-height:68px;display:flex;flex-direction:column;justify-content:center;align-items:center}.datebox strong{font:600 23px Georgia,"Times New Roman",serif;line-height:1.1}.datebox span{font-size:11px;letter-spacing:.04em;color:var(--muted)}.deadline-info{min-width:0}.deadline-title{font:600 19px Georgia,"Times New Roman",serif;line-height:1.28;overflow-wrap:anywhere}.deadline-meta{font-size:13px;color:var(--muted);margin-top:5px;overflow-wrap:anywhere}.deadline-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.pill{font-size:11px;font-weight:650;display:inline-block;padding:5px 8px;border-radius:99px;white-space:nowrap;background:#F0ECE8;color:#6F6A63}.pill.done{background:#E8F4EA;color:#306F42}.pill.overdue{background:#FAE8E6;color:#A3423D}.pill.upcoming{background:#F0ECE8;color:#6F6A63}.deadline-side{display:flex;flex-direction:column;align-items:flex-end;gap:9px;min-width:42px}.complete-box{display:flex;align-items:center;justify-content:center;width:41px;height:41px;cursor:pointer}.complete-box input{width:21px;height:21px;accent-color:#6F786E;cursor:pointer}.menu{position:relative}.menu summary{list-style:none;display:grid;place-items:center;min-width:42px;min-height:38px;border:1px solid var(--line);border-radius:8px;background:#FAF9F7;font-size:20px;line-height:1}.menu summary::-webkit-details-marker{display:none}.menu[open]{z-index:60}.menu-popover{position:absolute;right:0;top:calc(100% + 5px);width:195px;padding:6px;border:1px solid var(--line);border-radius:11px;background:#fff;box-shadow:0 11px 30px #0002}.menu-popover button,.menu-popover a{display:block;width:100%;padding:11px 10px;text-decoration:none;color:var(--ink);font-size:13px;border:0;border-radius:7px;background:#fff;text-align:left}.menu-popover button:hover,.menu-popover a:hover{background:var(--soft)}.menu-popover .danger{color:#A24C4C}.open-hint{grid-column:2/-1;justify-self:end;font-size:12px;color:#6F786E}.empty{padding:40px 16px;text-align:center;color:var(--muted);font-size:13px}.notice{border:1px solid #E4DCCF;background:#FAF7F0;border-radius:10px;padding:11px 13px;font-size:13px;color:#75634C;margin-bottom:12px}.notice[hidden]{display:none}.toast{position:fixed;z-index:130;bottom:16px;left:50%;transform:translateX(-50%);max-width:calc(100% - 30px);border-radius:10px;background:#37352F;color:white;padding:10px 14px;font-size:13px;box-shadow:0 8px 26px #0002}.toast[hidden]{display:none}
+.calendar{padding:15px}.cal-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.cal-title{font:600 23px Georgia,"Times New Roman",serif;text-align:center}.cal-actions{display:flex;gap:7px;align-items:center}.navbtn{min-width:43px}.calendar-scroll{border:1px solid #E9E6E1;border-radius:10px;overflow-x:auto;-webkit-overflow-scrolling:touch}.cal-inner{min-width:595px}.weekdays,.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}.weekdays{background:var(--soft)}.weekdays div{text-align:center;font-size:12px;font-weight:650;padding:10px 3px;border-right:1px solid #EAE7E2;color:var(--muted)}.weekdays div:last-child{border-right:0}.day{min-height:111px;padding:7px 5px;border-top:1px solid #EAE7E2;border-right:1px solid #EAE7E2;min-width:0;overflow:hidden}.day:nth-child(7n){border-right:0}.day.other{background:#FBFAF8}.day.today{background:#F4F5F0}.daytop{display:flex;align-items:center;justify-content:space-between;gap:3px;margin-bottom:4px}.day-num{border:0;border-radius:7px;padding:3px 5px;background:transparent;color:var(--ink);font-size:13px;min-width:30px;text-align:left}.day-num:hover{background:#EDEAE5}.day.today .day-num{background:var(--green);color:#fff}.day-count{font-size:10px;color:var(--muted)}.cal-event{display:block;width:100%;border:0;border-left:3px solid #C6C1BA;background:var(--soft);color:var(--ink);border-radius:5px;padding:5px;font-size:11px;line-height:1.3;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;margin:4px 0;text-align:left}.cal-event.overdue{background:#FCEDEC;border-color:#D9534F}.cal-event.done{background:#EBF5EC;border-color:#459B64;text-decoration:line-through;opacity:.75}.more-day{background:none;color:#596656;border:0;padding:3px 1px;font-size:11px;font-weight:650;text-align:left}.calendar-loading{font-size:12px;color:var(--muted)}
+.backdrop{position:fixed;inset:0;z-index:90;padding:14px;display:none;justify-content:center;align-items:center;background:rgba(55,53,47,.24)}.backdrop.show{display:flex}.modal{width:min(590px,100%);max-height:90vh;overflow-y:auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:0 14px 45px #0002}.modal-title{font:600 23px Georgia,"Times New Roman",serif;margin:0}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}.close{background:#fff;border:1px solid var(--line);border-radius:8px;min-width:42px;min-height:42px;font-size:20px}.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px;min-width:0}.field.full{grid-column:1/-1}.field label{font-size:12px;color:#6F6A63;font-weight:650}.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);width:100%;min-height:43px;padding:10px 11px;outline:none}.field textarea{min-height:84px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:#9CA79B}.form-message{min-height:17px;color:#A24C4C;font-size:12px;margin:9px 0 0}.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.secondary,.primary{min-height:44px;border-radius:9px;padding:10px 13px;border:1px solid var(--line)}.primary{background:var(--green)}.day-list{display:grid;gap:10px}.day-item{padding:12px;border:1px solid var(--line);border-radius:10px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:9px}.day-item input{width:20px;height:20px;accent-color:var(--green)}.day-item-info{min-width:0}.day-item strong{font-size:14px;overflow-wrap:anywhere}.day-item p{font-size:12px;color:var(--muted);margin:3px 0}.day-item-actions{display:flex;gap:6px;flex-wrap:wrap}.day-item-actions button,.day-item-actions a{padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:white;color:var(--ink);text-decoration:none;font-size:12px}.delete-confirm{font-size:13px;color:var(--muted)}
+@media(max-width:1120px){.list-grid{grid-template-columns:1fr}.summary{gap:8px}.stat{padding:12px}.stat b{font-size:25px}}
+@media(max-width:800px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:9px}.tab{flex-shrink:0}.field-bar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.filter-field.student-field{grid-column:1/-1}.filter-select{width:100%;max-width:none;min-width:0}.date-input{width:100%}.date-presets{grid-column:1/-1}.clear-dates{grid-column:1/-1}.cal-inner{min-width:640px}}
+@media(max-width:530px){.tools{display:grid;grid-template-columns:1fr auto;gap:8px}.search{grid-column:1/-1;width:100%;min-width:0}.view-switch{grid-column:1}.new{grid-column:2}.refresh{grid-column:1/-1}.deadline-card{grid-template-columns:52px minmax(0,1fr) auto;padding:12px 10px;gap:8px}.deadline-title{font-size:18px}.deadline-tags{gap:4px}.pill{font-size:10px;padding:4px 6px}.datebox strong{font-size:21px}.calendar{padding:8px}.cal-title{font-size:20px}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.day-item{grid-template-columns:auto 1fr}.day-item-actions{grid-column:2;justify-content:flex-start}}
 </style>
-
-<style id="true-edge-to-edge">
-html, body {
-  width:100% !important;
-  max-width:none !important;
-  margin:0 !important;
-  padding:0 !important;
-  background:#fff !important;
-  overflow-x:hidden !important;
-}
-body > .wrap, .wrap, .container, .page, main {
-  width:100% !important;
-  max-width:none !important;
-  margin:0 !important;
-  padding-left:0 !important;
-  padding-right:0 !important;
-  box-sizing:border-box !important;
-}
-.toolbar, .summary, #listPanel, #calendarPanel {
-  width:100% !important;
-  max-width:none !important;
-  box-sizing:border-box !important;
-}
-</style>
-
 </head>
 <body>
 <div class="wrap">
  <div class="toolbar">
-  <div class="filters" id="filters">
-   <button class="tab active" data-filter="all">All Tutoring Deadlines</button>
-   <button class="tab" data-filter="upcoming">Upcoming</button>
-   <button class="tab" data-filter="overdue">Overdue</button>
-   <button class="tab" data-filter="done">Done</button>
-   <select id="typeFilter" class="type-filter" aria-label="Filter by type">
-    <option value="">All Types</option>
-    <option value="Homework">Homework</option>
-    <option value="Quiz">Quiz</option>
-    <option value="Exam">Exam</option>
-    <option value="Assignment">Assignment</option>
-     <option value="Prepare Lesson">Prepare Lesson</option>
-   </select>
+  <div class="filters" id="filters" aria-label="Deadline status filters">
+   <button class="tab active" type="button" data-filter="all">All Deadlines</button>
+   <button class="tab" type="button" data-filter="upcoming">Upcoming</button>
+   <button class="tab" type="button" data-filter="overdue">Overdue</button>
+   <button class="tab" type="button" data-filter="done">Done</button>
   </div>
   <div class="tools">
-   <input id="search" class="search" placeholder="Search student, subject or deadline…">
-   <div class="view-switch"><button class="view-toggle active" data-view="list">List</button><button class="view-toggle" data-view="calendar">Calendar</button></div>
-   <button class="new" id="newDeadline">+ New Deadline</button>
+   <input id="search" class="search" placeholder="Search student, subject, or deadline…" aria-label="Search deadlines">
+   <div class="view-switch"><button class="toggle active" type="button" data-view="list">List</button><button class="toggle" type="button" data-view="calendar">Calendar</button></div>
+   <button id="refresh" class="refresh" type="button" aria-label="Refresh deadlines">↻ Refresh</button>
+   <button class="new" id="newDeadline" type="button">+ New Deadline</button>
+  </div>
+  <div class="field-bar">
+   <div class="filter-field student-field"><label for="studentFilter">Student</label><select id="studentFilter" class="filter-select"><option value="">All Students</option></select></div>
+   <div class="filter-field"><label for="typeFilter">Type</label><select id="typeFilter" class="filter-select"><option value="">All Types</option><option>Homework</option><option>Quiz</option><option>Exam</option><option>Assignment</option><option>Prepare Lesson</option></select></div>
+   <div class="filter-field"><label for="fromDate">From date</label><input class="date-input" type="date" id="fromDate"></div>
+   <div class="filter-field"><label for="toDate">To date</label><input class="date-input" type="date" id="toDate"></div>
+   <div class="date-presets"><button class="date-preset" data-preset="week" type="button">This Week</button><button class="date-preset" data-preset="month" type="button">This Month</button><button class="clear-dates" id="clearFilters" type="button">Clear filters</button></div>
   </div>
  </div>
-
+ <div id="notice" class="notice" role="alert" hidden></div>
+ <div class="stats-caption"><span>Deadline overview</span><span id="scopeLabel">Counts follow filters; older months load when viewed</span></div>
  <div class="summary">
   <div class="stat"><b id="sUpcoming">—</b><span>Upcoming</span></div>
   <div class="stat"><b id="sWeek">—</b><span>Due this week</span></div>
-  <div class="stat"><b id="sOverdue">—</b><span>Overdue</span></div>
-  <div class="stat"><b id="sDone">—</b><span>Done</span></div>
+  <div class="stat overdue"><b id="sOverdue">—</b><span>Overdue</span></div>
+  <div class="stat done"><b id="sDone">—</b><span>Completed</span></div>
  </div>
-
  <div id="listPanel" class="panel"><div class="empty">Loading deadlines…</div></div>
- <div id="calendarPanel" class="panel" style="display:none"><div class="calendar"><div class="calnav"><button class="secondary" id="prevMonth">‹</button><div class="caltitle" id="calTitle"></div><button class="secondary" id="nextMonth">›</button></div><div class="calhead"><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div></div><div class="calgrid" id="calendar"></div></div></div>
-</div>
-
-<div class="overlay" id="overlay" aria-hidden="true">
- <div class="modal">
-  <div class="modalHead"><div class="modalTitle">New Deadline</div><button class="close" id="closeModal" type="button">×</button></div>
-  <form id="deadlineForm">
-   <div class="form">
-    <div class="field full"><label>Deadline</label><input id="title" required placeholder="e.g. Cell Biology homework"></div>
-    <div class="field"><label>Student</label><select id="student" required><option value="">Choose student…</option></select></div>
-    <div class="field"><label>Subject</label><select id="subject"><option value="">Choose subject…</option></select></div>
-    <div class="field"><label>Due Date</label><input id="dueDate" type="date" required></div>
-    <div class="field"><label>Type</label><select id="type" required><option>Homework</option><option>Quiz</option><option>Exam</option><option>Assignment</option><option>Prepare Lesson</option></select></div>
-   </div>
-   <div id="formMessage" class="error"></div>
-   <div class="actions"><button class="secondary" id="cancel" type="button">Cancel</button><button class="new" id="saveDeadline" type="submit">Add Deadline</button></div>
-  </form>
+ <div id="calendarPanel" class="panel" hidden>
+  <div class="calendar">
+   <div class="cal-head"><strong class="cal-title" id="calTitle">Calendar</strong><div class="cal-actions"><button class="navbtn" id="prevMonth" type="button" aria-label="Previous month">‹</button><button class="today-btn" id="todayMonth" type="button">Today</button><button class="navbtn" id="nextMonth" type="button" aria-label="Next month">›</button></div></div>
+   <div class="calendar-scroll"><div class="cal-inner"><div class="weekdays"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div><div id="calendar" class="cal-grid"></div></div></div>
+   <p class="calendar-loading" id="calendarHint">Select a date to see every deadline for that day.</p>
+  </div>
  </div>
 </div>
-
-<div class="overlay" id="deleteOverlay" aria-hidden="true">
- <div class="modal">
-  <div class="modalHead"><div class="modalTitle">Delete deadline?</div><button class="close" id="deleteClose" type="button">×</button></div>
-  <div id="deleteText" style="font-size:13px;line-height:1.5;color:var(--muted)"></div>
-  <div id="deleteMessage" class="error"></div>
-  <div class="actions"><button class="secondary" id="deleteCancel" type="button">Cancel</button><button class="new" id="deleteYes" type="button" style="background:#8B514B;border-color:#8B514B">Delete</button></div>
- </div>
-</div>
-
+<div class="backdrop" id="editModal" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+ <div class="modal-head"><h2 class="modal-title" id="modalTitle">New Deadline</h2><button class="close" id="closeEdit" type="button" aria-label="Close">×</button></div>
+ <form id="deadlineForm"><div class="form">
+   <div class="field full"><label for="title">Deadline title</label><input id="title" maxlength="200" required placeholder="e.g. Cell Biology homework"></div>
+   <div class="field"><label for="student">Student</label><select id="student" required><option value="">Choose student…</option></select></div>
+   <div class="field"><label for="subject">Subject</label><select id="subject"><option value="">Choose subject…</option></select></div>
+   <div class="field"><label for="dueDate">Due date</label><input id="dueDate" type="date" required></div>
+   <div class="field"><label for="type">Type</label><select id="type" required><option>Homework</option><option>Quiz</option><option>Exam</option><option>Assignment</option><option>Prepare Lesson</option></select></div>
+   <div class="field full"><label for="notes">Deadline notes (optional)</label><textarea id="notes" maxlength="2000" placeholder="Instructions, reminders, or assignment details…"></textarea></div>
+  </div><p id="formMessage" class="form-message" role="alert"></p><div class="form-actions"><button class="secondary" id="cancelEdit" type="button">Cancel</button><button class="primary" id="saveDeadline" type="submit">Save Deadline</button></div></form>
+</div></div>
+<div class="backdrop" id="dayModal" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="modal-head"><h2 id="dayTitle" class="modal-title">Deadlines</h2><button id="dayClose" class="close" type="button" aria-label="Close">×</button></div><div class="day-list" id="dayList"></div></div></div>
+<div class="backdrop" id="deleteModal" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle"><div class="modal-head"><h2 id="deleteTitle" class="modal-title">Archive deadline?</h2><button id="deleteClose" class="close" type="button" aria-label="Close">×</button></div><p id="deleteText" class="delete-confirm"></p><p id="deleteMessage" class="form-message" role="alert"></p><div class="form-actions"><button class="secondary" id="deleteCancel" type="button">Cancel</button><button class="primary" id="deleteYes" type="button" style="background:#A24C4C!important;border-color:#A24C4C!important">Archive Deadline</button></div></div></div>
+<div id="toast" class="toast" aria-live="polite" hidden></div>
 <script>
+"use strict";
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
-let deadlines=[],students=[],filter="all",typeFilter="",view="list",calDate=new Date(),pendingDelete=null;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const dayStart=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
-const dateOf=x=>x?new Date(x+"T00:00:00"):null;
-const isDone=x=>String(x.status||"").toLowerCase()==="done";
+const types=["Homework","Quiz","Exam","Assignment","Prepare Lesson"];
+let deadlines=[],students=[],statusFilter="all",view="list",calDate=new Date(),editingId=null,deletingId=null,openDay=null,loading=false;
+let loadedRanges=[],toastTimer=null,activeFetch=null;
+calDate.setDate(1);
+const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const dateOf=s=>{const p=String(s||"").slice(0,10).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!p)return null;const d=new Date(+p[1],+p[2]-1,+p[3]);return ymd(d)===p[0]?d:null};
+const monday=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-(x.getDay()+6)%7);return x};
+const plusDays=(date,n)=>{const x=new Date(date);x.setDate(x.getDate()+n);return x};
+const isDone=x=>String(x.status||"").trim().toLowerCase()==="done";
+const dueYmd=x=>String(x.dueDate||"").slice(0,10);
+const statusOf=x=>isDone(x)?"done":dueYmd(x)&&dueYmd(x)<ymd(new Date())?"overdue":"upcoming";
+const byId=id=>deadlines.find(x=>x.id===id);
 const studentName=x=>x.studentName||x.student||students.find(s=>s.id===x.studentPageId)?.name||"Student";
-function statusOf(x){
- const d=dateOf(x.dueDate),today=dayStart(new Date());
- if(isDone(x))return "Done";
- if(d&&d<today)return "Overdue";
- return "Upcoming";
+const notionUrl=x=>{try{const u=new URL(x.notionUrl||`https://www.notion.so/${String(x.id||"").replace(/-/g,"")}`);return u.protocol==="https:"&&/(^|\.)notion\.(so|site)$/.test(u.hostname)?u.href:"#"}catch{return "#"}};
+function announce(text,error=false){$('notice').textContent=text;$('notice').hidden=!text;$('notice').style.color=error?'#9A4E49':'#75634C'}
+function toast(text){clearTimeout(toastTimer);$('toast').textContent=text;$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,3000)}
+async function json(path,options){const r=await fetch(API+path,{cache:"no-store",...(options||{})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw Error(d.error||`Request failed (${r.status})`);return d}
+async function mutate(data){return json('/tutoring-deadlines',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})}
+function covered(start,end){return loadedRanges.some(r=>r.start<=start&&r.end>=end)}
+function upsert(items){const map=new Map(deadlines.map(x=>[x.id,x]));for(const x of items)map.set(x.id,x);deadlines=[...map.values()]}
+async function fetchRange(start,end,{quiet=false}={}){
+ if(covered(start,end))return;
+ // Await a previous Notion request rather than silently skipping a new month on iPad.
+ if(activeFetch){try{await activeFetch}catch{}if(covered(start,end))return}
+ loading=true;
+ if(!quiet)announce('Loading deadlines…');
+ const current=(async()=>{
+   try{const d=await json(`/tutoring-deadlines?start=${encodeURIComponent(start+'T00:00:00')}&end=${encodeURIComponent(end+'T00:00:00')}`);upsert(d.deadlines||[]);loadedRanges.push({start,end});if(!quiet)announce('');render()}
+   catch(e){announce(`Could not load deadlines: ${e.message}`,true);throw e}
+   finally{loading=false}
+ })();
+ activeFetch=current;
+ try{await current}finally{if(activeFetch===current)activeFetch=null}
 }
-function fillStudents(){
- $("student").innerHTML='<option value="">Choose student…</option>'+students.filter(s=>!s.status||s.status==="Active").map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
-}
-$("student").onchange=()=>{
- const s=students.find(x=>x.id===$("student").value);
- $("subject").innerHTML='<option value="">Choose subject…</option>'+(s?.subjects||[]).map(x=>`<option>${esc(x)}</option>`).join("");
-};
-function visible(){
- const q=$("search").value.trim().toLowerCase(),today=dayStart(new Date());
- return deadlines.filter(x=>{
-  const hay=`${x.title||""} ${studentName(x)} ${x.subject||""} ${x.type||""}`.toLowerCase();
-  if(q&&!hay.includes(q))return false;
-  if(typeFilter && x.type!==typeFilter)return false;
-  const d=dateOf(x.dueDate),st=statusOf(x);
-  if(filter==="upcoming")return st==="Upcoming";
-  if(filter==="overdue")return st==="Overdue";
-  if(filter==="done")return st==="Done";
-  if(["Homework","Quiz","Exam","Assignment","Prepare Lesson"].includes(filter))return x.type===filter;
-  return true;
- });
-}
-function render(){
- const today=dayStart(new Date()),week=new Date(today);week.setDate(week.getDate()+7);
- $("sUpcoming").textContent=deadlines.filter(x=>statusOf(x)==="Upcoming").length;
- $("sWeek").textContent=deadlines.filter(x=>{const d=dateOf(x.dueDate);return d&&d>=today&&d<week&&!isDone(x)}).length;
- $("sOverdue").textContent=deadlines.filter(x=>statusOf(x)==="Overdue").length;
- $("sDone").textContent=deadlines.filter(isDone).length;
- renderList();renderCalendar();
-}
-function renderList(){
- const arr=visible().sort((a,b)=>dateOf(a.dueDate)-dateOf(b.dueDate));
- if(!arr.length){$("listPanel").innerHTML='<div class="empty">No deadlines found.</div>';return}
- $("listPanel").innerHTML=arr.map(x=>{
-  const d=dateOf(x.dueDate),st=statusOf(x),url=x.notionUrl||("https://www.notion.so/"+String(x.id||"").replace(/-/g,""));
-  return `<div class="deadline">
-   <div class="datebox"><div class="day">${d?d.getDate():"—"}</div><div class="mon">${d?d.toLocaleString([],{month:"short"}):""}</div></div>
-   <div><div class="name">${esc(x.title||"Deadline")}</div><div class="sub">${esc(studentName(x))}</div></div>
-   <div class="subjectcol"><div class="subject">${esc(x.subject||"—")}</div><div class="sub">${d?esc(d.toLocaleDateString([],{weekday:"long"})):""}</div></div>
-   <div class="typecol"><span class="badge">${esc(x.type||"Deadline")}</span> <span class="badge ${st.toLowerCase()}">${esc(st)}</span></div>
-   <div class="rowActions"><a class="open" href="${esc(url)}" target="_top">View →</a><button class="deleteBtn" type="button" data-delete="${esc(x.id)}" data-title="${esc(x.title||"Deadline")}" aria-label="Delete deadline">×</button></div>
-  </div>`;
- }).join("");
-}
-function renderCalendar(){
- const y=calDate.getFullYear(),m=calDate.getMonth();
- $("calTitle").textContent=calDate.toLocaleDateString([],{month:"long",year:"numeric"});
- const first=new Date(y,m,1), offset=(first.getDay()+6)%7, start=new Date(y,m,1-offset);
- let out="";
- for(let i=0;i<42;i++){
-  const d=new Date(start);d.setDate(start.getDate()+i);
-  const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  const ev=deadlines.filter(x=>x.dueDate===iso&&!isDone(x));
-  out+=`<div class="cell ${d.getMonth()!==m?"other":""}"><div class="cday">${d.getDate()}</div>${ev.slice(0,3).map(x=>`<div class="event">${esc(x.title||"Deadline")}</div>`).join("")}${ev.length>3?`<div class="sub">+${ev.length-3} more</div>`:""}</div>`;
- }
- $("calendar").innerHTML=out;
-}
-async function load(){
- try{
-  const now=new Date(),start=new Date(now);start.setFullYear(start.getFullYear()-1);const end=new Date(now);end.setFullYear(end.getFullYear()+1);
-  const [dr,sr]=await Promise.all([
-   fetch(`${API}/tutoring-deadlines?start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}`,{cache:"no-store"}).then(r=>r.json()),
-   fetch(`${API}/tutoring-students`,{cache:"no-store"}).then(r=>r.json())
-  ]);
-  if(!dr.success)throw Error(dr.error||"Could not load deadlines.");
-  if(!sr.success)throw Error(sr.error||"Could not load students.");
-  deadlines=dr.deadlines||[];students=sr.students||[];fillStudents();render();
- }catch(e){$("listPanel").innerHTML=`<div class="empty">${esc(e.message)}</div>`}
-}
-$("filters").onclick=e=>{const b=e.target.closest("[data-filter]");if(!b)return;filter=b.dataset.filter;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));render()};
-$("typeFilter").onchange=e=>{typeFilter=e.target.value;render()};
-$("listPanel").onclick=e=>{
- const b=e.target.closest("[data-delete]"); if(!b)return;
- pendingDelete={id:b.dataset.delete,title:b.dataset.title||"Deadline"};
- $("deleteText").textContent=`Delete "${pendingDelete.title}"? This will archive it in Notion.`;
- $("deleteMessage").textContent="";
- $("deleteOverlay").classList.add("show");
- $("deleteOverlay").setAttribute("aria-hidden","false");
-};
-function closeDelete(){pendingDelete=null;$("deleteOverlay").classList.remove("show");$("deleteOverlay").setAttribute("aria-hidden","true")}
-$("deleteClose").onclick=closeDelete;$("deleteCancel").onclick=closeDelete;
-$("deleteOverlay").onclick=e=>{if(e.target===$("deleteOverlay"))closeDelete()};
-$("deleteYes").onclick=async()=>{
- if(!pendingDelete)return;
- $("deleteYes").disabled=true;$("deleteMessage").textContent="";
- try{
-  const r=await fetch(API+"/tutoring-deadlines",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"delete",deadlineId:pendingDelete.id})});
-  const d=await r.json().catch(()=>({}));
-  if(!r.ok||!d.success)throw Error(d.error||"Could not delete deadline.");
-  closeDelete();await load();
- }catch(err){$("deleteMessage").textContent=err.message}
- finally{$("deleteYes").disabled=false}
-};
-$("search").oninput=render;
-document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{view=b.dataset.view;document.querySelectorAll("[data-view]").forEach(x=>x.classList.toggle("active",x===b));$("listPanel").style.display=view==="list"?"block":"none";$("calendarPanel").style.display=view==="calendar"?"block":"none";render()});
-$("prevMonth").onclick=()=>{calDate=new Date(calDate.getFullYear(),calDate.getMonth()-1,1);renderCalendar()};
-$("nextMonth").onclick=()=>{calDate=new Date(calDate.getFullYear(),calDate.getMonth()+1,1);renderCalendar()};
-const overlay=$("overlay");
-function openModal(){ $("deadlineForm").reset();$("subject").innerHTML='<option value="">Choose subject…</option>';$("formMessage").textContent="";overlay.classList.add("show");overlay.setAttribute("aria-hidden","false")}
-function closeModal(){overlay.classList.remove("show");overlay.setAttribute("aria-hidden","true")}
-$("newDeadline").onclick=openModal;$("closeModal").onclick=closeModal;$("cancel").onclick=closeModal;
-overlay.onclick=e=>{if(e.target===overlay)closeModal()};
-$("deadlineForm").onsubmit=async e=>{
- e.preventDefault();$("saveDeadline").disabled=true;$("formMessage").textContent="";
- try{
-  const body={title:$("title").value.trim(),studentPageId:$("student").value,subject:$("subject").value,type:$("type").value,dueDate:$("dueDate").value};
-  const r=await fetch(API+"/tutoring-deadlines",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-  const d=await r.json().catch(()=>({}));
-  if(!r.ok||!d.success)throw Error(d.error||"Could not add deadline.");
-  closeModal();await load();
- }catch(err){$("formMessage").textContent=err.message}
- finally{$("saveDeadline").disabled=false}
-};
-load();
+function fillStudents(){const option=s=>`<option value="${esc(s.id)}">${esc(s.name||'Student')}</option>`;$('studentFilter').innerHTML='<option value="">All Students</option>'+students.map(option).join('');$('student').innerHTML='<option value="">Choose student…</option>'+students.filter(s=>s.status!=='Inactive').map(option).join('')}
+function fillSubjects(studentId,selected=''){const s=students.find(x=>x.id===studentId),subjects=[...new Set([...(s?.subjects||[]),...(selected?[selected]:[])])];$('subject').innerHTML='<option value="">No subject</option>'+subjects.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');$('subject').value=selected||''}
+function scopeItems(){const q=$('search').value.trim().toLowerCase(),student=$('studentFilter').value,type=$('typeFilter').value,from=$('fromDate').value,to=$('toDate').value;return deadlines.filter(x=>{const hay=`${x.title||''} ${studentName(x)} ${x.subject||''} ${x.type||''} ${x.notes||''}`.toLowerCase(),day=dueYmd(x);return (!q||hay.includes(q))&&(!student||x.studentPageId===student)&&(!type||x.type===type)&&(!from||day>=from)&&(!to||day<=to)})}
+function visible(){return scopeItems().filter(x=>statusFilter==='all'||statusOf(x)===statusFilter)}
+function updateStats(){const items=scopeItems(),start=monday(new Date()),next=plusDays(start,7),today=ymd(new Date());$('sUpcoming').textContent=items.filter(x=>statusOf(x)==='upcoming').length;$('sWeek').textContent=items.filter(x=>!isDone(x)&&dueYmd(x)>=today&&dueYmd(x)>=ymd(start)&&dueYmd(x)<ymd(next)).length;$('sOverdue').textContent=items.filter(x=>statusOf(x)==='overdue').length;$('sDone').textContent=items.filter(isDone).length;}
+function render(){updateStats();renderList();renderCalendar();if(openDay)renderDay(openDay)}
+function fmtDay(date){return date?date.toLocaleDateString('en-US',{weekday:'short'}):''}
+function card(x){const d=dateOf(x.dueDate),st=statusOf(x),url=notionUrl(x);return `<article class="deadline-card ${st}" data-open-card="${esc(x.id)}" tabindex="0" role="link" aria-label="Open ${esc(x.title||'Deadline')} in Notion">
+ <div class="datebox"><strong>${d?d.getDate():'—'}</strong><span>${d?d.toLocaleDateString('en-US',{month:'short'}).toUpperCase():''}</span><span>${d?fmtDay(d):''}</span></div>
+ <div class="deadline-info"><div class="deadline-title">${esc(x.title||'Deadline')}</div><div class="deadline-meta">${esc(studentName(x))}${x.subject?' · '+esc(x.subject):''}</div><div class="deadline-tags"><span class="pill">${esc(x.type||'Deadline')}</span><span class="pill ${st}">${st==='done'?'Done':st==='overdue'?'Overdue':'Upcoming'}</span></div></div>
+ <div class="deadline-side"><label class="complete-box" title="${isDone(x)?'Reopen deadline':'Mark deadline Done'}"><input type="checkbox" data-complete="${esc(x.id)}" ${isDone(x)?'checked':''} aria-label="${isDone(x)?'Reopen':'Mark Done'}: ${esc(x.title)}"></label>
+ <details class="menu" data-menu="${esc(x.id)}"><summary aria-label="Actions for ${esc(x.title)}">•••</summary><div class="menu-popover"><a href="${esc(url)}" target="_top">Open in Notion ↗</a><button type="button" data-edit="${esc(x.id)}">Edit Deadline</button><button type="button" class="danger" data-delete="${esc(x.id)}">Archive Deadline</button></div></details></div>
+ <div class="open-hint">View Deadline ↗</div></article>`}
+function renderList(){const list=visible().sort((a,b)=>{const da=dueYmd(a),db=dueYmd(b);return (da>db?1:da<db?-1:0)||(studentName(a).localeCompare(studentName(b))) });$('listPanel').innerHTML=list.length?`<div class="list-grid">${list.map(card).join('')}</div>`:'<div class="empty">No deadlines match your current filters.</div>'}
+function renderCalendar(){const year=calDate.getFullYear(),month=calDate.getMonth(),first=new Date(year,month,1),start=plusDays(first,-((first.getDay()+6)%7)),today=ymd(new Date()),items=visible(),byDate=new Map();items.forEach(x=>{const key=dueYmd(x);if(!byDate.has(key))byDate.set(key,[]);byDate.get(key).push(x)});$('calTitle').textContent=calDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});let html='';for(let i=0;i<42;i++){const d=plusDays(start,i),key=ymd(d),ev=byDate.get(key)||[];html+=`<div class="day ${d.getMonth()!==month?'other':''} ${key===today?'today':''}"><div class="daytop"><button class="day-num" type="button" data-day="${key}" aria-label="View deadlines on ${key}">${d.getDate()}</button>${ev.length?`<span class="day-count">${ev.length}</span>`:''}</div>${ev.slice(0,3).map(x=>`<button class="cal-event ${statusOf(x)}" type="button" data-day="${key}" title="${esc(x.title)}">${esc(x.title)}</button>`).join('')}${ev.length>3?`<button class="more-day" type="button" data-day="${key}">+${ev.length-3} more</button>`:''}</div>`}$('calendar').innerHTML=html}
+function renderDay(key){const date=dateOf(key),items=visible().filter(x=>dueYmd(x)===key).sort((a,b)=>studentName(a).localeCompare(studentName(b)));$('dayTitle').textContent=(date?date.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}):key);$('dayList').innerHTML=items.length?items.map(x=>`<div class="day-item"><input type="checkbox" data-complete="${esc(x.id)}" ${isDone(x)?'checked':''} aria-label="${isDone(x)?'Reopen':'Mark Done'} ${esc(x.title)}"><div class="day-item-info"><strong>${esc(x.title)}</strong><p>${esc(studentName(x))}${x.subject?' · '+esc(x.subject):''} · ${esc(x.type||'Deadline')}</p><span class="pill ${statusOf(x)}">${statusOf(x)==='done'?'Done':statusOf(x)==='overdue'?'Overdue':'Upcoming'}</span></div><div class="day-item-actions"><button data-edit="${esc(x.id)}" type="button">Edit</button><a href="${esc(notionUrl(x))}" target="_top">Open ↗</a></div></div>`).join(''):'<div class="empty">No deadlines matching filters on this date.</div>'}
+function showModal(id){const el=$(id);el.classList.add('show');el.setAttribute('aria-hidden','false')}
+function hideModal(id){const el=$(id);el.classList.remove('show');el.setAttribute('aria-hidden','true')}
+function modalOpen(id=null){document.querySelectorAll('details.menu[open]').forEach(x=>x.open=false);editingId=id;const x=id?byId(id):null;if(id&&!x)return;$('deadlineForm').reset();$('modalTitle').textContent=x?'Edit Deadline':'New Deadline';$('saveDeadline').textContent=x?'Save Changes':'Add Deadline';$('formMessage').textContent='';fillStudents();$('student').value=x?.studentPageId||$('studentFilter').value||'';fillSubjects($('student').value,x?.subject||'');$('title').value=x?.title||'';$('type').value=x?.type||'Homework';$('dueDate').value=dueYmd(x||{})||ymd(new Date());$('notes').value=x?.notes||'';if(x?.studentPageId&&!Array.from($('student').options).some(o=>o.value===x.studentPageId)){const s=students.find(s=>s.id===x.studentPageId);$('student').add(new Option(s?.name||studentName(x),x.studentPageId));$('student').value=x.studentPageId}showModal('editModal')}
+function deleteOpen(id){const x=byId(id);if(!x)return;deletingId=id;$('deleteText').textContent=`Archive “${x.title}” in Notion? You can restore it from Notion later.`;$('deleteMessage').textContent='';showModal('deleteModal')}
+async function setCompleted(id,desired){const x=byId(id);if(!x)return;const next=desired?'Done':'Upcoming';const inputs=[...document.querySelectorAll('[data-complete]')].filter(el=>el.dataset.complete===id);inputs.forEach(el=>el.disabled=true);try{await mutate({action:'set-status',deadlineId:id,status:next});x.status=next;render();toast(desired?'Deadline completed':'Deadline reopened')}catch(e){render();announce('Could not update deadline: '+e.message,true)}finally{inputs.forEach(el=>el.disabled=false)}}
+async function saveDeadline(e){e.preventDefault();const save=$('saveDeadline');save.disabled=true;$('formMessage').textContent='';const values={title:$('title').value.trim(),studentPageId:$('student').value,subject:$('subject').value,dueDate:$('dueDate').value,type:$('type').value,notes:$('notes').value};if(!values.title||!values.studentPageId||!values.dueDate){$('formMessage').textContent='Please complete title, student, and due date.';save.disabled=false;return}if(!types.includes(values.type)){$('formMessage').textContent='Choose a valid type.';save.disabled=false;return}try{const id=editingId;const d=await mutate(id?{action:'edit',deadlineId:id,...values}:values);if(id){const x=byId(id);Object.assign(x,values);if(d.notionUrl)x.notionUrl=d.notionUrl;x.studentName=students.find(s=>s.id===values.studentPageId)?.name||x.studentName}else{const x={...d.deadline,...values,id:d.deadline?.id,studentName:students.find(s=>s.id===values.studentPageId)?.name||'Student'};deadlines.push(x)}hideModal('editModal');render();toast(id?'Deadline updated':'Deadline created')}catch(err){$('formMessage').textContent=err.message}finally{save.disabled=false}}
+async function deleteDeadline(){if(!deletingId)return;const id=deletingId;$('deleteYes').disabled=true;$('deleteMessage').textContent='';try{await mutate({action:'delete',deadlineId:id});deadlines=deadlines.filter(x=>x.id!==id);deletingId=null;hideModal('deleteModal');render();toast('Deadline archived in Notion')}catch(e){$('deleteMessage').textContent=e.message}finally{$('deleteYes').disabled=false}}
+async function ensureMonth(){const start=ymd(new Date(calDate.getFullYear(),calDate.getMonth()-1,1)),end=ymd(new Date(calDate.getFullYear(),calDate.getMonth()+2,1));if(covered(start,end))return;await fetchRange(start,end).catch(()=>{})}
+async function ensureDateFilters(){const from=$('fromDate').value,to=$('toDate').value;if(!from&&!to)return;if(from&&to&&to<from){announce('The end date must be on or after the start date.',true);return}if(from&&to&&!covered(from,ymd(plusDays(dateOf(to),1))))await fetchRange(from,ymd(plusDays(dateOf(to),1))).catch(()=>{});else if(from&&!covered(from,ymd(plusDays(dateOf(from),33))))await fetchRange(from,ymd(plusDays(dateOf(from),33))).catch(()=>{});else if(to&&!covered(ymd(plusDays(dateOf(to),-33)),ymd(plusDays(dateOf(to),1))))await fetchRange(ymd(plusDays(dateOf(to),-33)),ymd(plusDays(dateOf(to),1))).catch(()=>{});render()}
+async function moveMonth(delta){calDate=new Date(calDate.getFullYear(),calDate.getMonth()+delta,1);renderCalendar();await ensureMonth()}
+async function refresh(){const now=new Date(),start=ymd(new Date(now.getFullYear()-1,0,1)),end=ymd(new Date(now.getFullYear()+2,0,1));deadlines=[];loadedRanges=[];await fetchRange(start,end).catch(()=>{});await ensureMonth();render()}
+async function init(){try{const s=await json('/tutoring-students');students=s.students||[];fillStudents()}catch(e){announce('Could not load students: '+e.message,true)}await refresh()}
+$('filters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;statusFilter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));render()});
+$('search').addEventListener('input',render);$('typeFilter').addEventListener('change',render);$('studentFilter').addEventListener('change',render);
+$('fromDate').addEventListener('change',ensureDateFilters);$('toDate').addEventListener('change',ensureDateFilters);
+$('clearFilters').addEventListener('click',()=>{$('fromDate').value='';$('toDate').value='';$('studentFilter').value='';$('typeFilter').value='';$('search').value='';statusFilter='all';document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x.dataset.filter==='all'));document.querySelectorAll('[data-preset]').forEach(x=>x.classList.remove('active'));render()});
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',async()=>{const start=b.dataset.preset==='week'?monday(new Date()):new Date(new Date().getFullYear(),new Date().getMonth(),1),end=b.dataset.preset==='week'?plusDays(start,6):new Date(new Date().getFullYear(),new Date().getMonth()+1,0);$('fromDate').value=ymd(start);$('toDate').value=ymd(end);document.querySelectorAll('[data-preset]').forEach(x=>x.classList.toggle('active',x===b));await ensureDateFilters()}));
+$('refresh').addEventListener('click',refresh);$('newDeadline').addEventListener('click',()=>modalOpen());
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',async()=>{view=b.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));$('listPanel').hidden=view!=='list';$('calendarPanel').hidden=view!=='calendar';render();if(view==='calendar')await ensureMonth()}));
+$('prevMonth').addEventListener('click',()=>moveMonth(-1));$('nextMonth').addEventListener('click',()=>moveMonth(1));$('todayMonth').addEventListener('click',()=>{calDate=new Date(new Date().getFullYear(),new Date().getMonth(),1);renderCalendar();ensureMonth()});
+$('calendar').addEventListener('click',e=>{const b=e.target.closest('[data-day]');if(!b)return;openDay=b.dataset.day;renderDay(openDay);showModal('dayModal')});
+function onDeadlineControl(e){const edit=e.target.closest('[data-edit]');if(edit){e.preventDefault();if(openDay){openDay=null;hideModal('dayModal')}modalOpen(edit.dataset.edit);return}const del=e.target.closest('[data-delete]');if(del){e.preventDefault();deleteOpen(del.dataset.delete);return}const summary=e.target.closest('summary');if(summary){for(const x of document.querySelectorAll('details[open]'))if(x!==summary.closest('details'))x.open=false;return}const article=e.target.closest('[data-open-card]');if(article&&!e.target.closest('a,button,details,input,label')){const x=byId(article.dataset.openCard);if(x)window.top.location.href=notionUrl(x)}}
+$('listPanel').addEventListener('click',onDeadlineControl);$('dayList').addEventListener('click',onDeadlineControl);
+$('listPanel').addEventListener('change',e=>{const cb=e.target.closest('[data-complete]');if(cb)setCompleted(cb.dataset.complete,cb.checked)});
+$('dayList').addEventListener('change',e=>{const cb=e.target.closest('[data-complete]');if(cb)setCompleted(cb.dataset.complete,cb.checked)});
+// Checkbox actions are processed on change rather than click to support iPad/keyboard correctly.
+function onCardKey(e){const a=e.target.closest('[data-open-card]');if(!a||e.target!==a||!['Enter',' '].includes(e.key))return;e.preventDefault();const x=byId(a.dataset.openCard);if(x)window.top.location.href=notionUrl(x)}
+$('listPanel').addEventListener('keydown',onCardKey);
+document.addEventListener('click',e=>{if(!e.target.closest('details.menu'))document.querySelectorAll('details.menu[open]').forEach(x=>x.open=false)});
+$('student').addEventListener('change',()=>fillSubjects($('student').value));$('deadlineForm').addEventListener('submit',saveDeadline);
+function closeEdit(){hideModal('editModal');editingId=null}function closeDay(){hideModal('dayModal');openDay=null}function closeDelete(){hideModal('deleteModal');deletingId=null}
+$('closeEdit').onclick=closeEdit;$('cancelEdit').onclick=closeEdit;$('dayClose').onclick=closeDay;$('deleteClose').onclick=closeDelete;$('deleteCancel').onclick=closeDelete;$('deleteYes').onclick=deleteDeadline;
+for(const id of ['editModal','dayModal','deleteModal'])$(id).addEventListener('click',e=>{if(e.target===$(id)){if(id==='editModal')closeEdit();else if(id==='dayModal')closeDay();else closeDelete()}});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('deleteModal').classList.contains('show'))closeDelete();else if($('editModal').classList.contains('show'))closeEdit();else if($('dayModal').classList.contains('show'))closeDay()});
+init();
 </script>
 </body>
 </html>
-<style>
-.tools .search, .tools input[type="search"]{flex:1 1 280px;min-width:180px}
-.tools .view-toggle,.tools .new{flex:0 0 auto}
-@media(max-width:620px){
-  .wrap{padding:10px 12px}
-  .tools{display:grid;grid-template-columns:1fr auto auto;gap:7px}
-  .tools .search,.tools input[type="search"]{min-width:0;width:100%}
-}
-</style>
