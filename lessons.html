@@ -1,110 +1,37 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Lessons</title>
-<style>
-:root{--ink:#37352F;--muted:#8F8B84;--line:#DDDAD5;--soft:#F7F6F3;--green:#8BAF98;--greenSoft:#E8EFE9}
-*{box-sizing:border-box}
-html,body{margin:0;background:#fff;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{padding:0}
-.toolbar{display:flex;flex-direction:column;gap:14px;margin-bottom:16px;padding-top:4px}
-.filters,.tools{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-.tools{width:100%;padding-right:4px}
-.search{flex:1}
-.new{margin-left:auto;min-width:142px}
-button,.search,input,select{font:inherit}
-.tab,.new,.view-toggle,.secondary,.save,.cal-nav{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 12px;color:var(--ink);cursor:pointer}
-.tab.active,.view-toggle.active{background:var(--soft);font-weight:650}
-.search{border:1px solid var(--line);border-radius:9px;padding:9px 12px;min-width:230px;color:var(--ink)}
-.new,.save{background:#6F786E!important;color:#fff!important;border-color:#6F786E!important;font-weight:650}
-.view-switch{display:flex;gap:7px}
-.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px}
-.stat{border:1px solid var(--line);border-radius:13px;padding:16px;background:#fff}
-.stat b{font-family:Georgia,serif;font-size:24px;font-weight:600;display:block}
-.stat span{font-size:12px;color:var(--muted);margin-top:4px}
-.panel{border:1px solid var(--line);border-radius:13px;background:#fff;overflow:hidden}
-.lesson{display:grid;grid-template-columns:74px minmax(170px,1.5fr) minmax(120px,1fr) 110px 105px auto;gap:12px;align-items:center;padding:16px;border-bottom:1px solid var(--line)}
-.lesson:last-child{border-bottom:0}
-.datebox{text-align:center}.datebox .day{font-family:Georgia,serif;font-size:22px;font-weight:600}.datebox .mon{font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.06em}
-.name{font-family:Georgia,serif;font-size:20px;font-weight:600}
-.sub,.empty{font-size:12px;color:var(--muted);margin-top:4px}.time{font-weight:650}
-.pill{display:inline-block;padding:4px 9px;border-radius:999px;font-size:12px}
-.pill.attended{background:#E8EFE9;color:#52705C}
-.pill.no-show{background:#E8EEF5;color:#506A86}
-.pill.cancelled{background:#F5E7E5;color:#9A4E49}
-.pill.scheduled{background:#F0ECE8;color:#6F6A63}
-.open{display:flex;justify-content:space-between;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--ink);text-decoration:none;font-size:13px;background:#FAF9F7;white-space:nowrap}
-.lessonActions{display:flex;gap:7px;align-items:center}
-.deleteBtn{border:1px solid #E7C9C6;background:#FFF9F8;color:#A24C4C;border-radius:9px;padding:10px 12px;cursor:pointer;font-size:13px;white-space:nowrap}
-.empty{padding:40px;text-align:center}
-.calendar{padding:16px}.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.cal-head b{font-family:Georgia,serif;font-size:20px;font-weight:600}
-.weekdays,.grid{display:grid;grid-template-columns:repeat(7,1fr)}.weekdays div{padding:7px;text-align:center;color:var(--muted);font-size:11px}
-.cell{min-height:100px;border-top:1px solid #EEEDEB;border-right:1px solid #EEEDEB;padding:7px}.cell:nth-child(7n){border-right:0}.cell.dim{color:#C2BEB8}.num{font-size:11px;margin-bottom:5px}.event{font-size:11px;background:var(--soft);border-radius:6px;padding:4px 5px;margin:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
-.modal-back{position:fixed;inset:0;background:rgba(55,53,47,.18);display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal-back.show{display:flex}
-.modal{width:min(520px,100%);background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 12px 40px rgba(55,53,47,.12)}
-.modal h2{font-family:Georgia,serif;font-size:23px;font-weight:600;margin:0 0 18px}
-.form{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:650}.field input,.field select{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink);outline:none}.field input:focus,.field select:focus{border-color:#A9A59E}
-.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:19px}.error{color:#A24C4C;font-size:12px;margin-top:12px;min-height:16px}button:disabled{opacity:.55;cursor:default}
-@media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:620px){.summary{grid-template-columns:1fr 1fr}.search{min-width:0;flex:1}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.lesson{grid-template-columns:58px 1fr auto}.lesson .subjectcol{display:none}.lesson .statuscol{grid-column:2}.open{grid-column:3;grid-row:1/3}}
-
-.confirmOverlay{position:fixed;inset:0;background:rgba(55,53,47,.22);display:none;align-items:center;justify-content:center;padding:18px;z-index:100}
-.confirmOverlay.show{display:flex}
-.confirmBox{width:min(390px,100%);background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 12px 40px rgba(55,53,47,.14)}
-.confirmTitle{font-family:Georgia,serif;font-size:21px;font-weight:600;margin-bottom:8px}
-.confirmText{font-size:13px;line-height:1.5;color:var(--muted)}
-.confirmActions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
-.confirmCancel,.confirmDelete{font:inherit;border-radius:9px;padding:9px 12px;cursor:pointer}
-.confirmCancel{border:1px solid var(--line);background:#fff;color:var(--ink)}
-.confirmDelete{border:1px solid #A24C4C;background:#A24C4C;color:#fff;font-weight:650}
-
-/* Color each individual lesson in both list and calendar views. */
-.lesson.attended,.event.attended{--status-bg:#E8F5EC;--status-ink:#245C38;--status-accent:#398650}
-.lesson.no-show,.event.no-show{--status-bg:#E8F0FC;--status-ink:#244F87;--status-accent:#3978C6}
-.lesson.cancelled,.event.cancelled{--status-bg:#FDECEB;--status-ink:#922D2A;--status-accent:#C54640}
-.lesson.attended,.lesson.no-show,.lesson.cancelled{background:var(--status-bg);box-shadow:inset 4px 0 0 var(--status-accent)}
-.lesson.attended .name,.lesson.no-show .name,.lesson.cancelled .name{color:var(--status-ink)}
-.lesson.attended .sub,.lesson.no-show .sub,.lesson.cancelled .sub,
-.lesson.attended .datebox .mon,.lesson.no-show .datebox .mon,.lesson.cancelled .datebox .mon{color:var(--status-ink)}
-.event{color:var(--ink)}
-.event.attended,.event.no-show,.event.cancelled{background:var(--status-bg);color:var(--status-ink);border-left:3px solid var(--status-accent)}
-
-</style>
-</head>
-<body>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Lessons</title><style>
+:root{--ink:#37352F;--muted:#827E78;--line:#DDDAD5;--soft:#F7F6F3;--green:#6F786E;--mint:#E8EFE9;--radius:13px}
+*{box-sizing:border-box}html,body{margin:0;padding:0;width:100%;background:white;color:var(--ink);font:15px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{overflow-x:hidden}
+.wrap{max-width:100%;padding:2px 1px 20px}.toolbar{display:flex;flex-direction:column;gap:12px;margin-bottom:15px}.filters,.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.filters{padding-bottom:1px}.tools{width:100%}
+button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
+.tab,.new,.view-toggle,.secondary,.save,.cal-nav,.clear-filter,.select-student,.date-input{border:1px solid var(--line);background:#fff;border-radius:9px;padding:10px 12px;color:var(--ink);min-height:43px}
+.tab{font-size:13px;white-space:nowrap}.tab.active,.view-toggle.active{background:var(--soft);font-weight:700}.tab:hover,.view-toggle:hover,.cal-nav:hover,.clear-filter:hover{background:var(--soft)}
+.search{border:1px solid var(--line);border-radius:9px;padding:10px 12px;min-height:43px;min-width:160px;flex:1 1 200px;max-width:none;color:var(--ink)}.new,.save{background:var(--green)!important;color:white!important;border-color:var(--green)!important;font-weight:650}.new{white-space:nowrap}.view-switch{display:flex;gap:5px}.view-toggle{font-size:13px}.filterline{display:flex;align-items:end;gap:9px;flex-wrap:wrap}.filter-field{display:flex;flex-direction:column;gap:4px;min-width:0}.filter-field label{font-size:12px;color:var(--muted);font-weight:650}.select-student{min-width:170px;max-width:260px}.date-input{width:155px}.clear-filter{font-size:13px}.stats-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0 9px}.stats-note{font-size:12px;color:var(--muted)}
+.summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:15px}.stat{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:white;min-width:0}.stat b{font:600 27px Georgia,"Times New Roman",serif;display:block;line-height:1.2}.stat span{font-size:12px;color:var(--muted);margin-top:3px;display:block}
+.panel{border:1px solid var(--line);border-radius:13px;background:white;min-width:0}.lessons-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:13px}.lesson-card{position:relative;border:1px solid #E5E2DD;box-shadow:inset 4px 0 0 var(--status-border,#D0CBC4);border-radius:12px;background:white;padding:14px 15px 11px;cursor:pointer;min-width:0;display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:10px;align-items:start;transition:background .12s,border-color .12s}.lesson-card:hover{background:#FCFBF9;border-color:#CDC8C0}.lesson-card:focus-visible{outline:2px solid var(--green);outline-offset:2px}.lesson-card.attended{--status-border:#459B64}.lesson-card.cancelled{--status-border:#D9534F}.lesson-card.no-show{--status-border:#4B84D6}
+.datebox{background:#F7F6F3;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;min-height:68px}.datebox .day{font:600 23px Georgia,"Times New Roman",serif;line-height:1.1}.datebox .mon{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}.datebox .weekday{font-size:10px;color:var(--muted);margin-top:3px}.lesson-info{min-width:0}.name{font:600 20px Georgia,"Times New Roman",serif;line-height:1.26;overflow-wrap:anywhere}.sub{font-size:13px;color:var(--muted);margin-top:5px;overflow-wrap:anywhere}.time{font-size:13px;font-weight:650;margin-top:10px;display:flex;align-items:center;gap:5px}.lesson-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:87px}.pill{display:inline-flex;align-items:center;justify-content:center;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:650;white-space:nowrap}.pill.attended{background:#E8F4EA;color:#306F42}.pill.cancelled{background:#FAE8E6;color:#A3423D}.pill.no-show{background:#E8F0FB;color:#3C6DA6}.pill.scheduled{background:#F0ECE8;color:#6F6A63}.menu-toggle{background:#FAF9F7;border:1px solid var(--line);border-radius:8px;padding:2px 12px;font-size:19px;min-width:42px;min-height:35px;line-height:1}.lesson-footer{grid-column:2/-1;display:flex;align-items:center;justify-content:flex-end;color:#747069;font-size:12px;margin-top:-2px}.card-menu{position:absolute;right:12px;top:58px;z-index:40;background:white;border:1px solid var(--line);box-shadow:0 14px 38px rgba(55,53,47,.17);border-radius:12px;padding:7px;width:204px;cursor:default}.card-menu[hidden]{display:none}.menu-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:9px 10px 5px}.card-menu button,.card-menu a{display:block;width:100%;padding:10px;border:0;background:white;border-radius:7px;text-align:left;font-size:13px;color:var(--ink);text-decoration:none;cursor:pointer}.card-menu button:hover,.card-menu a:hover{background:var(--soft)}.card-menu .danger{color:#A24C4C}.menu-separator{height:1px;background:#E9E6E2;margin:5px 2px}.empty{padding:35px 12px;text-align:center;color:var(--muted);font-size:13px}.banner{padding:10px 12px;margin:0 0 12px;background:#FFF4F2;color:#9A4E49;border-radius:10px;border:1px solid #F1D6D2;font-size:13px}.banner[hidden]{display:none}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;background:#37352F;color:white;padding:11px 16px;border-radius:10px;box-shadow:0 8px 30px #0002;font-size:13px;max-width:calc(100vw - 30px)}.toast[hidden]{display:none}
+.calendar{padding:15px;min-width:0}.cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px;flex-wrap:wrap}.cal-head-title{font:600 22px Georgia,"Times New Roman",serif;min-width:165px;text-align:center}.cal-buttons{display:flex;align-items:center;gap:7px}.cal-nav{min-width:42px;min-height:42px}.cal-today{background:var(--soft)}.calendar-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid #E7E5E1;border-radius:10px}.calendar-inner{min-width:630px}.weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}.weekdays{background:#F7F6F3}.weekdays div{text-align:center;font-size:12px;padding:10px 4px;color:var(--muted);font-weight:650;border-right:1px solid #EBE8E4}.weekdays div:last-child{border-right:0}.calendar-grid{border-top:1px solid #EEEDEB}.cell{min-width:0;min-height:117px;padding:7px 5px;border-bottom:1px solid #EEEDEB;border-right:1px solid #EEEDEB;overflow:hidden}.cell:nth-child(7n){border-right:0}.cell.dim{background:#FBFAF8}.cell.today{background:#F5F5F0}.cell-header{display:flex;justify-content:space-between;align-items:center;gap:2px;margin-bottom:6px}.num{background:transparent;border:0;color:var(--ink);font-size:12px;padding:4px 6px;border-radius:7px;min-width:32px;text-align:left}.num:hover{background:#EDEAE5}.today .num{background:#6F786E;color:white}.event{display:block;min-width:0;width:100%;text-align:left;font-size:11px;padding:5px;border:0;border-left:3px solid #CFCAC3;background:#F7F6F3;border-radius:5px;margin:4px 0;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}.event.attended{background:#EBF5EC;border-color:#459B64}.event.cancelled{background:#FCEDEC;border-color:#D9534F}.event.no-show{background:#ECF2FC;border-color:#4B84D6}.day-more{display:block;border:0;background:none;color:#5C6659;font-weight:650;font-size:11px;text-align:left;padding:3px 0;cursor:pointer}.count-pill{font-size:10px;color:var(--muted)}
+.modal-back{position:fixed;inset:0;background:rgba(55,53,47,.26);display:none;align-items:center;justify-content:center;padding:14px;z-index:80}.modal-back.show{display:flex}.modal{width:min(520px,100%);max-height:min(90vh,850px);overflow:auto;background:white;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 14px 42px #0002}.modal h2{font:600 23px Georgia,"Times New Roman",serif;margin:0 0 18px}.form{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:650}.field input,.field select{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px;background:white;color:var(--ink);outline:none;min-height:43px}.field input:focus,.field select:focus{border-color:#A9A59E}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:19px}.secondary,.save{min-height:44px;border-radius:9px;padding:9px 13px}.error{color:#A24C4C;font-size:12px;margin-top:12px;min-height:16px}
+.confirmOverlay{position:fixed;inset:0;background:rgba(55,53,47,.22);display:none;align-items:center;justify-content:center;padding:16px;z-index:110}.confirmOverlay.show{display:flex}.confirmBox{width:min(390px,100%);background:white;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 12px 40px #0002}.confirmTitle{font:600 21px Georgia,serif;margin-bottom:8px}.confirmText{font-size:13px;line-height:1.5;color:var(--muted)}.confirmActions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.confirmCancel,.confirmDelete{font:inherit;border-radius:9px;padding:10px 13px;cursor:pointer}.confirmCancel{border:1px solid var(--line);background:white;color:var(--ink)}.confirmDelete{border:1px solid #A24C4C;background:#A24C4C;color:white;font-weight:650}
+.day-modal{width:min(590px,100%)}.day-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.day-heading h2{margin:0}.day-close{border:1px solid var(--line);border-radius:8px;background:white;min-height:40px;min-width:40px;font-size:20px}.day-lessons{display:grid;gap:9px}.day-item{display:grid;grid-template-columns:minmax(0,1fr) 135px;gap:8px;align-items:center;padding:11px 12px;border:1px solid var(--line);border-radius:10px}.day-item-main{display:flex;flex-direction:column;gap:4px;min-width:0}.day-item strong{font-size:14px}.day-item .sub{margin:0}.day-item a{color:#5F665C;font-size:12px;text-decoration:none}.day-status{border:1px solid var(--line);border-radius:8px;padding:8px;background:white;width:100%;font-size:12px;min-height:39px}
+@media(max-width:1120px){.lessons-grid{grid-template-columns:1fr}.summary{gap:8px}.stat{padding:12px}.stat b{font-size:25px}}
+@media(max-width:800px){.summary{grid-template-columns:repeat(3,minmax(0,1fr))}.filters{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}.tab{flex:0 0 auto}.filterline{display:grid;grid-template-columns:1fr 1fr auto;align-items:end}.filter-field.student-field{grid-column:1/-1}.select-student{min-width:0;width:100%;max-width:none}.date-input{width:100%}.cal-head-title{font-size:21px}.calendar-inner{min-width:658px}}
+@media(max-width:520px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.tools{display:grid;grid-template-columns:1fr auto;gap:8px}.search{grid-column:1/-1;width:100%;min-width:0}.new{grid-column:2}.view-switch{grid-column:1}.filterline{grid-template-columns:1fr 1fr}.filter-field.student-field{grid-column:1/-1}.clear-filter{grid-column:1/-1}.lesson-card{grid-template-columns:52px minmax(0,1fr) auto;padding:12px 9px;gap:8px}.lesson-right{min-width:70px}.name{font-size:18px}.pill{font-size:10px;padding:4px 6px}.lesson-footer{font-size:11px}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.calendar{padding:9px}.day-item{grid-template-columns:1fr}.day-status{max-width:210px}}
+</style></head><body>
 <div class="wrap">
   <div class="toolbar">
-    <div class="filters" id="filters">
-      <button class="tab active" data-filter="all">All Lessons</button>
-      <button class="tab" data-filter="upcoming">Upcoming</button>
-    <button class="tab" data-filter="history">Lesson History</button>
-      <button class="tab" data-filter="Attended">Attended</button>
-      <button class="tab" data-filter="Cancelled">Cancelled</button>
-      <button class="tab" data-filter="No Show">No Show</button>
+    <div class="filters" id="filters" aria-label="Lesson status filters">
+      <button class="tab active" type="button" data-filter="all">All Lessons</button><button class="tab" type="button" data-filter="upcoming">Upcoming</button><button class="tab" type="button" data-filter="history">Lesson History</button><button class="tab" type="button" data-filter="Scheduled">Scheduled</button><button class="tab" type="button" data-filter="Attended">Attended</button><button class="tab" type="button" data-filter="Cancelled">Cancelled</button><button class="tab" type="button" data-filter="No Show">No Show</button>
     </div>
-    <div class="tools">
-      <input id="search" class="search" placeholder="Search student or subject…">
-      <div class="view-switch">
-        <button class="view-toggle active" data-view="list">List</button>
-        <button class="view-toggle" data-view="calendar">Calendar</button>
-      </div>
-      <button class="new" id="newLesson">+ New Lesson</button>
-    </div>
+    <div class="tools"><input id="search" class="search" placeholder="Search student, subject, or grade…" aria-label="Search lessons"><div class="view-switch"><button class="view-toggle active" type="button" data-view="list">List</button><button class="view-toggle" type="button" data-view="calendar">Calendar</button></div><button class="new" id="newLesson" type="button">+ New Lesson</button></div>
+    <div class="filterline"><div class="filter-field student-field"><label for="studentFilter">Student</label><select id="studentFilter" class="select-student"><option value="all">All Students</option></select></div><div class="filter-field"><label for="dateFrom">From date</label><input id="dateFrom" class="date-input" type="date"></div><div class="filter-field"><label for="dateTo">To date</label><input id="dateTo" class="date-input" type="date"></div><button class="clear-filter" id="clearFilters" type="button">Clear filters</button></div>
   </div>
-
-  <div class="summary">
-    <div class="stat"><b id="sUpcoming">—</b><span>Upcoming</span></div>
-    <div class="stat"><b id="sThisWeek">—</b><span>This week</span></div>
-    <div class="stat"><b id="sAttended">—</b><span>Attended</span></div>
-    <div class="stat"><b id="sCancelled">—</b><span>Cancelled / No Show</span></div>
-  </div>
-
+  <div id="errorBanner" class="banner" role="alert" hidden></div>
+  <div class="stats-head"><span class="stats-note">Lesson overview · reflects your selected filters</span><span class="stats-note" id="matchingCount"></span></div>
+  <div class="summary"><div class="stat"><b id="sUpcoming">—</b><span>Upcoming</span></div><div class="stat"><b id="sThisWeek">—</b><span>This week</span></div><div class="stat"><b id="sAttended">—</b><span>Attended</span></div><div class="stat"><b id="sCancelled">—</b><span>Cancelled</span></div><div class="stat"><b id="sNoShow">—</b><span>No Show</span></div></div>
   <div id="listPanel" class="panel"><div class="empty">Loading lessons…</div></div>
   <div id="calendarPanel" class="panel" style="display:none"><div class="calendar" id="calendar"></div></div>
 </div>
-
 <div class="modal-back" id="modalBack">
   <div class="modal">
     <h2>New Lesson</h2>
@@ -153,212 +80,155 @@ button,.search,input,select{font:inherit}
   </div>
 </div>
 
+
+<div class="modal-back" id="dayModalBack" aria-hidden="true"><div class="modal day-modal" role="dialog" aria-modal="true" aria-labelledby="dayModalTitle"><div class="day-heading"><h2 id="dayModalTitle">Lessons</h2><button class="day-close" id="dayModalClose" type="button" aria-label="Close">×</button></div><div id="dayLessonList" class="day-lessons"></div></div></div>
+<div id="toast" class="toast" role="status" hidden></div>
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
-let lessons=[],students=[],filter="all",view="list",month=new Date(); month.setDate(1);
-
+let lessons=[], students=[], filter="all", view="list", month=new Date(), fetchedStart=null, fetchedEnd=null;
+month.setDate(1);
+const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const lessonStatusClass=status=>{
-  const key=String(status||"Scheduled").trim().toLowerCase().replace(/[\s_-]+/g,"-");
-  return ({attended:"attended","no-show":"no-show",cancelled:"cancelled",canceled:"cancelled"})[key]||"scheduled";
-};
+const statuses=["Scheduled","Attended","Cancelled","No Show"];
+const canonical=s=>statuses.find(x=>x.toLowerCase()===String(s||"Scheduled").trim().toLowerCase())||"Scheduled";
+const lessonStatusClass=s=>canonical(s).toLowerCase().replace(/\s+/g,"-");
 const studentById=id=>students.find(s=>s.id===id);
-const lessonName=l=>studentById(l.studentPageId)?.name || l.title?.split(" — ")[0] || "Student";
-const gradeOf=l=>studentById(l.studentPageId)?.grade || "";
-const fmtTime=s=>s?new Intl.DateTimeFormat([], {hour:"numeric",minute:"2-digit"}).format(new Date(s)):"";
-const sameDay=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
-
+const lessonName=l=>studentById(l?.studentPageId)?.name || l?.title?.split(" — ")[0] || "Student";
+const gradeOf=l=>studentById(l?.studentPageId)?.grade||"";
+const fmtTime=s=>{if(!s)return "";const t=new Date(s);return Number.isFinite(t.getTime())?t.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}):""};
+const dateKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const validStart=l=>{const d=new Date(l.start||"");return Number.isFinite(d.getTime())?d:null};
+let toastTimeout;
+function notify(message,error=false){const box=$("toast");box.textContent=message;box.style.background=error?"#963E3A":"#37352F";box.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>box.hidden=true,3600)}
+function errorBanner(message=""){$("errorBanner").textContent=message;$("errorBanner").hidden=!message}
+function notionLink(l){return l.notionUrl||(l.id?"https://www.notion.so/"+String(l.id).replace(/-/g,""):"")}
+function openLesson(l){const url=notionLink(l);if(url)window.open(url,"_top")}
+function baseVisible(){const q=$("search").value.trim().toLowerCase(),student=$("studentFilter").value,from=$("dateFrom").value,to=$("dateTo").value;
+  if(from&&to&&from>to)return [];
+  return lessons.filter(l=>{const d=validStart(l);if(!d)return false;const dk=dateKey(d);if(from&&dk<from||to&&dk>to)return false;
+    if(student!=="all"&&l.studentPageId!==student)return false;
+    return !q||[lessonName(l),l.subject||"",gradeOf(l),l.title||""].join(" ").toLowerCase().includes(q);
+  });
+}
+function visible(){const now=Date.now();return baseVisible().filter(l=>{const t=validStart(l).getTime();if(filter==="upcoming")return t>=now&&!(["Cancelled","No Show"].includes(canonical(l.status)));
+  if(filter==="history")return t<now;
+  return filter==="all"||canonical(l.status)===filter;});}
+function fillStudents(){const filterEl=$("studentFilter"),old=filterEl.value;filterEl.innerHTML='<option value="all">All Students</option>'+students.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");filterEl.value=students.some(s=>s.id===old)?old:"all";
+  const sel=$("student");sel.innerHTML='<option value="">Choose student…</option><option value="__add_student__">+ Add Student…</option>'+students.filter(s=>!s.status||s.status.toLowerCase()==="active").map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");}
+async function fetchJSON(url,opts){const response=await fetch(url,opts);const data=await response.json().catch(()=>({}));if(!response.ok||data.success===false)throw Error(data.error||`Request failed (${response.status})`);return data}
 async function load(){
-  const now=new Date(), start=new Date(now); start.setFullYear(start.getFullYear()-1);
-  const end=new Date(now); end.setFullYear(end.getFullYear()+1);
+  const now=new Date(),start=new Date(now),end=new Date(now);start.setFullYear(now.getFullYear()-1);end.setFullYear(now.getFullYear()+1);
+  const first=new Date(month.getFullYear(),month.getMonth()-1,1),last=new Date(month.getFullYear(),month.getMonth()+2,1);
+  if(first<start)start.setTime(first.getTime());if(last>end)end.setTime(last.getTime());
+  const from=$("dateFrom").value,to=$("dateTo").value;
+  if(from){const f=new Date(from+"T00:00:00");if(f<start)start.setTime(f.getTime())}
+  if(to){const t=new Date(to+"T23:59:59");if(t>end)end.setTime(t.getTime())}
   try{
+    errorBanner("");
     const [lr,sr]=await Promise.all([
-      fetch(`${API}/tutoring-lessons?start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}`).then(r=>r.json()),
-      fetch(`${API}/tutoring-students`).then(r=>r.json())
+      fetchJSON(`${API}/tutoring-lessons?start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}`),
+      fetchJSON(`${API}/tutoring-students`)
     ]);
-    if(!lr.success) throw new Error(lr.error||"Could not load lessons.");
-    if(!sr.success) throw new Error(sr.error||"Could not load students.");
-    lessons=lr.lessons||[]; students=sr.students||[];
-    fillStudents(); render();
-  }catch(e){document.getElementById("listPanel").innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+    lessons=lr.lessons||[];students=sr.students||[];fetchedStart=start;fetchedEnd=end;fillStudents();render();
+  }catch(e){lessons=[];fetchedStart=null;fetchedEnd=null;render();errorBanner("Could not load lessons: "+e.message)}
 }
-
-function fillStudents(){
-  const sel=document.getElementById("student");
-  sel.innerHTML='<option value="">Choose student…</option><option value="__add_student__">+ Add Student…</option>'+students.filter(s=>!s.status||s.status==="Active").map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
+function render(){const arr=visible();const now=new Date();const monday=new Date(now.getFullYear(),now.getMonth(),now.getDate());monday.setDate(monday.getDate()-(monday.getDay()+6)%7);const nextMonday=new Date(monday);nextMonday.setDate(monday.getDate()+7);
+  const good=l=>!(["Cancelled","No Show"].includes(canonical(l.status)));
+  $("sUpcoming").textContent=arr.filter(l=>validStart(l)>=now&&good(l)).length;
+  $("sThisWeek").textContent=arr.filter(l=>validStart(l)>=monday&&validStart(l)<nextMonday&&good(l)).length;
+  $("sAttended").textContent=arr.filter(l=>canonical(l.status)==="Attended").length;
+  $("sCancelled").textContent=arr.filter(l=>canonical(l.status)==="Cancelled").length;
+  $("sNoShow").textContent=arr.filter(l=>canonical(l.status)==="No Show").length;
+  $("matchingCount").textContent=arr.length+" matching lesson"+(arr.length===1?"":"s");renderList(arr);renderCalendar(arr);
 }
-document.getElementById("student").addEventListener("change",()=>{
-  const value=document.getElementById("student").value;
-  if(value==="__add_student__"){
-    document.getElementById("student").value="";
-    modal.classList.remove("show");
-    openStudentModal();
-    return;
+function renderList(items){let arr=[...items].sort((a,b)=>{const diff=validStart(a)-validStart(b);return filter==="history"?-diff:diff});
+  const panel=$("listPanel");if(!arr.length){panel.innerHTML='<div class="empty">No lessons match these filters.</div>';return}
+  panel.innerHTML='<div class="lessons-grid">'+arr.map(l=>{const d=validStart(l),st=lessonStatusClass(l.status),url=notionLink(l),title=lessonName(l);
+    return `<article class="lesson-card ${st}" tabindex="0" role="link" aria-label="Open ${esc(title)} lesson" data-open-lesson="${esc(l.id)}">
+       <div class="datebox"><span class="day">${d.getDate()}</span><span class="mon">${esc(d.toLocaleDateString([],{month:"short"}))}</span><span class="weekday">${esc(d.toLocaleDateString([],{weekday:"short"}))}</span></div>
+       <div class="lesson-info"><div class="name">${esc(title)}</div><div class="sub">${esc([gradeOf(l)?"Grade "+gradeOf(l):"",l.subject||""].filter(Boolean).join(" · ")||"Lesson")}</div><div class="time">◷ ${esc(fmtTime(l.start))}${l.end?" – "+esc(fmtTime(l.end)):""}</div></div>
+       <div class="lesson-right"><span class="pill ${st}">${esc(canonical(l.status))}</span><button class="menu-toggle" type="button" data-menu-toggle="${esc(l.id)}" aria-label="Manage ${esc(title)} lesson" aria-expanded="false">···</button></div>
+       <div class="lesson-footer">View lesson ↗</div>
+       <div class="card-menu" id="menu-${esc(l.id)}" hidden><a href="${esc(url)}" target="_top">Open in Notion ↗</a><div class="menu-separator"></div><div class="menu-title">Update attendance</div>${statuses.map(s=>`<button type="button" data-set-status="${esc(s)}" data-status-lesson="${esc(l.id)}">${s===canonical(l.status)?"✓ ":""}${esc(s)}</button>`).join("")}<div class="menu-separator"></div><button type="button" class="danger" data-delete-lesson="${esc(l.id)}">Archive lesson</button></div>
+     </article>`;
+   }).join("")+"</div>";
+}
+function renderCalendar(items){const y=month.getFullYear(),m=month.getMonth(),first=new Date(y,m,1),offset=(first.getDay()+6)%7,start=new Date(y,m,1-offset);
+  const groups=new Map();for(const l of items){const k=dateKey(validStart(l));if(!groups.has(k))groups.set(k,[]);groups.get(k).push(l)}
+  for(const arr of groups.values())arr.sort((a,b)=>validStart(a)-validStart(b));let cells="";
+  for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const key=dateKey(d),evs=groups.get(key)||[];
+    const evhtml=evs.slice(0,3).map(l=>`<button type="button" class="event ${lessonStatusClass(l.status)}" data-calendar-lesson="${esc(l.id)}" title="${esc(fmtTime(l.start)+" · "+lessonName(l)+" · "+canonical(l.status))}">${esc(fmtTime(l.start))} · ${esc(lessonName(l))}</button>`).join("");
+    cells+=`<div class="cell ${d.getMonth()!==m?"dim":""} ${dateKey(new Date())===key?"today":""}"><div class="cell-header"><button type="button" class="num" data-show-day="${key}" aria-label="Show lessons for ${key}">${d.getDate()}</button>${evs.length?`<span class="count-pill">${evs.length}</span>`:""}</div>${evhtml}${evs.length>3?`<button type="button" class="day-more" data-show-day="${key}">+${evs.length-3} more</button>`:""}</div>`;
   }
-  const s=studentById(value);
-  const subjects=s?.subjects||[];
-  document.getElementById("subject").innerHTML='<option value="">Choose subject…</option>'+subjects.map(x=>`<option>${esc(x)}</option>`).join("");
+  $("calendar").innerHTML=`<div class="cal-head"><div class="cal-head-title">${esc(month.toLocaleDateString([],{month:"long",year:"numeric"}))}</div><div class="cal-buttons"><button type="button" class="cal-nav cal-today" id="calToday">Today</button><button class="cal-nav" type="button" data-month-step="-1" aria-label="Previous month">‹</button><button class="cal-nav" type="button" data-month-step="1" aria-label="Next month">›</button></div></div><div class="calendar-scroll"><div class="calendar-inner"><div class="weekdays">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(x=>`<div>${x}</div>`).join("")}</div><div class="calendar-grid">${cells}</div></div></div></div>`;
+}
+function openDay(day){const evs=visible().filter(l=>dateKey(validStart(l))===day).sort((a,b)=>validStart(a)-validStart(b));const d=new Date(day+"T12:00:00");
+  $("dayModalTitle").textContent=d.toLocaleDateString([],{weekday:"long",month:"long",day:"numeric",year:"numeric"});
+  $("dayLessonList").innerHTML=evs.length?evs.map(l=>`<div class="day-item"><div class="day-item-main"><strong>${esc(lessonName(l))}</strong><span class="sub">${esc([fmtTime(l.start),l.subject||""].filter(Boolean).join(" · "))}</span><a href="${esc(notionLink(l))}" target="_top">Open lesson in Notion ↗</a></div><select class="day-status" aria-label="Attendance for ${esc(lessonName(l))}" data-day-status="${esc(l.id)}">${statuses.map(s=>`<option value="${s}" ${canonical(l.status)===s?"selected":""}>${s}</option>`).join("")}</select></div>`).join(""):'<div class="empty">No lessons scheduled for this day.</div>';
+  $("dayModalBack").classList.add("show");$("dayModalBack").setAttribute("aria-hidden","false");
+}
+function closeDay(){$("dayModalBack").classList.remove("show");$("dayModalBack").setAttribute("aria-hidden","true")}
+async function changeStatus(id,status){if(!statuses.includes(status))return;const l=lessons.find(x=>x.id===id);if(!l||canonical(l.status)===status)return;
+  try{const d=await fetchJSON(`${API}/tutoring-lessons`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:id,status})});l.status=d.status||status;closeMenus();render();if($("dayModalBack").classList.contains("show"))openDay($('dayModalBack').dataset.day||dateKey(validStart(l)));notify("Attendance updated to "+status+" in Notion");}
+  catch(e){notify("Could not update attendance: "+e.message,true);render();if($("dayModalBack").classList.contains("show"))openDay($("dayModalBack").dataset.day||dateKey(validStart(l)));}
+}
+function closeMenus(){document.querySelectorAll(".card-menu").forEach(m=>m.hidden=true);document.querySelectorAll("[data-menu-toggle]").forEach(b=>b.setAttribute("aria-expanded","false"))}
+$("listPanel").addEventListener("click",e=>{
+  const toggle=e.target.closest("[data-menu-toggle]");if(toggle){e.stopPropagation();const menu=$("menu-"+toggle.dataset.menuToggle),was=!menu.hidden;closeMenus();if(!was){menu.hidden=false;toggle.setAttribute("aria-expanded","true")}return}
+  const change=e.target.closest("[data-set-status]");if(change){e.stopPropagation();changeStatus(change.dataset.statusLesson,change.dataset.setStatus);return}
+  if(e.target.closest("[data-delete-lesson]"))return;
+  if(e.target.closest(".card-menu"))return;
+  const card=e.target.closest("[data-open-lesson]");if(card){const lesson=lessons.find(l=>l.id===card.dataset.openLesson);if(lesson)openLesson(lesson)}
 });
-
-function visible(){
-  const q=document.getElementById("search").value.trim().toLowerCase(), now=Date.now();
-  return lessons.filter(l=>{
-    const matches=!q || `${lessonName(l)} ${l.subject||""} ${gradeOf(l)}`.toLowerCase().includes(q);
-    if(!matches)return false;
-    if(filter==="upcoming")return l.start && new Date(l.start).getTime()>=now && !["Cancelled","No Show"].includes(l.status);
-    if(filter==="history")return l.start && new Date(l.start).getTime()<now;
-    if(filter!=="all")return l.status===filter;
-    return true;
-  });
-}
-function render(){
-  const now=new Date(), weekEnd=new Date(now); weekEnd.setDate(now.getDate()+7);
-  document.getElementById("sUpcoming").textContent=lessons.filter(l=>l.start&&new Date(l.start)>=now&&!["Cancelled","No Show"].includes(l.status)).length;
-  document.getElementById("sThisWeek").textContent=lessons.filter(l=>l.start&&new Date(l.start)>=now&&new Date(l.start)<weekEnd&&!["Cancelled","No Show"].includes(l.status)).length;
-  document.getElementById("sAttended").textContent=lessons.filter(l=>l.status==="Attended").length;
-  document.getElementById("sCancelled").textContent=lessons.filter(l=>["Cancelled","No Show"].includes(l.status)).length;
-  renderList(); renderCalendar();
-}
-function renderList(){
-  const arr=visible().sort((a,b)=>{
-    const ta=new Date(a.start||0).getTime(), tb=new Date(b.start||0).getTime();
-    return filter==="history" ? tb-ta : ta-tb;
-  });
-  const panel=document.getElementById("listPanel");
-  if(!arr.length){panel.innerHTML='<div class="empty">No lessons found.</div>';return}
-  panel.innerHTML=arr.map(l=>{
-    const d=new Date(l.start), st=lessonStatusClass(l.status);
-    const url=l.notionUrl||("https://www.notion.so/"+String(l.id||"").replace(/-/g,""));
-    return `<div class="lesson ${st}">
-      <div class="datebox"><div class="day">${d.getDate()}</div><div class="mon">${d.toLocaleString([],{month:"short"})}</div></div>
-      <div><div class="name">${esc(lessonName(l))}</div><div class="sub">${esc(gradeOf(l) ? "Grade "+gradeOf(l) : "")}</div></div>
-      <div class="subjectcol"><div>${esc(l.subject||"—")}</div><div class="sub">${esc(d.toLocaleDateString([],{weekday:"long"}))}</div></div>
-      <div><div class="time">${esc(fmtTime(l.start))}</div><div class="sub">${l.end?"to "+esc(fmtTime(l.end)):""}</div></div>
-      <div class="statuscol"><span class="pill ${st}">${esc(l.status||"Scheduled")}</span></div>
-      <div class="lessonActions"><a class="open" href="${esc(url)}" target="_top">View Lesson</a><button class="deleteBtn" type="button" data-delete-lesson="${esc(l.id)}">Delete</button></div>
-    </div>`;
-  }).join("");
-}
-function renderCalendar(){
-  const root=document.getElementById("calendar"), y=month.getFullYear(),m=month.getMonth();
-  const first=new Date(y,m,1), start=new Date(y,m,1-first.getDay());
-  let cells="";
-  for(let i=0;i<42;i++){
-    const d=new Date(start); d.setDate(start.getDate()+i);
-    const events=visible().filter(l=>l.start&&sameDay(new Date(l.start),d));
-    cells+=`<div class="cell ${d.getMonth()!==m?"dim":""}"><div class="num">${d.getDate()}</div>${events.slice(0,4).map(l=>`<div class="event ${lessonStatusClass(l.status)}" title="${esc((l.status||'Scheduled')+' · '+lessonName(l))}" onclick="openLesson('${esc(l.notionUrl||"")}')">${esc(fmtTime(l.start))} · ${esc(lessonName(l))}</div>`).join("")}${events.length>4?`<div class="sub">+${events.length-4} more</div>`:""}</div>`;
-  }
-  root.innerHTML=`<div class="cal-head"><button class="cal-nav" onclick="moveMonth(-1)">‹</button><b>${month.toLocaleDateString([],{month:"long",year:"numeric"})}</b><button class="cal-nav" onclick="moveMonth(1)">›</button></div><div class="weekdays">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(x=>`<div>${x}</div>`).join("")}</div><div class="grid">${cells}</div>`;
-}
-window.moveMonth=n=>{month=new Date(month.getFullYear(),month.getMonth()+n,1);renderCalendar()}
-window.openLesson=u=>{if(u) window.top.location.href=u}
+$("listPanel").addEventListener("keydown",e=>{const card=e.target.closest("[data-open-lesson]");if(card&&e.target===card&&(e.key==="Enter"||e.key===" ")){e.preventDefault();const lesson=lessons.find(l=>l.id===card.dataset.openLesson);if(lesson)openLesson(lesson)}});
+document.addEventListener("click",e=>{if(!e.target.closest(".card-menu")&&!e.target.closest("[data-menu-toggle]"))closeMenus()});
+$("calendar").addEventListener("click",e=>{const day=e.target.closest("[data-show-day]");if(day){$("dayModalBack").dataset.day=day.dataset.showDay;openDay(day.dataset.showDay);return}
+  const item=e.target.closest("[data-calendar-lesson]");if(item){const lesson=lessons.find(l=>l.id===item.dataset.calendarLesson);if(lesson)openLesson(lesson);return}
+  const step=e.target.closest("[data-month-step]");if(step){month=new Date(month.getFullYear(),month.getMonth()+Number(step.dataset.monthStep),1);const m1=new Date(month.getFullYear(),month.getMonth()-1,1),m2=new Date(month.getFullYear(),month.getMonth()+2,1);if(!fetchedStart||m1<fetchedStart||m2>fetchedEnd)load();else renderCalendar(visible());return}
+  if(e.target.closest("#calToday")){month=new Date();month.setDate(1);const m1=new Date(month.getFullYear(),month.getMonth()-1,1),m2=new Date(month.getFullYear(),month.getMonth()+2,1);if(!fetchedStart||m1<fetchedStart||m2>fetchedEnd)load();else renderCalendar(visible())}
+});
+$("dayLessonList").addEventListener("change",e=>{const s=e.target.closest("[data-day-status]");if(!s)return;s.disabled=true;changeStatus(s.dataset.dayStatus,s.value).finally(()=>{s.disabled=false})});
+$("dayModalClose").onclick=closeDay;$("dayModalBack").addEventListener("click",e=>{if(e.target===$("dayModalBack"))closeDay()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDay();closeMenus();$("modalBack").classList.remove("show");$("studentModalBack").classList.remove("show")}});
 let pendingLessonDelete=null;
-const deleteConfirm=document.getElementById("deleteConfirm");
-const deleteConfirmText=document.getElementById("deleteConfirmText");
-document.getElementById("listPanel").addEventListener("click",e=>{
-  const b=e.target.closest("[data-delete-lesson]");
-  if(!b)return;
-  const id=b.dataset.deleteLesson,lesson=lessons.find(x=>x.id===id);
-  pendingLessonDelete={id,button:b};
-  deleteConfirmText.textContent=`Delete ${lessonName(lesson||{})} lesson? This will archive it in Notion.`;
-  deleteConfirm.classList.add("show");
-  deleteConfirm.setAttribute("aria-hidden","false");
+const deleteConfirm=$("deleteConfirm"),deleteConfirmText=$("deleteConfirmText");
+$("listPanel").addEventListener("click",e=>{const b=e.target.closest("[data-delete-lesson]");if(!b)return;e.stopPropagation();const id=b.dataset.deleteLesson,l=lessons.find(x=>x.id===id);pendingLessonDelete={id,button:b};deleteConfirmText.textContent=`Archive ${lessonName(l||{})} lesson? This will archive it in Notion.`;deleteConfirm.classList.add("show");deleteConfirm.setAttribute("aria-hidden","false");closeMenus()});
+$("deleteCancel").onclick=()=>{pendingLessonDelete=null;deleteConfirm.classList.remove("show");deleteConfirm.setAttribute("aria-hidden","true")};
+$("deleteYes").onclick=async()=>{if(!pendingLessonDelete)return;const item=pendingLessonDelete;item.button.disabled=true;$("deleteYes").disabled=true;
+  try{await fetchJSON(`${API}/tutoring-lessons`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"delete",lessonId:item.id})});pendingLessonDelete=null;deleteConfirm.classList.remove("show");deleteConfirm.setAttribute("aria-hidden","true");await load();notify("Lesson archived in Notion")}
+  catch(e){deleteConfirmText.textContent="Could not archive lesson: "+e.message;item.button.disabled=false}
+  finally{$("deleteYes").disabled=false}
+};
+$("filters").addEventListener("click",e=>{const b=e.target.closest("[data-filter]");if(!b)return;filter=b.dataset.filter;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));render()});
+$("search").addEventListener("input",render);$("studentFilter").addEventListener("change",render);
+function rangeChanged(){const f=$("dateFrom").value,t=$("dateTo").value;if(f&&t&&f>t){errorBanner("Choose a To date on or after the From date.");render();return}errorBanner("");
+  const need=f&&(!fetchedStart||new Date(f+"T00:00:00")<fetchedStart)||t&&(!fetchedEnd||new Date(t+"T23:59:59")>fetchedEnd);
+  if(need)load();else render();}
+$("dateFrom").addEventListener("change",rangeChanged);$("dateTo").addEventListener("change",rangeChanged);
+$("clearFilters").onclick=()=>{$("search").value="";$("studentFilter").value="all";$("dateFrom").value="";$("dateTo").value="";filter="all";document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.filter==="all"));errorBanner("");render()};
+document.querySelectorAll(".view-toggle").forEach(b=>b.addEventListener("click",()=>{view=b.dataset.view;document.querySelectorAll(".view-toggle").forEach(x=>x.classList.toggle("active",x===b));$("listPanel").style.display=view==="list"?"block":"none";$("calendarPanel").style.display=view==="calendar"?"block":"none";render()}));
+const modal=$("modalBack"),studentModal=$("studentModalBack");
+$("newLesson").onclick=()=>{$("lessonForm").reset();$("subject").innerHTML='<option value="">Choose subject…</option>';$("formError").textContent="";
+  const d=new Date();d.setMinutes(Math.ceil(d.getMinutes()/15)*15,0,0);const end=new Date(d.getTime()+3600000);const local=x=>new Date(x.getTime()-x.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  $("start").value=local(d);$("end").value=local(end);modal.classList.add("show")};
+$("cancel").onclick=()=>modal.classList.remove("show");modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show")});
+function openStudentModal(){$("studentForm").reset();$("newStudentStatus").value="Active";$("studentFormError").textContent="";studentModal.classList.add("show");setTimeout(()=>$('newStudentName').focus(),50)}
+function closeStudentModal(returnToLesson=true){studentModal.classList.remove("show");if(returnToLesson)modal.classList.add("show")}
+$("studentCancel").onclick=()=>closeStudentModal(true);studentModal.addEventListener("click",e=>{if(e.target===studentModal)closeStudentModal(true)});
+$("student").addEventListener("change",()=>{const value=$("student").value;if(value==="__add_student__"){$("student").value="";modal.classList.remove("show");openStudentModal();return}
+  const s=studentById(value);const subjects=s?.subjects||[];$("subject").innerHTML='<option value="">Choose subject…</option>'+subjects.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");if(subjects.length===1)$("subject").value=subjects[0]
 });
-document.getElementById("deleteCancel").onclick=()=>{
-  pendingLessonDelete=null;deleteConfirm.classList.remove("show");deleteConfirm.setAttribute("aria-hidden","true");
-};
-document.getElementById("deleteYes").onclick=async()=>{
-  if(!pendingLessonDelete)return;
-  const item=pendingLessonDelete;
-  item.button.disabled=true;
-  document.getElementById("deleteYes").disabled=true;
-  try{
-    const r=await fetch(`${API}/tutoring-lessons`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"delete",lessonId:item.id})});
-    const d=await r.json().catch(()=>({}));
-    if(!r.ok||!d.success)throw new Error(d.error||"Could not delete lesson.");
-    pendingLessonDelete=null;
-    deleteConfirm.classList.remove("show");
-    deleteConfirm.setAttribute("aria-hidden","true");
-    await load();
-  }catch(err){
-    deleteConfirmText.textContent="Could not delete lesson: "+err.message;
-    item.button.disabled=false;
-  }finally{document.getElementById("deleteYes").disabled=false}
-};
-
-document.getElementById("filters").addEventListener("click",e=>{if(!e.target.dataset.filter)return;filter=e.target.dataset.filter;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===e.target));render()});
-document.getElementById("search").addEventListener("input",render);
-document.querySelectorAll(".view-toggle").forEach(b=>b.addEventListener("click",()=>{view=b.dataset.view;document.querySelectorAll(".view-toggle").forEach(x=>x.classList.toggle("active",x===b));document.getElementById("listPanel").style.display=view==="list"?"block":"none";document.getElementById("calendarPanel").style.display=view==="calendar"?"block":"none";render()}));
-
-const modal=document.getElementById("modalBack");
-document.getElementById("newLesson").onclick=()=>{
-  document.getElementById("lessonForm").reset(); document.getElementById("subject").innerHTML='<option value="">Choose subject…</option>'; document.getElementById("formError").textContent="";
-  const d=new Date(); d.setMinutes(Math.ceil(d.getMinutes()/15)*15,0,0); const e=new Date(d.getTime()+60*60000);
-  const local=x=>new Date(x.getTime()-x.getTimezoneOffset()*60000).toISOString().slice(0,16);
-  document.getElementById("start").value=local(d);document.getElementById("end").value=local(e);modal.classList.add("show");
-};
-document.getElementById("cancel").onclick=()=>modal.classList.remove("show");
-modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show")});
-
-const studentModal=document.getElementById("studentModalBack");
-function openStudentModal(){
-  document.getElementById("studentForm").reset();
-  document.getElementById("newStudentStatus").value="Active";
-  document.getElementById("studentFormError").textContent="";
-  studentModal.classList.add("show");
-  setTimeout(()=>document.getElementById("newStudentName").focus(),50);
-}
-function closeStudentModal(returnToLesson=true){
-  studentModal.classList.remove("show");
-  if(returnToLesson) modal.classList.add("show");
-}
-document.getElementById("studentCancel").onclick=()=>closeStudentModal(true);
-studentModal.addEventListener("click",e=>{if(e.target===studentModal)closeStudentModal(true)});
-
-document.getElementById("studentForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const save=document.getElementById("studentSave");
-  const err=document.getElementById("studentFormError");
-  const name=document.getElementById("newStudentName").value.trim();
-  const grade=document.getElementById("newGrade").value.trim().replace(/^grade\s*/i,"");
-  const subjects=document.getElementById("newSubjects").value.split(",").map(x=>x.trim()).filter(Boolean);
-  const googleChat=document.getElementById("newGoogleChat").value.trim();
-  if(!name)return;
-  save.disabled=true; save.textContent="Saving…"; err.textContent="";
-  try{
-    const r=await fetch(`${API}/tutoring-students-create`,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({name,grade,subjects,status:document.getElementById("newStudentStatus").value,googleChat})
-    });
-    const d=await r.json();
-    if(!r.ok||!d.success) throw new Error(d.error||"Could not create student.");
-    const created=d.student;
-    students.push(created);
-    fillStudents();
-    document.getElementById("student").value=created.id;
-    document.getElementById("subject").innerHTML='<option value="">Choose subject…</option>'+(created.subjects||[]).map(x=>`<option>${esc(x)}</option>`).join("");
-    if((created.subjects||[]).length===1) document.getElementById("subject").value=created.subjects[0];
-    closeStudentModal(true);
-  }catch(ex){err.textContent=ex.message}
-  finally{save.disabled=false;save.textContent="Add Student"}
+$("studentForm").addEventListener("submit",async e=>{e.preventDefault();const save=$("studentSave"),err=$("studentFormError"),name=$("newStudentName").value.trim(),grade=$("newGrade").value.trim().replace(/^grade\s*/i,""),subjects=$("newSubjects").value.split(",").map(x=>x.trim()).filter(Boolean),googleChat=$("newGoogleChat").value.trim();if(!name)return;
+  save.disabled=true;save.textContent="Saving…";err.textContent="";
+  try{const d=await fetchJSON(`${API}/tutoring-students-create`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,grade,subjects,status:$("newStudentStatus").value,googleChat})});const created=d.student;students.push(created);fillStudents();$("student").value=created.id;$("subject").innerHTML='<option value="">Choose subject…</option>'+(created.subjects||[]).map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");if((created.subjects||[]).length===1)$("subject").value=created.subjects[0];closeStudentModal(true)}
+  catch(ex){err.textContent=ex.message}finally{save.disabled=false;save.textContent="Add Student"}
 });
-
-document.getElementById("lessonForm").addEventListener("submit",async e=>{
-  e.preventDefault(); const err=document.getElementById("formError"), save=document.getElementById("save"); err.textContent="";
-  const sid=document.getElementById("student").value, s=studentById(sid), start=document.getElementById("start").value, end=document.getElementById("end").value;
-  if(!s)return;
+$("lessonForm").addEventListener("submit",async e=>{e.preventDefault();const err=$("formError"),save=$("save");err.textContent="";const sid=$("student").value,s=studentById(sid),start=$("start").value,end=$("end").value;
+  if(!s){err.textContent="Choose a student.";return}if(!$("subject").value){err.textContent="Choose a subject.";return}const startTime=new Date(start),endTime=end?new Date(end):null;
+  if(!start||!Number.isFinite(startTime.getTime())||(endTime&&!Number.isFinite(endTime.getTime()))){err.textContent="Enter a valid date and time.";return}if(endTime&&endTime<=startTime){err.textContent="End time must be after start time.";return}
   save.disabled=true;save.textContent="Adding…";
-  try{
-    const r=await fetch(`${API}/tutoring-lessons`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-      studentPageId:sid,studentName:s.name,subject:document.getElementById("subject").value,status:document.getElementById("status").value,
-      start:new Date(start).toISOString(),end:end?new Date(end).toISOString():"",zoomLink:document.getElementById("zoom").value.trim()
-    })});
-    const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Could not create lesson.");
-    modal.classList.remove("show");await load();
-  }catch(ex){err.textContent=ex.message}finally{save.disabled=false;save.textContent="Add Lesson"}
+  try{await fetchJSON(`${API}/tutoring-lessons`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({studentPageId:sid,studentName:s.name,subject:$("subject").value,status:$("status").value,start:startTime.toISOString(),end:endTime?endTime.toISOString():"",zoomLink:$("zoom").value.trim()})});modal.classList.remove("show");await load();notify("Lesson created in Notion")}
+  catch(ex){err.textContent=ex.message}finally{save.disabled=false;save.textContent="Add Lesson"}
 });
 load();
-</script>
-</body>
-</html>
+</script></body></html>
