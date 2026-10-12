@@ -217,6 +217,151 @@ select{
 #additionalNotes{width:100%;resize:vertical;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit;margin-bottom:8px;min-height:110px}.link-form{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.link-form input{min-width:100px;flex:1;border:1px solid var(--line);border-radius:7px;padding:8px;font:inherit}
 
 .deadline-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.deadline-form input{font:inherit;border:1px solid var(--line);border-radius:8px;padding:10px;min-width:0}.deadline-form input[type=text]{flex:2 1 190px}.deadline-form input[type=date]{flex:1 1 145px}.deadline-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}.deadline-row{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid var(--line);border-radius:9px}.deadline-detail{flex:1;min-width:0}.deadline-detail strong{font-size:13px;overflow-wrap:anywhere}.deadline-detail small{display:block;color:var(--muted);margin-top:3px}.deadline-done strong{text-decoration:line-through;opacity:.6}.deadline-overdue small{color:#ad3838}.deadline-delete{border:0;background:transparent;font-size:21px;color:#9A4E49;cursor:pointer;padding:4px 8px}.deadline-detail-link{flex:1;min-width:0;color:inherit;text-decoration:none;display:block;border-radius:6px}.deadline-detail-link:hover strong{text-decoration:underline}.deadline-detail-link:focus-visible{outline:2px solid #8BAF98;outline-offset:3px}.deadline-message{font-size:12px;color:var(--muted);margin-top:8px}
+
+/* === Enhanced Lesson Session — existing palette, more useful workflow === */
+:root{--action:#6F786E;--green:#8BAF98;--danger:#A24C4C;--shadow:0 3px 16px rgba(55,53,47,.035)}
+html,body{max-width:100%;overflow-x:hidden}
+body{font-size:15px;line-height:1.45}
+.wrap{min-width:0;padding:2px 0 20px}
+button,input,textarea,select{font-family:inherit;max-width:100%}
+button{cursor:pointer;touch-action:manipulation}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--action);outline-offset:2px}
+.top{padding:19px 20px 15px;margin:0 0 17px;border-radius:13px;box-shadow:var(--shadow)}
+.lesson-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:750;color:var(--muted);margin-bottom:8px}
+.lesson-header-main{display:flex;align-items:center;justify-content:space-between;gap:22px;min-width:0}
+.lesson-header-title{min-width:0;flex:1}
+.lesson-student{margin:0;font:600 clamp(24px,2.5vw,31px)/1.2 Georgia,'Times New Roman',serif;overflow-wrap:anywhere}
+.lesson-student .student-link{border:0}
+.lesson-student .student-link:hover{text-decoration:underline}
+.lesson-info{margin-top:8px;display:flex;gap:8px 14px;flex-wrap:wrap;align-items:center;font-size:14px;color:#6F6A63}
+.lesson-info #subject{font-weight:650;color:var(--ink)}
+.lesson-info #when{font-variant-numeric:tabular-nums}
+.header-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end;min-width:152px}
+.header-actions .meta-label{font-size:11px;letter-spacing:.05em}
+.status-select{margin:0;padding:10px 12px;border:1px solid #D4D0C9;border-radius:10px;min-width:152px;font-size:14px;background:var(--soft)}
+.status-select[data-state=attended]{background:#E8F5EC;border-color:#B6DAC1;color:#28613B}
+.status-select[data-state=cancelled]{background:#FDECEB;border-color:#F1C6C2;color:#953D35}
+.status-select[data-state=no-show]{background:#E8F0FC;border-color:#C4D6ED;color:#305F94}
+.zoom-panel{margin-top:15px;padding:11px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-radius:10px}
+.zoom-status{margin:0;flex:1}
+.zoom-actions{margin:0;flex:1;justify-content:flex-end}
+.zoom-join{min-height:43px;padding:10px 15px;background:var(--action);color:#fff;font-size:14px}
+.zoom-join:hover{background:#586257}
+.zoom-address{font-size:12px;max-width:330px}
+.status{margin-top:9px;min-height:17px;font-size:12px}
+.section-title{font-size:19px;padding:14px 17px;margin-bottom:13px}
+.session-titlebar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:16px 0 12px}
+.session-titlebar .section-title{margin:0;flex:1}
+.session-summary{display:flex;flex-wrap:wrap;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 13px;min-height:50px;background:#fff;font-size:13px}
+.session-summary strong{font-weight:750}
+.progress-mini{width:80px;height:7px;background:#EEEDEB;border-radius:99px;overflow:hidden}
+.progress-mini span{height:100%;background:var(--green);display:block;width:0%;transition:width .18s}
+.grid{min-width:0;grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{min-width:0;box-shadow:var(--shadow);padding:17px;border-radius:13px}
+.session-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.65fr) minmax(0,1.05fr);align-items:start}
+.workflow-col{min-width:0}
+.workflow-col .card{height:auto}
+.workflow-during{display:flex;flex-direction:column;gap:12px}
+.card h2{font-size:17px;margin-bottom:11px}
+.card-description{font-size:12px;color:var(--muted);line-height:1.45;margin:-4px 0 12px}
+.check{min-height:42px;line-height:1.4;gap:10px;font-size:14px}
+.check input,.topic-row input,.deadline-row input[type=checkbox]{width:19px;height:19px;flex:0 0 19px;accent-color:var(--action)}
+.topic-row{min-height:42px}
+#additionalNotes{min-height:150px;background:#FAF9F7;line-height:1.55;font-size:14px;padding:12px;margin-bottom:0}
+.notes-toolbar{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-top:9px}
+.notes-toolbar .upload-note{margin:0;flex:1;font-size:12px}
+.btn-primary{border:1px solid var(--action)!important;background:var(--action)!important;color:white!important;font-weight:650!important}
+.upload-btn{min-height:42px;font-size:14px;padding:9px 12px;border-radius:9px}
+.upload-btn:disabled{opacity:.55;cursor:wait}
+.completed-summary{border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:15px;flex-wrap:wrap;background:#FAF9F7;margin:12px 0 18px}
+.completed-summary .summary-text{flex:1;min-width:190px}
+.completed-summary .summary-text strong{display:block;font-size:15px}
+.completed-summary .summary-text span{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.completed-summary .summary-count{font-weight:750;color:#52705C;font-size:21px;font-variant-numeric:tabular-nums}
+.deadline-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.deadline-head h2{margin:0}
+.deadline-form-shell{margin-top:14px;padding:14px;background:#FAF9F7;border:1px solid var(--line);border-radius:10px}
+.deadline-form-shell[hidden]{display:none}
+.deadline-form input,.deadline-form select{min-height:42px;font-size:14px}
+.deadline-section{margin-top:13px}
+.deadline-section-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;background:var(--soft);border-radius:9px;color:var(--ink);font-size:13px;font-weight:650}
+.deadline-section-count{font-weight:650;color:var(--muted);background:#fff;border:1px solid var(--line);padding:1px 8px;border-radius:999px}
+.deadline-section-body{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.deadline-row{min-height:56px;background:#fff;padding:11px 12px}
+.deadline-detail strong{font-size:14px}
+.deadline-detail small{font-size:12px}
+.deadline-overdue{border-color:#EDCAC8;background:#FFFAF9}
+.deadline-delete,.file-remove{width:40px;height:40px;min-width:40px;padding:5px;border:0;border-radius:9px;font-size:20px;background:#FBF9F8;color:#9A4E49}
+.file-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.file-card{min-height:190px}
+.file-card h2{margin-bottom:7px}
+.file-actions{margin-top:10px}
+.file-pick-zone{border:1px dashed #CFCAC3;background:#FAF9F7;border-radius:11px;padding:13px;display:flex;flex-direction:column;gap:8px;min-width:0;width:100%}
+.file-pick-zone.busy{opacity:.55}
+.file-pick-title{font-size:13px;font-weight:650;color:var(--ink)}
+.file-input{position:static;display:block;inset:auto;opacity:1;width:100%;height:auto;min-height:42px;border:1px solid #D9D5CF;background:#fff;border-radius:8px;padding:6px;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;touch-action:manipulation}
+.file-input::file-selector-button{background:var(--action);color:#fff;border:0;border-radius:7px;padding:9px 10px;font:inherit;font-weight:650;margin-right:9px;cursor:pointer}
+.file-list{gap:8px;margin-top:12px}
+.file-row{gap:7px;min-width:0}
+.file-link{min-height:43px;font-size:13px;padding:10px;min-width:0}
+.file-link span{white-space:normal;overflow-wrap:anywhere}
+.upload-note{font-size:12px;line-height:1.45;margin-top:10px}
+.link-form{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.2fr) auto;gap:7px;margin-top:12px}
+.link-form input{min-width:0;width:100%;font-size:13px;min-height:42px}
+.upload-queue{margin:12px 0 0;display:flex;flex-direction:column;gap:7px}
+.upload-item{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 10px;display:grid;gap:6px}
+.upload-item-top{display:flex;align-items:center;gap:8px;justify-content:space-between;min-width:0}
+.upload-item-name{font-size:12px;font-weight:650;min-width:0;overflow-wrap:anywhere}
+.upload-item-status{font-size:11px;color:var(--muted);flex:0 0 auto}
+.upload-item[data-status=error]{border-color:#E7C9C6;background:#FFF9F8}
+.upload-item[data-status=error] .upload-item-status{color:#A24C4C}
+.upload-item[data-status=done] .upload-item-status{color:#52705C}
+.upload-track{height:5px;border-radius:999px;background:#EEEDEB;overflow:hidden}
+.upload-bar{display:block;background:#8BAF98;height:100%;width:0;transition:width .2s}
+.upload-feedback{margin-top:7px;font-size:12px;color:var(--muted);min-height:15px}
+.confirm-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:100;background:rgba(55,53,47,.23);padding:17px}
+.confirm-overlay.show{display:flex}
+.confirm-dialog{max-width:410px;width:100%;border-radius:15px;border:1px solid var(--line);background:#fff;box-shadow:0 15px 48px rgba(0,0,0,.14);padding:20px}
+.confirm-dialog h2{margin:0 0 8px;font:600 22px Georgia,serif}
+.confirm-dialog p{font-size:14px;color:#6F6A63;margin:0;line-height:1.5;overflow-wrap:anywhere}
+.confirm-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:20px}
+.confirm-actions button{min-height:42px;border:1px solid var(--line);border-radius:9px;background:white;padding:9px 13px;font-size:14px}
+.confirm-actions .danger{color:#fff;background:#A24C4C;border-color:#A24C4C;font-weight:650}
+@media(max-width:1120px){
+ .session-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);grid-template-areas:'during during' 'before after'}
+ .workflow-before{grid-area:before}.workflow-during{grid-area:during}.workflow-after{grid-area:after}
+ .file-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .file-card:last-child{grid-column:1/-1}
+}
+@media(max-width:780px){
+ .top{padding:16px}
+ .lesson-student{font-size:25px}
+ .file-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .meta{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .session-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .zoom-panel{align-items:flex-start}
+ .zoom-actions{justify-content:flex-start}
+}
+@media(max-width:610px){
+ .lesson-header-main{align-items:stretch;flex-direction:column;gap:13px}
+ .header-actions{align-items:flex-start}
+ .status-select{width:auto;min-width:160px}
+ .zoom-panel{display:block}
+ .zoom-actions{margin-top:7px}
+ .session-grid{grid-template-columns:1fr;grid-template-areas:'during' 'before' 'after'}
+ .grid,.file-grid{grid-template-columns:1fr}
+ .file-card:last-child{grid-column:auto}
+ .session-titlebar{display:block}
+ .session-summary{margin-top:8px}
+ .link-form{grid-template-columns:1fr}
+ .deadline-form{display:grid;grid-template-columns:1fr 1fr}
+ .deadline-form input[type=text],.deadline-form button{grid-column:1/-1}
+ .completed-summary{padding:13px}
+ .section-title{font-size:18px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
 </style>
 </head>
 <body>
@@ -224,22 +369,24 @@ select{
   <div class="top">
     <!-- Kept in the DOM for existing save/upload logic, but no longer shown. -->
     <select id="lesson" hidden aria-hidden="true" tabindex="-1"><option>Loading lessons…</option></select>
-    <div class="meta">
-      <div class="meta-card"><div class="meta-label">Student</div><div id="student" class="meta-value">—</div></div>
-      <div class="meta-card"><div class="meta-label">Subject</div><div id="subject" class="meta-value">—</div></div>
-      <div class="meta-card"><div class="meta-label">Date & time</div><div id="when" class="meta-value">—</div></div>
-      <div class="meta-card">
-  <div class="meta-label">Status / Attendance</div>
-  <select id="lessonStatus" class="status-select" aria-label="Lesson status">
-    <option value="Scheduled">Scheduled</option>
-    <option value="Attended">Attended</option>
-    <option value="Cancelled">Cancelled</option>
-    <option value="No Show">No Show</option>
-  </select>
-</div>
+    <div class="lesson-kicker">Lesson Session · Student Workspace</div>
+    <div class="lesson-header-main">
+      <div class="lesson-header-title">
+        <h1 class="lesson-student" id="student">Loading lesson…</h1>
+        <div class="lesson-info"><span id="subject">—</span><span aria-hidden="true">·</span><span id="when">—</span></div>
+      </div>
+      <div class="header-actions">
+        <label class="meta-label" for="lessonStatus">Status / Attendance</label>
+        <select id="lessonStatus" class="status-select" aria-label="Lesson status">
+          <option value="Scheduled">Scheduled</option>
+          <option value="Attended">Attended</option>
+          <option value="Cancelled">Cancelled</option>
+          <option value="No Show">No Show</option>
+        </select>
+      </div>
     </div>
     <div class="zoom-panel" aria-live="polite">
-      <div class="meta-label">Zoom meeting</div>
+      <div class="meta-label">ZOOM MEETING</div>
       <div id="zoomStatus" class="zoom-status">Loading meeting link…</div>
       <div id="zoomActions" class="zoom-actions" hidden>
         <a id="zoomJoin" class="zoom-join" href="#" target="_blank" rel="noopener noreferrer">Join Zoom meeting ↗</a>
@@ -249,31 +396,36 @@ select{
     <div id="status" class="status"></div>
   </div>
 
-  <div class="section-title">Lesson Session</div>
-  <div class="grid">
-    <section class="card">
+  <div class="session-titlebar">
+    <div class="section-title">Lesson Session</div>
+    <div class="session-summary" aria-live="polite"><strong id="checklistProgressLabel">0 / 8 tasks done</strong><div class="progress-mini" aria-hidden="true"><span id="checklistProgressFill"></span></div></div>
+  </div>
+  <div class="grid session-grid">
+    <section class="card workflow-col workflow-before">
       <h2>Before Lesson</h2>
+      <p class="card-description">A quick check before the meeting begins.</p>
       <label class="check"><input id="notice24h" data-checklist="notice24h" type="checkbox">24h Notice sent</label>
       <label class="check"><input id="notice1h" data-checklist="notice1h" type="checkbox">1h Notice sent</label>
-      <div class="placeholder" style="margin-top:9px">The controls will be connected to the Lesson record after lesson identity is confirmed.</div>
     </section>
-
-    <div>
-    <section class="card" style="margin-bottom:12px">
-      <h2>Additional Topics Covered</h2>
-      <textarea id="additionalNotes" maxlength="20000" rows="5" placeholder="Write anything else you covered during this lesson…" aria-label="Additional topics covered"></textarea>
-      <button type="button" class="upload-btn" id="saveAdditionalNotes">Save notes</button>
-      <div id="notesStatus" class="upload-note" aria-live="polite"></div>
-    </section>
-    <section class="card">
-      <h2>During Lesson</h2>
-      <div class="placeholder"><strong>Topics Covered</strong></div>
-      <div id="topics" style="margin-top:7px"><div class="placeholder">Select a lesson to load this student's Study Plan.</div></div>
-    </section>
-
+    <div class="workflow-col workflow-during">
+      <section class="card">
+        <h2>During Lesson</h2>
+        <p class="card-description">Topics covered from this student's Study Plan.</p>
+        <div id="topics"><div class="placeholder">Loading study plan topics…</div></div>
+      </section>
+      <section class="card">
+        <h2>Additional Topics &amp; Lesson Notes</h2>
+        <p class="card-description">Record explanations, extra material, or follow-up items from the lesson.</p>
+        <textarea id="additionalNotes" maxlength="20000" rows="6" placeholder="What else did you cover this lesson?" aria-label="Additional topics covered"></textarea>
+        <div class="notes-toolbar">
+          <span id="notesStatus" class="upload-note" aria-live="polite">Loading notes…</span>
+          <button type="button" class="upload-btn btn-primary" id="saveAdditionalNotes">Save notes</button>
+        </div>
+      </section>
     </div>
-    <section class="card">
+    <section class="card workflow-col workflow-after">
       <h2>After Lesson</h2>
+      <p class="card-description">Track everything needed to wrap up the session.</p>
       <label class="check"><input id="attendance" data-checklist="attendance" type="checkbox">Attendance recorded</label>
       <label class="check"><input id="transcriptionSaved" data-checklist="transcriptionSaved" type="checkbox">Meeting transcription saved</label>
       <label class="check"><input id="recordingSaved" data-checklist="recordingSaved" type="checkbox">Lesson recording saved</label>
@@ -282,62 +434,101 @@ select{
       <label class="check"><input id="lessonNotesSent" data-checklist="lessonNotesSent" type="checkbox">Lesson notes completed</label>
     </section>
   </div>
-
+  <div class="completed-summary" aria-live="polite">
+    <div class="summary-text"><strong id="sessionWrapTitle">Session wrap-up</strong><span id="sessionWrapNote">Complete the after-lesson checklist to finish the session.</span></div>
+    <div class="summary-count" id="sessionWrapCount">0 / 6</div>
+  </div>
 
   <div class="section-title">Deadlines</div>
   <section class="card" style="margin-bottom:16px">
-    <h2>Student Deadlines</h2>
-    <div class="upload-note" style="margin-bottom:10px">Synced with your existing Notion Tutoring Deadlines database.</div>
-    <div class="deadline-form">
-      <input type="text" id="deadlineTitle" maxlength="200" placeholder="Task or assignment" aria-label="Deadline task">
-      <input type="date" id="deadlineDate" aria-label="Deadline date">
-      <select id="deadlineType" aria-label="Deadline type" style="flex:1 1 140px"><option value="">Type (optional)</option></select>
-      <select id="deadlineSubject" aria-label="Deadline subject" style="flex:1 1 140px"><option value="">Subject (optional)</option></select>
-      <button type="button" class="upload-btn" id="addDeadline">+ Add deadline</button>
+    <div class="deadline-head">
+      <div><h2>Student Deadlines</h2><div class="card-description" style="margin:5px 0 0">Synced with your Notion Tutoring Deadlines database.</div></div>
+      <button type="button" id="toggleDeadlineForm" class="upload-btn btn-primary" aria-expanded="false" aria-controls="deadlineFormShell">+ Add Deadline</button>
     </div>
-    <textarea id="deadlineNotes" rows="2" maxlength="2000" placeholder="Deadline notes (optional)" style="width:100%;margin-top:9px;border:1px solid var(--line);border-radius:8px;padding:9px;font:inherit"></textarea>
+    <div class="deadline-form-shell" id="deadlineFormShell" hidden>
+      <div class="deadline-form">
+        <input type="text" id="deadlineTitle" maxlength="200" placeholder="Task or assignment" aria-label="Deadline task">
+        <input type="date" id="deadlineDate" aria-label="Deadline date">
+        <select id="deadlineType" aria-label="Deadline type" style="flex:1 1 140px"><option value="">Type (optional)</option></select>
+        <select id="deadlineSubject" aria-label="Deadline subject" style="flex:1 1 140px"><option value="">Subject (optional)</option></select>
+        <button type="button" class="upload-btn btn-primary" id="addDeadline">Save deadline</button>
+      </div>
+      <textarea id="deadlineNotes" rows="2" maxlength="2000" placeholder="Deadline notes (optional)" style="width:100%;margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:11px;font:inherit"></textarea>
+    </div>
     <div id="deadlineMessage" class="deadline-message" aria-live="polite"></div>
     <div id="deadlineList" class="deadline-list"></div>
   </section>
 
-  <div class="section-title">Files & Resources</div>
-  <div class="grid">
-    <div class="card">
+  <div class="section-title">Files &amp; Resources</div>
+  <div class="grid file-grid">
+    <section class="card file-card">
       <h2>Lecture Notes</h2>
-      <div class="file-actions">
-        <label class="upload-btn" id="lectureNotesBtn">+ Upload files
-          <input class="file-input" id="lectureNotesInput" type="file" multiple>
-        </label>
-      </div>
+      <p class="card-description">Reference materials and lecture files.</p>
+      <div class="file-actions"><div class="file-pick-zone" id="lectureNotesBtn">
+        <span class="file-pick-title">Choose files to upload</span>
+        <input class="file-input" id="lectureNotesInput" type="file" multiple aria-label="Select lecture notes files">
+      </div></div>
+      <div class="upload-queue" id="lectureNotesQueue" aria-live="polite"></div>
       <div class="file-list" id="lectureNotesList"></div>
-      <div class="upload-note">PDF, Word, PowerPoint, images and other Notion-supported files · up to 100 MB each</div>
-    </div>
-    <div class="card">
-      <h2>Homework & Worksheets</h2>
-      <div class="file-actions">
-        <label class="upload-btn" id="homeworkWorksheetsBtn">+ Upload files
-          <input class="file-input" id="homeworkWorksheetsInput" type="file" multiple>
-        </label>
-      </div>
+      <div class="upload-note">Multiple files supported · up to 100 MB each</div>
+    </section>
+    <section class="card file-card">
+      <h2>Homework &amp; Worksheets</h2>
+      <p class="card-description">Upload worksheets or attach web links.</p>
+      <div class="file-actions"><div class="file-pick-zone" id="homeworkWorksheetsBtn">
+        <span class="file-pick-title">Choose files to upload</span>
+        <input class="file-input" id="homeworkWorksheetsInput" type="file" multiple aria-label="Select homework and worksheet files">
+      </div></div>
+      <div class="upload-queue" id="homeworkWorksheetsQueue" aria-live="polite"></div>
       <div class="link-form"><input id="homeworkLinkName" placeholder="Link title (optional)" aria-label="Homework link title"><input type="url" id="homeworkLinkURL" placeholder="https://…" aria-label="Homework web link"><button type="button" class="upload-btn" id="addHomeworkLink">+ Add link</button></div>
       <div class="file-list" id="homeworkWorksheetsList"></div>
-      <div class="upload-note">You can select several homework/worksheet files together · up to 100 MB each</div>
-    </div>
-    <div class="card">
-      <h2>Recording & Transcription</h2>
-      <div class="file-actions">
-        <label class="upload-btn" id="recordingTranscriptionBtn">+ Upload files
-          <input class="file-input" id="recordingTranscriptionInput" type="file" multiple>
-        </label>
-      </div>
+      <div class="upload-note">Multiple files and web links · up to 100 MB per file</div>
+    </section>
+    <section class="card file-card">
+      <h2>Recording &amp; Transcription</h2>
+      <p class="card-description">Recordings and transcript files.</p>
+      <div class="file-actions"><div class="file-pick-zone" id="recordingTranscriptionBtn">
+        <span class="file-pick-title">Choose files to upload</span>
+        <input class="file-input" id="recordingTranscriptionInput" type="file" multiple aria-label="Select recordings and transcriptions">
+      </div></div>
+      <div class="upload-queue" id="recordingTranscriptionQueue" aria-live="polite"></div>
       <div class="file-list" id="recordingTranscriptionList"></div>
-      <div class="upload-note">Upload the lesson recording, transcript, or both · up to 100 MB each</div>
-    </div>
+      <div class="upload-note">Upload your recording, transcript, or both · up to 100 MB each</div>
+    </section>
+  </div>
+</div>
+<div class="confirm-overlay" id="actionConfirm" aria-hidden="true">
+  <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="actionConfirmTitle">
+    <h2 id="actionConfirmTitle">Confirm removal</h2>
+    <p id="actionConfirmBody">Are you sure?</p>
+    <div class="confirm-actions"><button type="button" id="actionConfirmCancel">Cancel</button><button type="button" class="danger" id="actionConfirmYes">Remove</button></div>
   </div>
 </div>
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
 let lessons=[],studentRecords=[];
+let confirmResolve=null;
+function confirmAction(title,body,label="Remove"){
+  if(confirmResolve){confirmResolve(false);confirmResolve=null;}
+  const overlay=document.getElementById("actionConfirm");
+  document.getElementById("actionConfirmTitle").textContent=title;
+  document.getElementById("actionConfirmBody").textContent=body;
+  document.getElementById("actionConfirmYes").textContent=label;
+  overlay.classList.add("show");overlay.setAttribute("aria-hidden","false");
+  return new Promise(resolve=>confirmResolve=resolve);
+}
+function closeConfirm(result){
+  const overlay=document.getElementById("actionConfirm");
+  overlay.classList.remove("show");overlay.setAttribute("aria-hidden","true");
+  const fn=confirmResolve;confirmResolve=null;if(fn)fn(result);
+}
+document.getElementById("actionConfirmCancel").addEventListener("click",()=>closeConfirm(false));
+document.getElementById("actionConfirmYes").addEventListener("click",()=>closeConfirm(true));
+document.getElementById("actionConfirm").addEventListener("click",e=>{if(e.target.id==="actionConfirm")closeConfirm(false)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&confirmResolve)closeConfirm(false)});
+function prettySize(bytes){return bytes<1024*1024?`${Math.max(1,Math.round(bytes/1024))} KB`:`${(bytes/1024/1024).toFixed(1)} MB`;}
+function safeTime(){return new Date().toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});}
+
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function fmt(d){
@@ -405,96 +596,100 @@ function escapeHTML(value){
 let resourceBusy=false;
 function setResourceBusy(busy){
   resourceBusy=busy;
-  document.querySelectorAll('.file-input,.file-remove,#addHomeworkLink,#saveAdditionalNotes').forEach(el=>el.disabled=busy);
+  document.querySelectorAll('.file-input,.file-remove,#addHomeworkLink').forEach(el=>el.disabled=busy);
   document.getElementById("lesson").disabled=busy;
+}
+function fileIcon(f){
+  const name=String(f?.name||"").toLowerCase();
+  if(f?.type==="external"||/^https?:/.test(f?.url||"")&&/link|website|url/.test(name))return "🔗";
+  if(/\.(png|jpe?g|gif|webp|heic|svg)$/.test(name))return "🖼️";
+  if(/\.(mp4|mov|webm|m4v|mkv)$/.test(name))return "🎬";
+  if(/\.(mp3|m4a|wav|aac)$/.test(name))return "🎧";
+  return "📄";
 }
 function renderResourceFiles(lesson){
   if(lesson?.id!==document.getElementById("lesson").value)return;
-  const groups={
-    lectureNotes: lesson?.resources?.lectureNotes || [],
-    homeworkWorksheets: lesson?.resources?.homeworkWorksheets || [],
-    recordingTranscription: lesson?.resources?.recordingTranscription || []
-  };
+  const groups={lectureNotes:lesson?.resources?.lectureNotes||[],homeworkWorksheets:lesson?.resources?.homeworkWorksheets||[],recordingTranscription:lesson?.resources?.recordingTranscription||[]};
   Object.entries(groups).forEach(([category,files])=>{
-    const box=document.getElementById(category+"List");
-    if(!box)return;
-    if(!files.length){
-      box.innerHTML='<div class="placeholder">No files uploaded yet.</div>';
-      return;
-    }
+    const box=document.getElementById(category+"List");if(!box)return;
+    if(!files.length){box.innerHTML='<div class="placeholder">No files uploaded yet.</div>';return;}
     box.innerHTML=files.map((f,index)=>{
-      const safeName=escapeHTML(f.name||"File");
-      const link=f.url?`<a class="file-link" href="${escapeHTML(f.url)}" target="_blank" rel="noopener">📎 <span>${safeName}</span></a>`:`<div class="file-link">📎 <span>${safeName}</span></div>`;
-      return `<div class="file-row">${link}<button type="button" class="file-remove" data-category="${category}" data-index="${index}" aria-label="Remove ${safeName}" title="Remove file" ${resourceBusy?'disabled':''}>×</button></div>`;
+      const safeName=escapeHTML(f.name||"File"),symbol=fileIcon(f);
+      let url=null;try{const u=new URL(f.url||"");if(["http:","https:"].includes(u.protocol))url=u.href}catch{}
+      const item=url?`<a class="file-link" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">${symbol}</span> <span>${safeName}</span></a>`:`<div class="file-link"><span aria-hidden="true">${symbol}</span><span>${safeName}</span></div>`;
+      return `<div class="file-row">${item}<button type="button" class="file-remove" data-category="${category}" data-index="${index}" aria-label="Remove ${safeName}" title="Remove file" ${resourceBusy?'disabled':''}>×</button></div>`;
     }).join("");
-    box.querySelectorAll('.file-remove').forEach(button=>button.addEventListener('click',()=>removeLessonFile(category,Number(button.dataset.index))));
+    box.querySelectorAll('.file-remove').forEach(b=>b.addEventListener('click',()=>removeLessonFile(category,Number(b.dataset.index))));
   });
 }
-
+function newUploadProgress(category,files){
+  const box=document.getElementById(category+"Queue");
+  box.innerHTML=files.map((f,i)=>`<div class="upload-item" data-status="waiting" data-upload-index="${i}">
+    <div class="upload-item-top"><span class="upload-item-name">${escapeHTML(f.name)} <span style="color:var(--muted);font-weight:400">· ${prettySize(f.size)}</span></span><span class="upload-item-status">Waiting</span></div>
+    <div class="upload-track"><span class="upload-bar"></span></div>
+  </div>`).join("");
+}
+function setUploadProgress(category,index,status,text,percent){
+ const el=document.querySelector(`#${category}Queue [data-upload-index="${index}"]`);if(!el)return;
+ el.dataset.status=status;
+ el.querySelector('.upload-item-status').textContent=text;
+ if(percent!=null)el.querySelector('.upload-bar').style.width=Math.max(0,Math.min(100,percent))+"%";
+ if(status==='error')el.querySelector('.upload-item-status').title=text;
+}
 async function uploadLessonFiles(category,fileList){
   const lessonId=document.getElementById("lesson").value;
-  if(resourceBusy || !lessonId || !fileList?.length)return;
-
-  const files=[...fileList];
-  const oversized=files.find(f=>f.size>100*1024*1024);
-  if(oversized){
-    document.getElementById("status").textContent=`${oversized.name} is larger than 100 MB.`;
-    return;
+  if(resourceBusy||!lessonId||!fileList?.length)return;
+  const files=Array.from(fileList);
+  const btn=document.getElementById(category+"Btn"),input=document.getElementById(category+"Input");
+  const status=document.getElementById("status");
+  newUploadProgress(category,files);
+  setResourceBusy(true);btn.classList.add("busy");
+  status.textContent=`Uploading ${files.length} file${files.length===1?'':'s'}…`;
+  let completed=0,failed=0;
+  async function postR2(body){
+    const isForm=body instanceof FormData;
+    const r=await fetch(API+"/tutoring-r2-upload",{method:"POST",body:isForm?body:JSON.stringify(body),...(isForm?{}:{headers:{"Content-Type":"application/json"}})});
+    const raw=await r.text();let d;try{d=JSON.parse(raw)}catch{throw new Error("Upload server returned HTTP "+r.status)}
+    if(!r.ok||!d.success)throw new Error(d.error||"Upload request failed");return d;
   }
-
-  const btn=document.getElementById(category+"Btn");
-  const input=document.getElementById(category+"Input");
-  setResourceBusy(true);
-  btn.classList.add("busy");
-  document.getElementById("status").textContent=`Uploading ${files.length} file(s)…`;
-
   try{
-    async function postR2(body){
-      const isForm=body instanceof FormData;
-      const r=await fetch(API+"/tutoring-r2-upload",{method:"POST",body:isForm?body:JSON.stringify(body),...(isForm?{}:{headers:{"Content-Type":"application/json"}})});
-      const raw=await r.text();let d;try{d=JSON.parse(raw)}catch{throw new Error("Upload server returned HTTP "+r.status)}
-      if(!r.ok||!d.success)throw new Error(d.error||"Upload request failed");return d;
+    for(let i=0;i<files.length;i++){
+      const file=files[i];
+      if(file.size>100*1024*1024){failed++;setUploadProgress(category,i,'error','Exceeds 100 MB limit',0);continue}
+      try{
+        setUploadProgress(category,i,'uploading','Uploading…',0);
+        let d;
+        if(file.size<=5*1024*1024){
+          const form=new FormData();form.append("lessonId",lessonId);form.append("category",category);form.append("files",file,file.name);
+          const r=await fetch(API+"/tutoring-lesson-files",{method:"POST",body:form});
+          d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw new Error(d.error||"Notion upload failed");
+        }else{
+          const init=await postR2({action:"init",lessonId,category,name:file.name,size:file.size,contentType:file.type});
+          const CHUNK=8*1024*1024,parts=[];
+          try{
+            for(let part=1;part<=init.parts;part++){
+              const blob=file.slice((part-1)*CHUNK,Math.min(part*CHUNK,file.size));
+              const form=new FormData();form.append("action","part");form.append("lessonId",lessonId);form.append("category",category);
+              form.append("key",init.key);form.append("uploadId",init.uploadId);form.append("partNumber",String(part));form.append("file",blob,file.name);
+              const result=await postR2(form);parts.push({partNumber:result.partNumber,etag:result.etag});
+              const percent=Math.round(part/init.parts*95);
+              setUploadProgress(category,i,'uploading',`${percent}% · ${part}/${init.parts} parts sent`,percent);
+            }
+            setUploadProgress(category,i,'uploading','Finalizing…',95);
+            d=await postR2({action:"finish",lessonId,category,key:init.key,uploadId:init.uploadId,parts,name:file.name});
+          }catch(error){try{await postR2({action:"abort",lessonId,category,key:init.key,uploadId:init.uploadId})}catch{}throw error;}
+        }
+        const lesson=lessons.find(x=>x.id===lessonId);
+        if(lesson){lesson.resources=lesson.resources||{};lesson.resources[category]=d.files||[];renderResourceFiles(lesson);}
+        completed++;setUploadProgress(category,i,'done','Uploaded ✓',100);
+      }catch(error){failed++;setUploadProgress(category,i,'error',`Failed · ${error.message}`,0)}
     }
-    let d;
-    for(let fileIndex=0;fileIndex<files.length;fileIndex++){
-      const file=files[fileIndex];
-      if(file.size<=5*1024*1024){
-        const form=new FormData();form.append("lessonId",lessonId);form.append("category",category);form.append("files",file,file.name);
-        const r=await fetch(API+"/tutoring-lesson-files",{method:"POST",body:form});
-        d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Notion upload failed");
-      }else{
-        const init=await postR2({action:"init",lessonId,category,name:file.name,size:file.size,contentType:file.type});
-        const CHUNK=8*1024*1024,parts=[];
-        try{
-          for(let part=1;part<=init.parts;part++){
-            const blob=file.slice((part-1)*CHUNK,Math.min(part*CHUNK,file.size));
-            const form=new FormData();form.append("action","part");form.append("lessonId",lessonId);form.append("category",category);
-            form.append("key",init.key);form.append("uploadId",init.uploadId);form.append("partNumber",String(part));form.append("file",blob,file.name);
-            const result=await postR2(form);parts.push({partNumber:result.partNumber,etag:result.etag});
-            document.getElementById("status").textContent=`Uploading ${fileIndex+1}/${files.length}: ${file.name} — ${Math.round(part/init.parts*100)}%`;
-          }
-          d=await postR2({action:"finish",lessonId,category,key:init.key,uploadId:init.uploadId,parts,name:file.name});
-        }catch(error){try{await postR2({action:"abort",lessonId,category,key:init.key,uploadId:init.uploadId})}catch{}throw error;}
-      }
-    }
-
     const lesson=lessons.find(x=>x.id===lessonId);
-    if(lesson){
-      lesson.resources=lesson.resources||{};
-      lesson.resources[category]=d.files||[];
-      renderResourceFiles(lesson);
-    }
-
-    // Refresh only this lesson's resources; lesson loading remains untouched.
-    if(lesson) await loadLessonResources(lesson);
-
-    document.getElementById("status").textContent="Files uploaded ✓";
-  }catch(e){
-    document.getElementById("status").textContent="Could not upload: "+e.message;
+    if(lesson&&completed)await loadLessonResources(lesson);
+    if(failed) status.textContent=`${completed} uploaded · ${failed} failed. Review each file below.`;
+    else status.textContent=`${completed} file${completed===1?'':'s'} uploaded ✓`;
   }finally{
-    setResourceBusy(false);
-    btn.classList.remove("busy");
-    input.value="";
+    setResourceBusy(false);btn.classList.remove("busy");input.value="";
   }
 }
 
@@ -503,14 +698,16 @@ async function removeLessonFile(category,index){
   const lessonId=document.getElementById("lesson").value;
   const lesson=lessons.find(l=>l.id===lessonId),file=lesson?.resources?.[category]?.[index];
   if(!file)return;
+  const confirmed=await confirmAction("Remove file?",`Remove “${file.name||'this file'}” from this lesson's resources?`,"Remove file");
+  if(!confirmed||resourceBusy||document.getElementById("lesson").value!==lessonId)return;
   setResourceBusy(true);
   const status=document.getElementById("status");status.textContent="Removing file…";
   try{
     const r=await fetch(API+"/tutoring-lesson-files",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"remove",lessonId,category,fileIndex:index,fileKey:file.key})});
     const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Could not remove file.");
     lesson.resources[category]=d.files||[];renderResourceFiles(lesson);status.textContent="File removed ✓";
-  }catch(e){await loadLessonResources(lesson);status.textContent="Could not remove file: "+e.message;}
-  finally{setResourceBusy(false);}
+  }catch(e){await loadLessonResources(lesson);status.textContent="Could not remove file: "+e.message}
+  finally{setResourceBusy(false);renderResourceFiles(lesson)}
 }
 
 async function addHomeworkLink(){
@@ -528,28 +725,37 @@ async function addHomeworkLink(){
   }catch(e){document.getElementById("status").textContent=e.message;}finally{setResourceBusy(false);}
 }
 const noteDrafts=new Map();
-let notesLessonId="";
+let notesLessonId="",notesSaving=false;
 async function loadAdditionalNotes(id){
   notesLessonId=id;
   const input=document.getElementById("additionalNotes"),status=document.getElementById("notesStatus");
-  input.value=noteDrafts.get(id)||"";status.textContent=noteDrafts.has(id)?"Unsaved notes":"Loading notes…";
+  const hasDraft=noteDrafts.has(id);
+  input.value=hasDraft?noteDrafts.get(id):"";
+  status.textContent=hasDraft?"Unsaved notes":"Loading notes…";
   try{
-    const r=await fetch(API+"/tutoring-lesson-notes?lessonId="+encodeURIComponent(id),{cache:"no-store"});const d=await r.json();
-    if(!r.ok||!d.success)throw new Error(d.error||"Could not load notes.");
-    if(notesLessonId===id&&!noteDrafts.has(id)){input.value=d.notes||"";status.textContent="";}
-  }catch(e){if(notesLessonId===id)status.textContent=e.message;}
+    const r=await fetch(API+"/tutoring-lesson-notes?lessonId="+encodeURIComponent(id),{cache:"no-store"});
+    const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Could not load notes.");
+    if(notesLessonId===id&&!noteDrafts.has(id)){input.value=d.notes||"";status.textContent="Loaded from Notion";}
+  }catch(e){if(notesLessonId===id)status.textContent="Could not load notes: "+e.message}
 }
 async function saveAdditionalNotes(){
-  if(resourceBusy||!notesLessonId)return;
-  const id=notesLessonId,input=document.getElementById("additionalNotes"),notes=input.value,status=document.getElementById("notesStatus");
-  noteDrafts.set(id,notes);setResourceBusy(true);input.disabled=true;status.textContent="Saving…";
+  if(notesSaving||!notesLessonId)return;
+  const id=notesLessonId,input=document.getElementById("additionalNotes"),notes=input.value,status=document.getElementById("notesStatus"),saveBtn=document.getElementById("saveAdditionalNotes");
+  noteDrafts.set(id,notes);notesSaving=true;saveBtn.disabled=true;status.textContent="Saving to Notion…";
   try{
-    const r=await fetch(API+"/tutoring-lesson-notes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:id,notes})});const d=await r.json();
-    if(!r.ok||!d.success)throw new Error(d.error||"Could not save notes.");
-    noteDrafts.delete(id);status.textContent="Notes saved ✓";
-  }catch(e){status.textContent=e.message;}finally{input.disabled=false;setResourceBusy(false);}
+    const r=await fetch(API+"/tutoring-lesson-notes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:id,notes})});
+    const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw new Error(d.error||"Could not save notes.");
+    if(notesLessonId===id){
+      if(input.value===notes){noteDrafts.delete(id);status.textContent="Saved to Notion at "+safeTime()+" ✓";}
+      else{noteDrafts.set(id,input.value);status.textContent="New changes not saved yet · Save again";}
+    }else if(noteDrafts.get(id)===notes)noteDrafts.delete(id);
+  }catch(e){if(notesLessonId===id)status.textContent="Not saved · "+e.message;}
+  finally{notesSaving=false;saveBtn.disabled=false;}
 }
-document.getElementById("additionalNotes").addEventListener("input",e=>{if(notesLessonId)noteDrafts.set(notesLessonId,e.target.value);document.getElementById("notesStatus").textContent="Unsaved notes";});
+document.getElementById("additionalNotes").addEventListener("input",e=>{
+ if(notesLessonId)noteDrafts.set(notesLessonId,e.target.value);
+ document.getElementById("notesStatus").textContent="Unsaved changes · Select Save notes";
+});
 document.getElementById("saveAdditionalNotes").addEventListener("click",saveAdditionalNotes);
 document.getElementById("addHomeworkLink").addEventListener("click",addHomeworkLink);
 
@@ -562,53 +768,41 @@ function bindResourceUploads(){
 }
 
 function checklistState(){
-  const state={};
-  document.querySelectorAll('input[data-checklist]').forEach(cb=>{
-    state[cb.dataset.checklist]=cb.checked;
-  });
-  return state;
+ const state={};document.querySelectorAll('input[data-checklist]').forEach(cb=>state[cb.dataset.checklist]=cb.checked);return state;
+}
+function updateChecklistSummary(){
+  const all=[...document.querySelectorAll('input[data-checklist]')];
+  const done=all.filter(cb=>cb.checked).length;
+  document.getElementById('checklistProgressLabel').textContent=`${done} / ${all.length} tasks done`;
+  document.getElementById('checklistProgressFill').style.width=(all.length?done/all.length*100:0)+'%';
+  const after=[...document.querySelectorAll('.workflow-after input[data-checklist]')];
+  const complete=after.filter(cb=>cb.checked).length;
+  document.getElementById('sessionWrapCount').textContent=`${complete} / ${after.length}`;
+  document.getElementById('sessionWrapTitle').textContent=complete===after.length?'Session wrap-up complete ✓':'Session wrap-up';
+  document.getElementById('sessionWrapNote').textContent=complete===after.length?'All post-lesson tasks are marked complete.':`${after.length-complete} post-lesson task${after.length-complete===1?'':'s'} remaining`;
 }
 function loadChecklist(lesson){
-  const saved=lesson?.checklist||{};
-  document.querySelectorAll('input[data-checklist]').forEach(cb=>{
-    cb.checked=!!saved[cb.dataset.checklist];
-    cb.disabled=false;
-  });
+ const saved=lesson?.checklist||{};
+ document.querySelectorAll('input[data-checklist]').forEach(cb=>{cb.checked=!!saved[cb.dataset.checklist];cb.disabled=false});
+ updateChecklistSummary();
 }
+let checklistSaving=false;
 async function saveChecklist(){
-  const lessonId=document.getElementById("lesson").value;
-  const boxes=[...document.querySelectorAll('input[data-checklist]')];
-  const checklist=checklistState();
-  const status=document.getElementById("status");
-  boxes.forEach(x=>x.disabled=true);
-  status.textContent="Saving checklist…";
-  try{
-    const r=await fetch(API+"/tutoring-lessons",{
-      method:"PATCH",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({lessonId,checklist})
-    });
-    const d=await r.json();
-    if(!r.ok||!d.success)throw new Error(d.error||"Could not save checklist");
-    const lesson=lessons.find(x=>x.id===lessonId);
-    if(lesson) lesson.checklist={...checklist};
-    status.textContent="Checklist saved ✓";
-  }finally{
-    boxes.forEach(x=>x.disabled=false);
-  }
+ if(checklistSaving)return;
+ const lessonId=document.getElementById('lesson').value,lesson=lessons.find(x=>x.id===lessonId);
+ if(!lesson)return;
+ const boxes=[...document.querySelectorAll('input[data-checklist]')],checklist=checklistState(),previous={...(lesson.checklist||{})};
+ checklistSaving=true;boxes.forEach(x=>x.disabled=true);updateChecklistSummary();
+ const status=document.getElementById('status');status.textContent='Saving checklist…';
+ try{
+  const r=await fetch(API+'/tutoring-lessons',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({lessonId,checklist})});
+  const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw Error(d.error||'Could not save checklist');
+  lesson.checklist={...checklist};status.textContent='Checklist saved to Notion ✓';
+ }catch(e){lesson.checklist=previous;loadChecklist(lesson);status.textContent='Checklist NOT saved: '+e.message;}
+ finally{boxes.forEach(x=>x.disabled=false);checklistSaving=false;updateChecklistSummary()}
 }
 function bindChecklist(){
-  document.querySelectorAll('input[data-checklist]').forEach(cb=>{
-    cb.addEventListener("change",async()=>{
-      const previous=!cb.checked;
-      try{
-        await saveChecklist();
-      }catch(e){
-        cb.checked=previous;
-        document.getElementById("status").textContent="Could not save: "+e.message;
-      }
-    });
-  });
+  document.querySelectorAll('input[data-checklist]').forEach(cb=>cb.addEventListener('change',()=>saveChecklist()));
 }
 
 async function loadTopics(studentPageId){
@@ -664,21 +858,31 @@ function renderDeadlineOptions(options){
   if(values.includes(previous))el.value=previous;
  }
 }
+function localYmd(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function renderDeadlines(){
- const list=document.getElementById("deadlineList");
+ const list=document.getElementById('deadlineList');
  if(!deadlineStudentId){list.innerHTML='<div class="placeholder">This lesson has no linked student record.</div>';return;}
  if(!deadlineItems.length){list.innerHTML='<div class="placeholder">No deadlines for this student yet.</div>';return;}
- const today=new Date().toLocaleDateString('en-CA');
- list.innerHTML=[...deadlineItems].sort((a,b)=>Number(a.status==='Done')-Number(b.status==='Done')||a.date.localeCompare(b.date)).map(d=>{
-  const done=d.status==='Done',overdue=!done&&d.date<today;
-  return `<div class="deadline-row ${done?'deadline-done':''} ${overdue?'deadline-overdue':''}">
-   <input type="checkbox" data-deadline-check="${esc(d.id)}" ${done?'checked':''} ${deadlineBusy?'disabled':''} aria-label="Mark deadline complete">
-   ${d.notionUrl?'<a class="deadline-detail-link" href="'+esc(d.notionUrl)+'" target="_blank" rel="noopener noreferrer" aria-label="Open '+esc(d.title)+' in Notion">':'<div class="deadline-detail-link">'}<div class="deadline-detail"><strong>${esc(d.title)}</strong><small>Due ${esc(d.date)}${d.type?' · '+esc(d.type):''}${d.subject?' · '+esc(d.subject):''}${overdue?' · Overdue':''}</small>${d.notes?'<small>'+esc(d.notes)+'</small>':''}</div>${d.notionUrl?'</a>':'</div>'}
-   <button type="button" class="deadline-delete" data-deadline-delete="${esc(d.id)}" ${deadlineBusy?'disabled':''} aria-label="Delete deadline">×</button>
-  </div>`;
- }).join('');
+ const today=localYmd();
+ const groups=[
+   {name:'Overdue',items:deadlineItems.filter(d=>d.status!=='Done'&&d.date&&d.date<today)},
+   {name:'Upcoming',items:deadlineItems.filter(d=>d.status!=='Done'&&(!d.date||d.date>=today))},
+   {name:'Completed',items:deadlineItems.filter(d=>d.status==='Done')}
+ ];
+ const row=d=>{
+   const done=d.status==='Done',overdue=!done&&d.date<today;
+   return `<div class="deadline-row ${done?'deadline-done':''} ${overdue?'deadline-overdue':''}">
+    <input type="checkbox" data-deadline-check="${esc(d.id)}" ${done?'checked':''} ${deadlineBusy?'disabled':''} aria-label="Mark deadline complete">
+    ${d.notionUrl?'<a class="deadline-detail-link" href="'+esc(d.notionUrl)+'" target="_blank" rel="noopener noreferrer" aria-label="Open '+esc(d.title)+' in Notion">':'<div class="deadline-detail-link">'}<div class="deadline-detail"><strong>${esc(d.title)}</strong><small>Due ${esc(d.date||'No date')}${d.type?' · '+esc(d.type):''}${d.subject?' · '+esc(d.subject):''}${overdue?' · Overdue':''}</small>${d.notes?'<small>'+esc(d.notes)+'</small>':''}</div>${d.notionUrl?'</a>':'</div>'}
+    <button type="button" class="deadline-delete" data-deadline-delete="${esc(d.id)}" ${deadlineBusy?'disabled':''} aria-label="Delete deadline">×</button>
+   </div>`;
+ };
+ list.innerHTML=groups.map(group=>`<div class="deadline-section"><div class="deadline-section-header"><span>${group.name}</span><span class="deadline-section-count">${group.items.length}</span></div><div class="deadline-section-body">${group.items.length?group.items.slice().sort((a,b)=>group.name==='Completed'?String(b.date||'').localeCompare(String(a.date||'')):String(a.date||'').localeCompare(String(b.date||''))).map(row).join(''):'<div class="placeholder">Nothing here.</div>'}</div></div>`).join('');
  list.querySelectorAll('[data-deadline-check]').forEach(el=>el.addEventListener('change',()=>changeDeadline(el.dataset.deadlineCheck,'toggle')));
- list.querySelectorAll('[data-deadline-delete]').forEach(el=>el.addEventListener('click',()=>{if(confirm('Delete this deadline from Notion?'))changeDeadline(el.dataset.deadlineDelete,'delete');}));
+ list.querySelectorAll('[data-deadline-delete]').forEach(el=>el.addEventListener('click',async()=>{
+   const item=deadlineItems.find(d=>d.id===el.dataset.deadlineDelete);
+   if(await confirmAction('Delete deadline?',`Delete “${item?.title||'this deadline'}” from Notion?`,'Delete'))changeDeadline(el.dataset.deadlineDelete,'delete');
+ }));
 }
 async function loadStudentDeadlines(lesson){
  const studentId=deadlineStudentForLesson(lesson),generation=++deadlineGeneration;
@@ -709,12 +913,24 @@ async function changeDeadline(id,action){
   const d=await r.json();if(!r.ok||!d.success)throw Error(d.error||'Could not save deadline');
   if(generation!==deadlineGeneration)return;
   deadlineItems=d.deadlines||[];renderDeadlineOptions(d.options);
-  if(action==='add'){document.getElementById('deadlineTitle').value='';document.getElementById('deadlineNotes').value='';}
+  if(action==='add'){
+   document.getElementById('deadlineTitle').value='';document.getElementById('deadlineNotes').value='';
+   document.getElementById('deadlineFormShell').hidden=true;
+   document.getElementById('toggleDeadlineForm').setAttribute('aria-expanded','false');
+   document.getElementById('toggleDeadlineForm').textContent='+ Add Deadline';
+  }
   msg.textContent='Saved in Tutoring Deadlines ✓';renderDeadlines();
  }catch(e){if(generation===deadlineGeneration)msg.textContent=e.message;}
  finally{deadlineBusy=false;document.getElementById('addDeadline').disabled=false;if(generation===deadlineGeneration)renderDeadlines();}
 }
 document.getElementById('addDeadline').addEventListener('click',()=>changeDeadline(null,'add'));
+document.getElementById('toggleDeadlineForm').addEventListener('click',()=>{
+ const el=document.getElementById('deadlineFormShell'),btn=document.getElementById('toggleDeadlineForm');
+ el.hidden=!el.hidden;
+ btn.setAttribute('aria-expanded',String(!el.hidden));
+ btn.textContent=el.hidden?'+ Add Deadline':'Close form';
+ if(!el.hidden)document.getElementById('deadlineTitle').focus();
+});
 
 async function loadZoomLink(lesson){
   const status=document.getElementById("zoomStatus");
@@ -756,6 +972,7 @@ function show(id){
   document.getElementById("subject").textContent=l.subject||"—";
   document.getElementById("when").textContent=fmt(l.start);
   document.getElementById("lessonStatus").value=l.status||"Scheduled";
+  document.getElementById("lessonStatus").dataset.state=String(l.status||'Scheduled').toLowerCase().replace(/\s+/g,'-');
   document.getElementById("status").textContent=`Selected lesson: ${l.status||"Scheduled"}`;
   loadZoomLink(l);
   loadStudentDeadlines(l);
@@ -788,9 +1005,11 @@ async function saveLessonStatus(){
     const d=await r.json();
     if(!r.ok||!d.success)throw new Error(d.error||"Could not update attendance");
     lesson.status=next;
+    select.dataset.state=next.toLowerCase().replace(/\s+/g,'-');
     document.getElementById("status").textContent="Attendance saved ✓";
   }catch(e){
     select.value=previous;
+    select.dataset.state=previous.toLowerCase().replace(/\s+/g,'-');
     document.getElementById("status").textContent="Could not save attendance: "+e.message;
   }finally{
     select.disabled=false;
