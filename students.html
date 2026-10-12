@@ -5,292 +5,269 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Students</title>
 <style>
-:root{--ink:#37352F;--muted:#8F8B84;--line:#DDDAD5;--soft:#F7F6F3;--green:#8BAF98;--greenSoft:#E8EFE9}
+:root{
+  --ink:#37352F;--muted:#8F8B84;--line:#DDDAD5;--soft:#F7F6F3;
+  --green:#6F786E;--green-soft:#EEF1EC;--danger:#A24C4C;
+}
 *{box-sizing:border-box}
-html,body{margin:0;background:#fff;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{padding:0}
-.toolbar{display:flex;flex-direction:column;gap:14px;margin-bottom:16px;padding-top:4px}
-.filters,.tools{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-.tools{width:100%;padding-right:4px}
-.search{flex:1}
-.new{margin-left:auto;min-width:142px}
-button,.search,input,select{font:inherit}
-.filter,.new,.modal button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 12px;color:var(--ink);cursor:pointer}
-.filter.active{background:var(--soft);font-weight:650}
-.search{border:1px solid var(--line);border-radius:9px;padding:9px 12px;min-width:230px;color:var(--ink)}
-.new,.save{background:#6F786E!important;color:#fff!important;border-color:#6F786E!important;font-weight:650}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.card{border:1px solid var(--line);border-radius:13px;padding:16px;background:#fff;min-width:0}
-.head{display:flex;gap:12px;align-items:center}
-.avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#F0ECE8;font-family:Georgia,serif;font-size:22px;color:#6F6A63;flex:0 0 auto}
-.name{font-family:Georgia,serif;font-size:20px;font-weight:600}
-.meta,.nexttext,.empty{font-size:12px;color:var(--muted);margin-top:4px}
-.status{display:inline-block;margin-top:8px;padding:4px 9px;border-radius:999px;background:var(--greenSoft);font-size:12px}
-.prow{display:flex;justify-content:space-between;margin-top:18px;font-size:12px}
-.track{height:8px;background:#EEEDEB;border-radius:99px;overflow:hidden;margin-top:7px}
-.fill{height:100%;background:var(--green)}
-.next{margin-top:17px}.label{font-size:12px;font-weight:650}
-.open{display:flex;justify-content:space-between;margin-top:14px;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--ink);text-decoration:none;font-size:13px;background:#FAF9F7}
-.cardActions{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:stretch}
-.deleteBtn{margin-top:14px;border:1px solid #E7C9C6;background:#FFF9F8;color:#A24C4C;border-radius:9px;padding:10px 12px;cursor:pointer;font-size:13px}
-.groupTitle{grid-column:1/-1;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 -3px}
-
-/* modal */
-.overlay{position:fixed;inset:0;background:rgba(55,53,47,.18);display:none;align-items:center;justify-content:center;padding:18px;z-index:20}
-.overlay.show{display:flex}
-.modal{width:min(520px,100%);background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 12px 40px rgba(55,53,47,.12)}
-.modalHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-.modalTitle{font-family:Georgia,serif;font-size:23px;font-weight:600}
-.close{border:0!important;background:transparent!important;font-size:22px;padding:3px 7px!important;color:var(--muted)!important}
-.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}
+html,body{margin:0;min-height:100%;width:100%;background:#fff;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px}
+body{padding:1px 0 14px;overflow-x:hidden}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.58;cursor:wait}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #6F786E;outline-offset:2px}
+.toolbar{display:flex;flex-direction:column;gap:12px;margin-bottom:15px;padding-top:4px}
+.filters{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.filter{min-height:42px;padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);white-space:nowrap;font-size:14px}
+.filter:hover,.filter.active{background:var(--soft)}
+.filter.active{font-weight:700}
+.tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.search{height:44px;min-width:190px;flex:1 1 260px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);padding:10px 13px;font-size:14px}
+.search::placeholder{color:#93908B}
+.new{height:44px;min-width:150px;padding:10px 17px;margin-left:auto;background:var(--green);color:#fff;border:1px solid var(--green);border-radius:9px;font-weight:650;font-size:15px;white-space:nowrap}
+.new:hover,.save:hover{background:#606A60}
+.selectors{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.selector{height:42px;min-width:180px;max-width:100%;flex:0 1 245px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:9px 12px;color:var(--ink);font-size:14px}
+.selector:disabled{opacity:.6}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 20px}
+.stat{border:1px solid var(--line);border-radius:12px;min-height:90px;padding:15px 17px;background:#fff;display:flex;flex-direction:column;justify-content:center;gap:7px}
+.statValue{font-size:26px;font-weight:700;line-height:1;color:#302E2A;font-variant-numeric:tabular-nums}
+.statLabel{font-size:12px;color:var(--muted)}
+.resultsLabel{font-size:12px;color:var(--muted);margin:0 0 11px;min-height:15px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.groupTitle{grid-column:1/-1;font-size:12px;font-weight:700;color:#77736D;text-transform:uppercase;letter-spacing:.075em;margin:10px 0 -1px}
+.card{position:relative;min-width:0;border:1px solid var(--line);border-radius:13px;padding:17px;background:#fff;transition:border-color .15s ease,box-shadow .15s ease,transform .15s ease}
+.card:hover,.card:focus-within{border-color:#BEBBB5;box-shadow:0 5px 16px rgba(55,53,47,.065);transform:translateY(-1px)}
+.cardLink{position:absolute;inset:0;border-radius:13px;z-index:1;cursor:pointer}
+.cardHead{display:flex;gap:11px;align-items:flex-start;padding-right:27px}
+.avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#F0ECE8;color:#6F6A63;font:600 21px Georgia,"Times New Roman",serif;flex:0 0 auto}
+.headText{min-width:0;flex:1}
+.name{font-size:19px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}
+.meta{font-size:12px;line-height:1.5;color:var(--muted);margin-top:5px;overflow-wrap:anywhere}
+.status{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:5px 10px;border-radius:999px;background:#F0EFED;color:#66615B;font-size:11px;font-weight:650}
+.status.active{background:var(--green-soft);color:#526351}
+.statusDot{height:5px;width:5px;border-radius:50%;background:currentColor;opacity:.7}
+.menuWrap{position:absolute;right:12px;top:12px;z-index:4}
+.more{width:34px;height:34px;border:1px solid transparent;background:#fff;color:#77736D;border-radius:9px;font-size:23px;line-height:1;display:grid;place-items:center;padding:0 0 8px}
+.more:hover,.more[aria-expanded="true"]{background:var(--soft);border-color:var(--line)}
+.menu{position:absolute;right:0;top:39px;width:178px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:5px;box-shadow:0 11px 28px rgba(55,53,47,.12);z-index:6}
+.menu[hidden]{display:none}
+.menu a,.menu button{display:block;width:100%;border:none;background:transparent;border-radius:7px;text-align:left;text-decoration:none;color:var(--ink);font-size:13px;padding:11px 10px;line-height:1.25}
+.menu a:hover,.menu button:hover{background:var(--soft)}
+.menu .deleteAction{color:var(--danger)}
+.progress{margin-top:19px}
+.progressRow{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:650;line-height:1.3}
+.progressRow .progressCount{font-variant-numeric:tabular-nums;color:#77716B}
+.track{height:8px;background:#EEEDEB;border-radius:99px;overflow:hidden;margin-top:9px}
+.fill{height:100%;background:#8BAF98;border-radius:inherit;transition:width .25s ease}
+.noPlan{margin-top:9px;font-size:12px;color:var(--muted);line-height:1.45}
+.nextPanel{border:1px solid #EEEAE5;background:#FAF9F7;border-radius:10px;margin-top:18px;padding:13px 14px;min-height:105px}
+.nextTitle{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;margin-bottom:9px}
+.nextTitle svg{width:15px;height:15px;stroke:#77716B}
+.nextDate{font-size:14px;font-weight:700;line-height:1.45}
+.nextSubject{font-size:12px;color:#77716B;margin-top:3px;line-height:1.4;overflow-wrap:anywhere}
+.nextNone{font-size:12px;color:var(--muted);margin-top:2px}
+.cardFooter{border-top:1px solid #EEECE8;margin-top:16px;padding-top:14px;display:flex;align-items:center;justify-content:space-between;font-weight:650;font-size:13px}
+.cardFooter span:last-child{font-size:18px;color:#726D66}
+.empty{padding:27px 18px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:13px;text-align:center;grid-column:1/-1}
+/* New student modal, kept connected to the existing create API. */
+.overlay,.confirmOverlay{position:fixed;inset:0;background:rgba(55,53,47,.24);display:none;align-items:center;justify-content:center;padding:18px;z-index:30}
+.overlay.show,.confirmOverlay.show{display:flex}
+.modal,.confirmBox{width:min(520px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 15px 40px rgba(55,53,47,.15)}
+.modalHead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:19px}
+.modalTitle,.confirmTitle{font-size:22px;font-weight:700;line-height:1.25}
+.close{background:transparent;border:0;border-radius:8px;color:#807A74;font-size:25px;padding:0 6px}
+.formGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.full{grid-column:1/-1}
 .field label{font-size:12px;font-weight:650}
-.field input,.field select{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink);outline:none}
-.field input:focus,.field select:focus{border-color:#A9A59E}
-.hint{font-size:11px;color:var(--muted)}
-.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:19px}
-.message{font-size:12px;margin-top:12px;min-height:16px}.error{color:#A24C4C}.success{color:#5F806A}
-button:disabled{opacity:.55;cursor:default}
-
-@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:620px){.toolbar{flex-direction:column}.grid{grid-template-columns:1fr}.search{min-width:0;flex:1}.formGrid{grid-template-columns:1fr}.field.full{grid-column:auto}}
-
-.confirmOverlay{position:fixed;inset:0;background:rgba(55,53,47,.22);display:none;align-items:center;justify-content:center;padding:18px;z-index:100}
-.confirmOverlay.show{display:flex}
-.confirmBox{width:min(390px,100%);background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 12px 40px rgba(55,53,47,.14)}
-.confirmTitle{font-family:Georgia,serif;font-size:21px;font-weight:600;margin-bottom:8px}
-.confirmText{font-size:13px;line-height:1.5;color:var(--muted)}
-.confirmActions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
-.confirmCancel,.confirmDelete{font:inherit;border-radius:9px;padding:9px 12px;cursor:pointer}
-.confirmCancel{border:1px solid var(--line);background:#fff;color:var(--ink)}
-.confirmDelete{border:1px solid #A24C4C;background:#A24C4C;color:#fff;font-weight:650}
-
+.field input,.field select{width:100%;height:43px;border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:#fff;color:var(--ink);font-size:14px}
+.hint{font-size:11px;color:var(--muted);line-height:1.45}
+.actions,.confirmActions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.actions button,.confirmActions button{min-height:43px;padding:10px 15px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:14px}
+.actions .save{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+.message{font-size:12px;margin-top:12px;min-height:15px;line-height:1.5}
+.error{color:var(--danger)}.success{color:#526351}
+.confirmBox{width:min(405px,100%)}
+.confirmText{font-size:13px;line-height:1.6;color:#75706A;margin-top:9px}
+.confirmActions .confirmDelete{border-color:var(--danger);background:var(--danger);color:#fff;font-weight:650}
+@media (max-width:1050px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){.new{margin-left:0}.selector{flex:1 1 180px}.summary{gap:9px}.stat{padding:13px;min-height:83px}.statValue{font-size:24px}.grid{gap:11px}.card{padding:15px}}
+@media (max-width:590px){.grid{grid-template-columns:1fr}.summary{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.stat{padding:11px 9px;min-height:82px}.statValue{font-size:22px}.statLabel{font-size:11px}.filters{gap:6px}.filter{padding:9px 10px;font-size:13px}.tools{align-items:stretch}.search{min-width:0;flex:1 1 100%}.new{flex:1 1 100%}.selectors{gap:7px}.selector{min-width:0;flex:1 1 135px}.formGrid{grid-template-columns:1fr}.field.full{grid-column:auto}.modal{padding:18px}}
+@media (prefers-reduced-motion:reduce){.card,.fill{transition:none}.card:hover,.card:focus-within{transform:none}}
 </style>
 </head>
 <body>
-
-<div class="toolbar">
-  <div class="filters">
-    <button class="filter active" data-f="all">All Students</button>
-    <button class="filter" data-f="Active">Active</button>
-    <button class="filter" data-f="Inactive">Inactive</button>
-    <button class="filter" data-f="subject">By Subject</button>
-    <button class="filter" data-f="grade">By Grade</button>
+<main>
+  <div class="toolbar">
+    <div class="filters" aria-label="Student view">
+      <button class="filter active" type="button" data-f="all" aria-pressed="true">All Students</button>
+      <button class="filter" type="button" data-f="Active" aria-pressed="false">Active</button>
+      <button class="filter" type="button" data-f="Inactive" aria-pressed="false">Inactive</button>
+      <button class="filter" type="button" data-f="subject" aria-pressed="false">By Subject</button>
+      <button class="filter" type="button" data-f="grade" aria-pressed="false">By Grade</button>
+    </div>
+    <div class="tools">
+      <input id="search" class="search" type="search" aria-label="Search students" placeholder="Search students, grade, or subject…">
+      <button class="new" id="newStudent" type="button">+ New Student</button>
+    </div>
+    <div class="selectors">
+      <select id="subjectFilter" class="selector" aria-label="Filter by specific subject"><option value="">All subjects</option></select>
+      <select id="gradeFilter" class="selector" aria-label="Filter by specific grade"><option value="">All grades</option></select>
+    </div>
   </div>
-  <div class="tools">
-    <input id="search" class="search" placeholder="Search students…">
-    <button class="new" id="newStudent">+ New Student</button>
-  </div>
-</div>
-
-<div id="grid" class="grid"><span class="empty">Loading students…</span></div>
+  <section class="summary" aria-label="Student overview statistics">
+    <div class="stat"><span class="statValue" id="totalStat">—</span><span class="statLabel">Total Students</span></div>
+    <div class="stat"><span class="statValue" id="activeStat">—</span><span class="statLabel">Active Students</span></div>
+    <div class="stat"><span class="statValue" id="weekStat">—</span><span class="statLabel">Lessons This Week</span></div>
+  </section>
+  <div id="resultsLabel" class="resultsLabel" aria-live="polite"></div>
+  <section id="grid" class="grid" aria-label="Student cards"><div class="empty">Loading students…</div></section>
+</main>
 
 <div class="overlay" id="overlay" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modalHead">
       <div class="modalTitle" id="modalTitle">Add New Student</div>
-      <button class="close" id="closeModal" aria-label="Close">×</button>
+      <button class="close" id="closeModal" type="button" aria-label="Close">×</button>
     </div>
-
     <form id="studentForm">
       <div class="formGrid">
-        <div class="field full">
-          <label for="studentName">Student Name</label>
-          <input id="studentName" required autocomplete="off" placeholder="e.g. Gabriella Darby">
-        </div>
-
-        <div class="field">
-          <label for="grade">Grade</label>
-          <input id="grade" autocomplete="off" placeholder="e.g. 12">
-        </div>
-
-        <div class="field">
-          <label for="status">Status</label>
-          <select id="status">
-            <option value="Active" selected>Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-        </div>
-
-        <div class="field full">
-          <label for="subjects">Subject</label>
-          <input id="subjects" autocomplete="off" placeholder="e.g. Biology">
-          <div class="hint">For more than one subject, separate them with commas.</div>
-        </div>
-
-        <div class="field full">
-          <label for="googleChat">Google Chat</label>
-          <input id="googleChat" type="url" autocomplete="off" placeholder="Optional URL">
-        </div>
+        <div class="field full"><label for="studentName">Student Name</label><input id="studentName" required autocomplete="off" maxlength="200" placeholder="e.g. Gabriella Darby"></div>
+        <div class="field"><label for="grade">Grade</label><input id="grade" autocomplete="off" placeholder="e.g. 12"></div>
+        <div class="field"><label for="status">Status</label><select id="status"><option value="Active" selected>Active</option><option value="Inactive">Inactive</option></select></div>
+        <div class="field full"><label for="subjects">Subject</label><input id="subjects" autocomplete="off" placeholder="e.g. Biology"><div class="hint">For multiple subjects, separate them with commas.</div></div>
+        <div class="field full"><label for="googleChat">Google Chat</label><input id="googleChat" type="url" autocomplete="off" placeholder="Optional URL"></div>
       </div>
-
-      <div id="formMessage" class="message"></div>
-      <div class="actions">
-        <button type="button" id="cancel">Cancel</button>
-        <button class="save" id="saveStudent" type="submit">Add Student</button>
-      </div>
+      <div id="formMessage" class="message" role="status"></div>
+      <div class="actions"><button type="button" id="cancel">Cancel</button><button class="save" id="saveStudent" type="submit">Add Student</button></div>
     </form>
   </div>
 </div>
 
-
 <div class="confirmOverlay" id="deleteConfirm" aria-hidden="true">
-  <div class="confirmBox">
-    <div class="confirmTitle">Confirm deletion</div>
+  <div class="confirmBox" role="alertdialog" aria-modal="true" aria-labelledby="deleteTitle" aria-describedby="deleteConfirmText">
+    <div class="confirmTitle" id="deleteTitle">Confirm deletion</div>
     <div class="confirmText" id="deleteConfirmText"></div>
-    <div class="confirmActions">
-      <button class="confirmCancel" id="deleteCancel" type="button">Cancel</button>
-      <button class="confirmDelete" id="deleteYes" type="button">Delete</button>
-    </div>
+    <div class="confirmActions"><button type="button" id="deleteCancel" class="confirmCancel">Cancel</button><button type="button" id="deleteYes" class="confirmDelete">Delete</button></div>
   </div>
 </div>
 
 <script>
 const API="https://notion-calendar-api.nourmohsen12223.workers.dev";
-let students=[],topics=[],lessons=[],filter="all";
-
+const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-async function get(p){const r=await fetch(API+p,{cache:"no-store"}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}
-async function post(p,body){const r=await fetch(API+p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}
-async function del(p,body){const r=await fetch(API+p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"delete",...body})}),d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw Error(d.error||"Request failed");return d}
-let pendingStudentDelete=null;
-const deleteConfirm=document.getElementById("deleteConfirm");
-const deleteConfirmText=document.getElementById("deleteConfirmText");
-document.getElementById("grid").addEventListener("click",e=>{
-  const b=e.target.closest("[data-delete-student]");
-  if(!b)return;
-  pendingStudentDelete={id:b.dataset.deleteStudent,name:b.dataset.studentName||"this student",button:b};
-  deleteConfirmText.textContent=`Delete ${pendingStudentDelete.name}? This will archive the student in Notion.`;
-  deleteConfirm.classList.add("show");
-  deleteConfirm.setAttribute("aria-hidden","false");
-});
-document.getElementById("deleteCancel").onclick=()=>{
-  pendingStudentDelete=null;deleteConfirm.classList.remove("show");deleteConfirm.setAttribute("aria-hidden","true");
-};
-document.getElementById("deleteYes").onclick=async()=>{
-  if(!pendingStudentDelete)return;
-  const item=pendingStudentDelete;
-  item.button.disabled=true;
-  document.getElementById("deleteYes").disabled=true;
-  try{
-    await del("/tutoring-students-create",{studentId:item.id});
-    pendingStudentDelete=null;
-    deleteConfirm.classList.remove("show");
-    deleteConfirm.setAttribute("aria-hidden","true");
-    await load();
-  }catch(err){
-    deleteConfirmText.textContent="Could not delete student: "+err.message;
-    item.button.disabled=false;
-  }finally{document.getElementById("deleteYes").disabled=false}
-};
-function progress(id){const x=topics.filter(t=>t.studentPageId===id);return x.length?Math.round(x.filter(t=>t.completed).length/x.length*100):0}
-function nextLesson(id){return lessons.filter(l=>l.studentPageId===id&&new Date(l.start)>new Date()).sort((a,b)=>new Date(a.start)-new Date(b.start))[0]}
-function fmt(x){return new Date(x).toLocaleString(undefined,{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}
+let students=[],topics=[],lessons=[],filter="all",pendingStudentDelete=null;
+const invalidStatuses=new Set(["cancelled","canceled","no show","no-show","noshow"]);
+function normalizedStatus(value){return String(value||"").trim().toLowerCase().replace(/\s+/g," ")}
+function isUsableLesson(l){const s=normalizedStatus(l.status);return !invalidStatuses.has(s)&&s!=="attended"&&s!=="completed"}
+function isCountableWeekLesson(l){return !invalidStatuses.has(normalizedStatus(l.status))}
+function safeStudentUrl(s){const fallback="https://www.notion.so/"+String(s.id||"").replace(/-/g,"");try{const u=new URL(s.notionUrl||fallback);return u.protocol==="https:"&&(u.hostname==="notion.so"||u.hostname==="www.notion.so"||u.hostname==="app.notion.com")?u.href:fallback}catch{return fallback}}
+async function get(p){const r=await fetch(API+p,{cache:"no-store"}),d=await r.json().catch(()=>({}));if(!r.ok||d.success===false)throw Error(d.error||"Request failed");return d}
+async function post(p,body){const r=await fetch(API+p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}),d=await r.json().catch(()=>({}));if(!r.ok||d.success===false)throw Error(d.error||"Request failed");return d}
+async function del(p,body){return post(p,{action:"delete",...body})}
 function gradeLabel(g){const v=String(g||"").trim();return v?/^grade\b/i.test(v)?v:"Grade "+v:""}
-
+function progressInfo(id){const entries=topics.filter(t=>t.studentPageId===id);const completed=entries.filter(t=>t.completed).length;return {total:entries.length,completed,pct:entries.length?Math.round(completed/entries.length*100):0}}
+function nextLesson(id){const now=Date.now();return lessons.filter(l=>l.studentPageId===id&&l.start&&isUsableLesson(l)&&Number.isFinite(Date.parse(l.start))&&Date.parse(l.start)>now).sort((a,b)=>Date.parse(a.start)-Date.parse(b.start))[0]}
+function fmtDate(x){return new Date(x).toLocaleString(undefined,{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}
+function weekCount(){const now=new Date(),monday=new Date(now);monday.setHours(0,0,0,0);monday.setDate(now.getDate()-(now.getDay()+6)%7);const end=new Date(monday);end.setDate(monday.getDate()+7);return lessons.filter(l=>{if(!l.start||!isCountableWeekLesson(l))return false;const t=Date.parse(l.start);return Number.isFinite(t)&&t>=monday.getTime()&&t<end.getTime()}).length}
 function card(s){
-  const pct=progress(s.id),n=nextLesson(s.id);
-  const url=s.notionUrl||("https://www.notion.so/"+String(s.id||"").replace(/-/g,""));
-  return `<div class="card">
-    <div class="head">
-      <div class="avatar">${esc((s.name||"?").trim().charAt(0).toUpperCase())}</div>
-      <div>
-        <div class="name">${esc(s.name||"Student")}</div>
-        <div class="meta">${esc(gradeLabel(s.grade))}${s.grade&&(s.subjects||[]).length?" · ":""}${esc((s.subjects||[]).join(", "))}</div>
-        <span class="status">${esc(s.status||"—")}</span>
+  const p=progressInfo(s.id),n=nextLesson(s.id),url=safeStudentUrl(s),name=String(s.name||"Student");
+  const status=String(s.status||"—"),active=status.toLowerCase()==="active";
+  return `<article class="card">
+    <a class="cardLink" href="${esc(url)}" target="_top" aria-label="Open ${esc(name)} in Notion"></a>
+    <div class="menuWrap">
+      <button type="button" class="more" data-menu="${esc(s.id)}" aria-haspopup="true" aria-expanded="false" aria-label="Actions for ${esc(name)}">⋯</button>
+      <div class="menu" data-menu-panel="${esc(s.id)}" hidden>
+        <a href="${esc(url)}" target="_top">Open Student ↗</a>
+        <button type="button" class="deleteAction" data-delete-student="${esc(s.id)}" data-student-name="${esc(name)}">Delete Student</button>
       </div>
     </div>
-    <div class="prow"><span>Study Plan Progress</span><span>${pct}%</span></div>
-    <div class="track"><div class="fill" style="width:${pct}%"></div></div>
-    <div class="next"><div class="label">Next Lesson</div><div class="nexttext">${n?esc(fmt(n.start))+" · "+esc(n.subject||n.title||"Lesson"):"Not scheduled"}</div></div>
-    <div class="cardActions">
-      <a class="open" href="${esc(url)}" target="_top"><span>View Student</span><span>→</span></a>
-      <button class="deleteBtn" type="button" data-delete-student="${esc(s.id)}" data-student-name="${esc(s.name||"Student")}">Delete</button>
+    <div class="cardHead">
+      <div class="avatar" aria-hidden="true">${esc(name.trim().charAt(0).toUpperCase()||"?")}</div>
+      <div class="headText"><div class="name">${esc(name)}</div>
+        <div class="meta">${esc([gradeLabel(s.grade),...(s.subjects||[])].filter(Boolean).join(" · "))||"No grade or subject assigned"}</div>
+        <span class="status${active?" active":""}"><span class="statusDot"></span>${esc(status)}</span>
+      </div>
     </div>
-  </div>`;
+    <div class="progress"><div class="progressRow"><span>Study Plan Progress</span><span class="progressCount">${p.total?p.pct+"%":"—"}</span></div>
+      ${p.total?`<div class="track" role="progressbar" aria-label="Study plan progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${p.pct}"><div class="fill" style="width:${p.pct}%"></div></div>`:`<div class="noPlan">No study plan yet</div>`}
+    </div>
+    <div class="nextPanel"><div class="nextTitle">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>
+      Next Lesson</div>
+      ${n?`<div class="nextDate">${esc(fmtDate(n.start))}</div><div class="nextSubject">${esc(n.subject||n.title||"Lesson")}</div>`:`<div class="nextNone">No upcoming lesson scheduled</div>`}
+    </div>
+    <div class="cardFooter" aria-hidden="true"><span>View Student</span><span>↗</span></div>
+  </article>`;
 }
-
+function uniqueOptions(items){return [...new Set(items.map(x=>String(x||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"}))}
+function fillFilters(){
+  const sub=$('subjectFilter'),gr=$('gradeFilter'),oldSubject=sub.value,oldGrade=gr.value;
+  const subjects=uniqueOptions(students.flatMap(s=>s.subjects||[]));const grades=uniqueOptions(students.map(s=>gradeLabel(s.grade)));
+  sub.innerHTML='<option value="">All subjects</option>'+subjects.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  gr.innerHTML='<option value="">All grades</option>'+grades.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  if(subjects.includes(oldSubject))sub.value=oldSubject;if(grades.includes(oldGrade))gr.value=oldGrade;
+}
 function filtered(){
-  const q=search.value.toLowerCase().trim();
+  const q=$('search').value.toLowerCase().trim(),sub=$('subjectFilter').value,grade=$('gradeFilter').value;
   return students.filter(s=>{
-    const statusOK=!["Active","Inactive"].includes(filter)||(s.status||"").toLowerCase()===filter.toLowerCase();
-    const text=[s.name,s.grade,...(s.subjects||[])].join(" ").toLowerCase();
-    return statusOK&&(!q||text.includes(q));
+    const statusOK=!['Active','Inactive'].includes(filter)||normalizedStatus(s.status)===filter.toLowerCase();
+    const subjectOK=!sub||(s.subjects||[]).includes(sub),gradeOK=!grade||gradeLabel(s.grade)===grade;
+    const searchText=[s.name,s.grade,gradeLabel(s.grade),...(s.subjects||[])].join(' ').toLowerCase();
+    return statusOK&&subjectOK&&gradeOK&&(!q||searchText.includes(q));
   });
 }
-
-function grouped(list,keyFn){
-  const groups={};
-  list.forEach(s=>{
-    const keys=keyFn(s);
-    (keys.length?keys:["Unspecified"]).forEach(k=>(groups[k]??=[]).push(s));
-  });
-  return Object.keys(groups).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(k=>
-    `<div class="groupTitle">${esc(k)}</div>${groups[k].map(card).join("")}`
-  ).join("");
-}
-
+function grouped(list,keyFn){const groups=new Map();for(const s of list){const keys=keyFn(s);for(const key of keys.length?keys:['Unspecified']){if(!groups.has(key))groups.set(key,[]);groups.get(key).push(s)}}return [...groups.keys()].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(key=>`<h2 class="groupTitle">${esc(key)}</h2>`+groups.get(key).map(card).join('')).join('')}
 function render(){
-  const list=filtered();
-  if(!list.length){grid.innerHTML='<span class="empty">No students found.</span>';return}
-  if(filter==="subject") grid.innerHTML=grouped(list,s=>s.subjects||[]);
-  else if(filter==="grade") grid.innerHTML=grouped(list,s=>[gradeLabel(s.grade)||"Unspecified"]);
-  else grid.innerHTML=list.map(card).join("");
+  const list=filtered();$('resultsLabel').textContent=`Showing ${list.length} of ${students.length} students`;
+  $('totalStat').textContent=students.length;$('activeStat').textContent=students.filter(s=>normalizedStatus(s.status)==='active').length;$('weekStat').textContent=weekCount();
+  if(!list.length){$('grid').innerHTML='<div class="empty">No students match your filters.</div>';return}
+  if(filter==='subject')$('grid').innerHTML=grouped(list,s=>s.subjects||[]);
+  else if(filter==='grade')$('grid').innerHTML=grouped(list,s=>[gradeLabel(s.grade)||'Unspecified']);
+  else $('grid').innerHTML=list.map(card).join('');
 }
-
 async function load(){
   try{
-    const [s,l]=await Promise.all([get("/study-plan-embed-students"),get("/tutoring-lessons")]);
+    const [s,l]=await Promise.all([get('/study-plan-embed-students'),get('/tutoring-lessons')]);
     students=s.students||[];lessons=l.lessons||[];
-    const rs=await Promise.all(students.map(x=>get("/study-plan-embed?studentPageId="+encodeURIComponent(x.id)).catch(()=>({topics:[]}))));
+    const rs=await Promise.all(students.map(x=>get('/study-plan-embed?studentPageId='+encodeURIComponent(x.id)).catch(()=>({topics:[]}))));
     topics=rs.flatMap((r,i)=>(r.topics||[]).map(t=>({...t,studentPageId:students[i].id})));
-    render();
-  }catch(e){grid.innerHTML=`<span class="empty">${esc(e.message)}</span>`}
+    fillFilters();render();
+  }catch(e){$('grid').innerHTML=`<div class="empty">Could not load students: ${esc(e.message)}</div>`;$('resultsLabel').textContent='';}
 }
-
-document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{
-  document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");filter=b.dataset.f;render();
-});
-search.oninput=render;
-
-const overlay=document.getElementById("overlay");
-function openModal(){studentForm.reset();status.value="Active";formMessage.textContent="";formMessage.className="message";overlay.classList.add("show");overlay.setAttribute("aria-hidden","false");setTimeout(()=>studentName.focus(),50)}
-function closeModal(){overlay.classList.remove("show");overlay.setAttribute("aria-hidden","true")}
-newStudent.onclick=openModal;closeModal.onclick=closeModal;cancel.onclick=closeModal;
-overlay.addEventListener("click",e=>{if(e.target===overlay)closeModal()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
-
-studentForm.addEventListener("submit",async e=>{
-  e.preventDefault();
-  const name=studentName.value.trim();
-  const gradeValue=grade.value.trim().replace(/^grade\s*/i,"");
-  const subjectValues=subjects.value.split(",").map(x=>x.trim()).filter(Boolean);
-  const googleChatValue=googleChat.value.trim();
-  if(!name)return;
-
-  saveStudent.disabled=true;saveStudent.textContent="Saving…";
-  formMessage.textContent="";formMessage.className="message";
-  try{
-    await post("/tutoring-students-create",{
-      name,
-      grade:gradeValue,
-      subjects:subjectValues,
-      status:status.value,
-      googleChat:googleChatValue
-    });
-    formMessage.textContent="Student added successfully.";
-    formMessage.className="message success";
-    await load();
-    setTimeout(closeModal,550);
-  }catch(err){
-    formMessage.textContent=err.message;
-    formMessage.className="message error";
-  }finally{
-    saveStudent.disabled=false;saveStudent.textContent="Add Student";
+function closeMenus(){document.querySelectorAll('.menu:not([hidden])').forEach(m=>m.hidden=true);document.querySelectorAll('[data-menu][aria-expanded="true"]').forEach(b=>b.setAttribute('aria-expanded','false'))}
+$('grid').addEventListener('click',e=>{
+  const delButton=e.target.closest('[data-delete-student]');
+  if(delButton){e.preventDefault();e.stopPropagation();closeMenus();pendingStudentDelete={id:delButton.dataset.deleteStudent,name:delButton.dataset.studentName||'this student'};
+    $('deleteConfirmText').textContent=`Delete ${pendingStudentDelete.name}? This will archive the student in Notion.`;
+    $('deleteConfirm').classList.add('show');$('deleteConfirm').setAttribute('aria-hidden','false');$('deleteCancel').focus();return;
   }
+  const menuButton=e.target.closest('[data-menu]');
+  if(menuButton){e.preventDefault();e.stopPropagation();const wasOpen=menuButton.getAttribute('aria-expanded')==='true';closeMenus();if(!wasOpen){const menu=$('grid').querySelectorAll('[data-menu-panel]');const panel=[...menu].find(x=>x.dataset.menuPanel===menuButton.dataset.menu);if(panel){panel.hidden=false;menuButton.setAttribute('aria-expanded','true')}}return}
 });
-
+document.addEventListener('click',e=>{if(!e.target.closest('.menuWrap'))closeMenus()});
+$('deleteCancel').onclick=()=>{pendingStudentDelete=null;$('deleteConfirm').classList.remove('show');$('deleteConfirm').setAttribute('aria-hidden','true')};
+$('deleteYes').onclick=async()=>{if(!pendingStudentDelete)return;const item=pendingStudentDelete;$('deleteYes').disabled=true;
+  try{await del('/tutoring-students-create',{studentId:item.id});pendingStudentDelete=null;$('deleteConfirm').classList.remove('show');$('deleteConfirm').setAttribute('aria-hidden','true');await load()}
+  catch(err){$('deleteConfirmText').textContent='Could not delete student: '+err.message}
+  finally{$('deleteYes').disabled=false}
+};
+$('deleteConfirm').addEventListener('click',e=>{if(e.target===$('deleteConfirm'))$('deleteCancel').click()});
+document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.filter').forEach(x=>{x.classList.remove('active');x.setAttribute('aria-pressed','false')});b.classList.add('active');b.setAttribute('aria-pressed','true');filter=b.dataset.f;closeMenus();render()});
+$('search').addEventListener('input',render);$('subjectFilter').addEventListener('change',render);$('gradeFilter').addEventListener('change',render);
+function openModal(){$('studentForm').reset();$('status').value='Active';$('formMessage').textContent='';$('formMessage').className='message';$('overlay').classList.add('show');$('overlay').setAttribute('aria-hidden','false');$('studentName').focus()}
+function hideModal(){$('overlay').classList.remove('show');$('overlay').setAttribute('aria-hidden','true')}
+$('newStudent').onclick=openModal;$('closeModal').onclick=hideModal;$('cancel').onclick=hideModal;
+$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))hideModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('deleteCancel').click();hideModal();closeMenus()}});
+$('studentForm').addEventListener('submit',async e=>{
+  e.preventDefault();const name=$('studentName').value.trim(),gradeValue=$('grade').value.trim().replace(/^grade\s*/i,''),subjectValues=$('subjects').value.split(',').map(x=>x.trim()).filter(Boolean),googleChatValue=$('googleChat').value.trim();if(!name)return;
+  $('saveStudent').disabled=true;$('saveStudent').textContent='Saving…';$('formMessage').textContent='';$('formMessage').className='message';
+  try{await post('/tutoring-students-create',{name,grade:gradeValue,subjects:subjectValues,status:$('status').value,googleChat:googleChatValue});$('formMessage').textContent='Student added successfully.';$('formMessage').className='message success';$('search').value='';$('subjectFilter').value='';$('gradeFilter').value='';filter='all';document.querySelectorAll('.filter').forEach(b=>{const active=b.dataset.f==='all';b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});await load();setTimeout(hideModal,550)}
+  catch(err){$('formMessage').textContent=err.message;$('formMessage').className='message error'}
+  finally{$('saveStudent').disabled=false;$('saveStudent').textContent='Add Student'}
+});
 load();
 </script>
 </body>
