@@ -191,7 +191,6 @@ select{
  .zoom-actions[hidden]{display:none}
  .zoom-join{display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;min-height:36px;border-radius:9px;background:#E5EFE9;color:#2C5F42;text-decoration:none;font-size:13px;font-weight:700}
  .zoom-join:hover{background:#D8E9DE}
- .zoom-address{color:var(--ink);font-size:12px;overflow-wrap:anywhere;word-break:break-word;text-decoration:underline;text-decoration-color:#C7C3BD;text-underline-offset:2px}
  .file-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
 .upload-btn{
   display:inline-flex;align-items:center;justify-content:center;
@@ -247,7 +246,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .zoom-actions{margin:0;flex:1;justify-content:flex-end}
 .zoom-join{min-height:43px;padding:10px 15px;background:var(--action);color:#fff;font-size:14px}
 .zoom-join:hover{background:#586257}
-.zoom-address{font-size:12px;max-width:330px}
 .status{margin-top:9px;min-height:17px;font-size:12px}
 .section-title{font-size:19px;padding:14px 17px;margin-bottom:13px}
 .session-titlebar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:16px 0 12px}
@@ -390,7 +388,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <div id="zoomStatus" class="zoom-status">Loading meeting link…</div>
       <div id="zoomActions" class="zoom-actions" hidden>
         <a id="zoomJoin" class="zoom-join" href="#" target="_blank" rel="noopener noreferrer">Join Zoom meeting ↗</a>
-        <a id="zoomLink" class="zoom-address" href="#" target="_blank" rel="noopener noreferrer"></a>
       </div>
     </div>
     <div id="status" class="status"></div>
@@ -935,11 +932,9 @@ document.getElementById('toggleDeadlineForm').addEventListener('click',()=>{
 async function loadZoomLink(lesson){
   const status=document.getElementById("zoomStatus");
   const actions=document.getElementById("zoomActions");
-  const address=document.getElementById("zoomLink");
   const join=document.getElementById("zoomJoin");
   const lessonId=lesson?.id;
   actions.hidden=true;
-  address.removeAttribute("href");
   join.removeAttribute("href");
   status.textContent="Loading Zoom link…";
   if(!lessonId){status.textContent="No lesson selected.";return;}
@@ -951,8 +946,6 @@ async function loadZoomLink(lesson){
     if(!d.zoomLink){status.textContent="No Zoom link saved in this lesson's Notion record.";return;}
     const parsed=new URL(d.zoomLink);
     if(parsed.protocol!=="https:")throw new Error("The saved Zoom link must begin with https://");
-    address.href=parsed.href;
-    address.textContent=parsed.href;
     join.href=parsed.href;
     status.textContent="";
     actions.hidden=false;
