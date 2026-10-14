@@ -23,7 +23,7 @@
 
   --today: #D8D2CA;
 
-  --time-width: 54px;
+  --time-width: 82px;
 
   /* Warm-neutral colors throughout, including each student’s calendar events. */
 }
@@ -987,7 +987,7 @@ body {
 .student-legend { -webkit-overflow-scrolling: touch; }
 
 @media (max-width: 1120px) {
-  :root { --time-width: 52px; }
+  :root { --time-width: 78px; }
   .dashboard {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -1018,7 +1018,7 @@ body {
 /* Even if Notion allocates a narrower column, avoid shrinking
    the calendar through a two-column dashboard layout. */
 @media (max-width: 660px) {
-  :root { --time-width: 47px; }
+  :root { --time-width: 75px; }
   .calendar-panel { padding: 10px; }
   .sidebar { grid-template-columns: minmax(0, 1fr); }
   .sidebar-panel { min-height: 130px; padding: 14px; }
@@ -1089,6 +1089,29 @@ body {
   .deadline-task-title { font-size: 11.5px; }
 }
 
+
+/* ================= EVENING TIME AXIS (TRIAL) =================
+   Every column runs from 5 PM to 5 AM the following morning.
+   The day at the top is the day on which that evening begins. */
+.time-label { right: 7px; font-size: 11px; font-weight: 550; color: #645F59; }
+.time-label.midnight { right: 5px; color: #37352F; font-weight: 750; z-index: 2; }
+.time-label.midnight::after {
+  content: "NEXT DAY"; display: block; margin-top: 4px;
+  font-size: 8px; font-weight: 700; letter-spacing: .3px;
+  color: #89817A;
+}
+.hour-line.midnight-line { height: 2px; background: #A9A198; z-index: 1; }
+.day-column .overnight-shade {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  top: 58.333333%; background: rgba(226, 220, 212, .14);
+  pointer-events: none;
+}
+.calendar-time-note { margin: 0 0 9px; color: #77716B; font-size: 11.5px; line-height: 1.35; }
+@media (max-width: 660px) {
+  .time-label { font-size: 10px; right: 5px; }
+  .time-label.midnight::after { font-size: 7px; }
+  .calendar-time-note { font-size: 11px; }
+}
 </style>
 </head>
 
@@ -1158,6 +1181,7 @@ body {
       <span class="status-legend-item"><span class="status-mark" style="background:#AAA"></span>Scheduled</span>
     </div>
 
+    <p class="calendar-time-note">Each column is one tutoring evening: 5:00 PM–5:00 AM the following morning.</p>
     <p class="calendar-swipe-hint">Swipe sideways to see all seven days →</p>
     <div class="calendar-shell">
 
@@ -1313,9 +1337,7 @@ const HOUR_HEIGHT = (window.innerWidth >= 621 && window.innerWidth <= 1180) ? 42
 ========================================== */
 
 let currentWeekStart =
-  getMonday(
-    new Date()
-  );
+  getMonday(getVisualPosition(new Date()).visualDate);
 
 
 let tutoringLessons = [];
@@ -1602,30 +1624,11 @@ function formatTime(date) {
 
 
 function formatGridHour(gridHour) {
-
-  const actualHour =
-    gridHour % 24;
-
-
-  const date =
-    new Date();
-
-
-  date.setHours(
-    actualHour,
-    0,
-    0,
-    0
-  );
-
-
-  return date
-    .toLocaleTimeString(
-      "en-US",
-      {
-        hour: "numeric"
-      }
-    );
+  // Grid 17…29 corresponds to 5 PM…5 AM the NEXT calendar day.
+  const hour24 = gridHour % 24;
+  const hour12 = hour24 % 12 || 12;
+  const period = hour24 >= 12 ? "PM" : "AM";
+  return `${hour12}:00 ${period}`;
 }
 
 
@@ -1756,27 +1759,16 @@ function parseLesson(item) {
 */
 
 function getVisualPosition(date) {
-
-  const visualDate =
-    new Date(date);
-
-  let hour =
-    date.getHours() +
-    date.getMinutes() / 60;
-
-  /*
-    Keep 12 AM–4:59 AM inside the existing
-    5 PM–5 AM vertical time scale, but do NOT
-    move the lesson to the previous date.
-  */
+  // A 1:00 AM Tuesday lesson is part of Monday evening's 5 PM–5 AM column.
+  // Only the display position changes; original lesson timestamps are untouched.
+  const visualDate = new Date(date);
+  let hour = date.getHours() + date.getMinutes() / 60 + date.getSeconds() / 3600;
   if (hour < 5) {
+    visualDate.setDate(visualDate.getDate() - 1);
     hour += 24;
   }
-
-  return {
-    visualDate,
-    hour
-  };
+  visualDate.setHours(0, 0, 0, 0);
+  return { visualDate, hour };
 }
 
 
@@ -2035,6 +2027,8 @@ function renderGrid() {
         hour
       );
 
+    if (hour === 24) label.classList.add("midnight");
+
 
     timeColumn.appendChild(
       label
@@ -2100,6 +2094,10 @@ function renderGrid() {
     }
 
 
+    const overnightShade = document.createElement("div");
+    overnightShade.className = "overnight-shade";
+    column.appendChild(overnightShade);
+
     for (
       let hour = START_HOUR;
       hour <= END_HOUR;
@@ -2123,6 +2121,8 @@ function renderGrid() {
         ) +
         "px";
 
+
+      if (hour === 24) line.classList.add("midnight-line");
 
       column.appendChild(
         line
@@ -2199,10 +2199,11 @@ function updateCurrentTimeIndicator() {
   let hour = now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600;
   if (hour < 5) hour += 24;
   if (hour < START_HOUR || hour >= END_HOUR) return;
-  // Match by calendar day, including weeks spanning daylight-saving changes.
+  // After midnight, NOW belongs under the previous evening too.
+  const visualNow = getVisualPosition(now).visualDate;
   let columnIndex = -1;
   for (let i=0; i<7; i++) {
-    if (sameDay(addDays(currentWeekStart,i), now)) { columnIndex=i; break; }
+    if (sameDay(addDays(currentWeekStart,i), visualNow)) { columnIndex=i; break; }
   }
   if (columnIndex < 0) return;
   const column = document.querySelectorAll(".day-column")[columnIndex];
@@ -2894,9 +2895,7 @@ document
     () => {
 
       currentWeekStart =
-        getMonday(
-          new Date()
-        );
+        getMonday(getVisualPosition(new Date()).visualDate);
 
 
       renderCalendar();
