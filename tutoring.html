@@ -1112,6 +1112,11 @@ body {
   .time-label.midnight::after { font-size: 7px; }
   .calendar-time-note { font-size: 11px; }
 }
+
+/* Manual sync feedback appears only after the Sync button is used. */
+.sync-feedback{margin:0 0 9px;color:#6F6A63;font-size:12px;line-height:1.4}
+.sync-feedback.error{color:#9A4E49}
+.sync-feedback[hidden]{display:none}
 </style>
 </head>
 
@@ -1173,6 +1178,7 @@ body {
 
     </div>
 
+    <div id="syncFeedback" class="sync-feedback" role="status" aria-live="polite" hidden></div>
     <div id="studentLegend" class="student-legend" role="group" aria-label="Filter calendar by student"></div>
     <div class="status-legend" aria-label="Lesson status colors">
       <span class="status-legend-item"><span class="status-mark" style="background:#459B64"></span>Attended</span>
@@ -2903,20 +2909,53 @@ document
   );
 
 
-/* MANUAL SOLOMON SYNC */
+/* MANUAL SOLOMON SYNC — process safe Worker batches until current. */
 document.getElementById("syncCalendarButton").addEventListener("click", async () => {
   const button = document.getElementById("syncCalendarButton");
+  const feedback = document.getElementById("syncFeedback");
+  const message = (text, isError = false) => {
+    feedback.textContent = text;
+    feedback.hidden = !text;
+    feedback.classList.toggle("error", isError);
+  };
   if (button.disabled) return;
-  button.disabled = true; button.textContent = "Syncing…";
+  button.disabled = true;
+  button.textContent = "Syncing…";
+  message("Checking Solomon Calendar for new or changed lessons…");
   try {
-    const response = await fetch(SYNC_CALENDAR_URL, {cache:"no-store"});
-    if (!response.ok) throw new Error("Calendar sync failed.");
-    button.textContent = "✓ Synced";
+    let rounds = 0;
+    let result;
+    let created = 0, updated = 0, cancelled = 0;
+    do {
+      const response = await fetch(SYNC_CALENDAR_URL, {cache:"no-store"});
+      result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success)
+        throw new Error(result.error || "Solomon sync failed.");
+      if (result.errors?.length) {
+        console.warn("Solomon sync event errors:", result.errors);
+        throw new Error(result.errors.map(e => e.error).slice(0,2).join("; "));
+      }
+      rounds++;
+      created += result.created || 0;
+      updated += result.updated || 0;
+      cancelled += result.cancelled || 0;
+      if (result.hasMore) {
+        button.textContent = `Syncing… ${rounds}`;
+        message(`${created} new, ${updated} updated. Checking remaining records (batch ${rounds})…`);
+      }
+      // Avoid an endlessly running request loop in the Notion iPad embed.
+      if (rounds >= 30 && result.hasMore)
+        throw new Error("This import is still processing. Press Sync again to continue it.");
+    } while (result.hasMore);
     await loadData();
-    setTimeout(() => { button.textContent = "↻ Sync"; button.disabled = false; }, 1600);
-  } catch (error) {
-    console.error(error); button.textContent = "Try again";
+    button.textContent = "✓ Synced";
+    message(`Complete: ${created} new, ${updated} updated, ${cancelled} cancelled.`, false);
     setTimeout(() => { button.textContent = "↻ Sync"; button.disabled = false; }, 1800);
+  } catch (error) {
+    console.error("Solomon calendar sync error:", error);
+    message("Sync failed: " + (error.message || "Unknown error"), true);
+    button.textContent = "Try again";
+    setTimeout(() => { button.textContent = "↻ Sync"; button.disabled = false; }, 2000);
   }
 });
 
